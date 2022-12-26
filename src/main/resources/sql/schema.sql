@@ -4,8 +4,8 @@ CREATE TABLE library (
     street_name   TEXT  NOT NULL,
     street_number TEXT  NOT NULL,
     postcode      TEXT  NOT NULL,
-    city          TEXT  NOT NULL,
-    location     POINT  NOT NULL,
+    city          TEXT  NOT NULL
+    -- location     POINT  NOT NULL
 );
 
 CREATE TABLE "user" (
@@ -14,7 +14,7 @@ CREATE TABLE "user" (
     lastName  TEXT  NOT NULL,
     email     TEXT  NOT NULL,
     username  TEXT  NOT NULL,
-    password  TEXT  NOT NULL,
+    password  TEXT  NOT NULL
 );
 
 CREATE TABLE author (
@@ -25,19 +25,19 @@ CREATE TABLE author (
 
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
-CREATE TABLE resource
+CREATE TABLE resource (
     id                UUID  NOT NULL PRIMARY KEY,
     title             TEXT  NOT NULL,
     author            UUID  NOT NULL REFERENCES author,
     release_date      DATE  NOT NULL,
     description       TEXT  NOT NULL,
     series            TEXT,
-    status RESOURCE_STATUS  NOT NULL,
+    status RESOURCE_STATUS  NOT NULL
 );
 
 CREATE TABLE book (
     resource_id UUID  NOT NULL PRIMARY KEY REFERENCES resource,
-    isbn        TEXT  NOT NULL,
+    isbn        TEXT  NOT NULL
 );
 
 CREATE TYPE unit AS ENUM ('PDF', 'MOBI', 'EPUB');
@@ -47,7 +47,7 @@ CREATE TABLE e-book (
     format      TEXT  NOT NULL,
     content    BYTEA  NOT NULL,
     size     NUMERIC  NOT NULL,
-    size_unit   UNIT  NOT NULL,
+    size_unit   UNIT  NOT NULL
 );
 
 CREATE TABLE resource_categories (
@@ -99,6 +99,8 @@ CREATE TABLE librarian (
     library_id UUID  NOT NULL REFERENCES library,
     PRIMARY KEY (id, library_id)
 );
+
+CREATE SEQUENCE card_seq START 1000000000;
 
 CREATE TABLE library_card (
     -- DEFAULT START FROM ...
