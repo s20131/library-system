@@ -10,7 +10,12 @@ data class Library (
 )
 
 @JvmInline
-value class LibraryId(val raw: UUID)
+value class LibraryId(val raw: UUID) {
+
+    companion object {
+        fun create() = LibraryId(UUID.randomUUID())
+    }
+}
 
 @JvmInline
 value class LibraryName(val raw: String)
