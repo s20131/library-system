@@ -18,22 +18,22 @@ import pja.s20131.librarysystem.domain.library.StreetNumber
 class LibraryRepository : LibraryRepository {
 
     override fun getAll(): List<Library> =
-        Libraries.selectAll().map { it.toLibrary() }
+        LibraryTable.selectAll().map { it.toLibrary() }
 }
 
 private fun ResultRow.toLibrary() =
     Library(
-        LibraryId(this[Libraries.id].value),
-        LibraryName(this[Libraries.name]),
+        LibraryId(this[LibraryTable.id].value),
+        LibraryName(this[LibraryTable.name]),
         Address(
-            StreetName(this[Libraries.streetName]),
-            StreetNumber(this[Libraries.streetNumber]),
-            Postcode(this[Libraries.postcode]),
-            City(this[Libraries.city])
+            StreetName(this[LibraryTable.streetName]),
+            StreetNumber(this[LibraryTable.streetNumber]),
+            Postcode(this[LibraryTable.postcode]),
+            City(this[LibraryTable.city])
         )
     )
 
-object Libraries : UUIDTable() {
+object LibraryTable : UUIDTable("library") {
     val name = text("name")
     val streetName = text("street_name")
     val streetNumber = text("street_number")

@@ -13,7 +13,7 @@ data class Library (
 value class LibraryId(val raw: UUID) {
 
     companion object {
-        fun create() = LibraryId(UUID.randomUUID())
+        fun generate() = LibraryId(UUID.randomUUID())
     }
 }
 

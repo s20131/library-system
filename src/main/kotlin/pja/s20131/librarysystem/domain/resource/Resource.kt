@@ -16,7 +16,7 @@ data class Resource(
 value class ResourceId(val raw: UUID) {
 
     companion object {
-        fun create() = ResourceId(UUID.randomUUID())
+        fun generate() = ResourceId(UUID.randomUUID())
     }
 }
 
