@@ -22,7 +22,7 @@ class BookEndpoints {
     @GetMapping
     fun getAllBooks() = listOf(
         Book(
-            Resource(ResourceId.create(), Title("Wieża Jaskółki"), ReleaseDate(LocalDate.of(1997, 10, 10)), description = null, Series("Wiedźmin"), ResourceStatus.AVAILABLE),
+            Resource(ResourceId.generate(), Title("Wieża Jaskółki"), ReleaseDate(LocalDate.of(1997, 10, 10)), description = null, Series("Wiedźmin"), ResourceStatus.AVAILABLE),
             ISBN(UUID.randomUUID().toString())
         )
     ).map { it.toGetBookResponse() }
