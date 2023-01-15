@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.adapter.library
+package pja.s20131.librarysystem.adapter.database
 
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -15,7 +15,7 @@ import pja.s20131.librarysystem.domain.library.StreetName
 import pja.s20131.librarysystem.domain.library.StreetNumber
 
 @Repository
-class LibraryRepository : LibraryRepository {
+class SqlLibraryRepository : LibraryRepository {
 
     override fun getAll(): List<Library> =
         LibraryTable.selectAll().map { it.toLibrary() }

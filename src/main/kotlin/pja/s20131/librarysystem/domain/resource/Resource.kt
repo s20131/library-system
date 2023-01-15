@@ -3,15 +3,6 @@ package pja.s20131.librarysystem.domain.resource
 import java.time.LocalDate
 import java.util.UUID
 
-data class Resource(
-    val resourceId: ResourceId,
-    val title: Title,
-    val releaseDate: ReleaseDate,
-    val description: Description?,
-    val series: Series?,
-    val resourceStatus: ResourceStatus
-)
-
 @JvmInline
 value class ResourceId(val raw: UUID) {
 
