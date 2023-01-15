@@ -14,20 +14,20 @@ CREATE TABLE library (
 );
 
 CREATE TABLE "user" (
-    id        UUID  NOT NULL,
-    firstName TEXT  NOT NULL,
-    lastName  TEXT  NOT NULL,
-    email     TEXT  NOT NULL,
-    username  TEXT  NOT NULL,
-    password  TEXT  NOT NULL,
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
+    email      TEXT  NOT NULL,
+    username   TEXT  NOT NULL,
+    password   TEXT  NOT NULL,
 
     PRIMARY KEY (id)
 );
 
 CREATE TABLE author (
-    id        UUID  NOT NULL,
-    firstName TEXT  NOT NULL,
-    lastName  TEXT  NOT NULL,
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
 
     PRIMARY KEY (id)
 );
@@ -145,7 +145,7 @@ CREATE TABLE librarian (
     FOREIGN KEY (library_id) REFERENCES library
 );
 
-CREATE SEQUENCE card_seq MINVALUE 1000000000;
+CREATE SEQUENCE library_card_seq MINVALUE 1000000000;
 
 CREATE TABLE library_card (
     number     BIGINT  NOT NULL,  -- card_seq
