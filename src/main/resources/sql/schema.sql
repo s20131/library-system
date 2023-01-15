@@ -47,7 +47,7 @@ CREATE TABLE resource (
     release_date      DATE  NOT NULL,
     description       TEXT          ,
     series            TEXT          ,
-    status RESOURCE_STATUS  NOT NULL,
+    status RESOURCE_STATUS  NOT NULL DEFAULT 'AVAILABLE',
 
     PRIMARY KEY (id),
     FOREIGN KEY (author) REFERENCES author,
@@ -148,7 +148,7 @@ CREATE TABLE librarian (
 CREATE SEQUENCE library_card_seq MINVALUE 1000000000;
 
 CREATE TABLE library_card (
-    number     BIGINT  NOT NULL,  -- card_seq
+    number     BIGINT  NOT NULL DEFAULT nextval('library_card_seq'),
     qr_code     BYTEA  NOT NULL,
     expiration   DATE  NOT NULL,
     is_active BOOLEAN  NOT NULL,

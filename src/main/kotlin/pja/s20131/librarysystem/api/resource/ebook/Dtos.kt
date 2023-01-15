@@ -14,8 +14,8 @@ import pja.s20131.librarysystem.domain.resource.Title
 data class GetEbookResponse(
     val title: Title,
     val releaseDate: ReleaseDate,
-    val description: Description,
-    val series: Series,
+    val description: Description?,
+    val series: Series?,
     val resourceStatus: ResourceStatus,
     val format: Format,
     val content: Content,

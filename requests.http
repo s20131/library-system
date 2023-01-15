@@ -1,2 +1,5 @@
 ### Get libraries
 GET http://localhost:8080/libraries
+
+### Get books
+GET http://localhost:8080/books
