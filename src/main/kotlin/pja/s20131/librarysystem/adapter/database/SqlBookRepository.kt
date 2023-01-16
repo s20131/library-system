@@ -37,7 +37,7 @@ private fun ResultRow.toBook() =
     )
 
 object BookTable : IdTable<UUID>("book") {
-    override val id = uuid("resource_id").references(ResourceTable.id).entityId()
+    override val id = reference("resource_id", ResourceTable)
     override val primaryKey = PrimaryKey(id)
     val isbn = text("isbn")
 }
