@@ -14,20 +14,20 @@ CREATE TABLE library (
 );
 
 CREATE TABLE "user" (
-    id        UUID  NOT NULL,
-    firstName TEXT  NOT NULL,
-    lastName  TEXT  NOT NULL,
-    email     TEXT  NOT NULL,
-    username  TEXT  NOT NULL,
-    password  TEXT  NOT NULL,
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
+    email      TEXT  NOT NULL,
+    username   TEXT  NOT NULL,
+    password   TEXT  NOT NULL,
 
     PRIMARY KEY (id)
 );
 
 CREATE TABLE author (
-    id        UUID  NOT NULL,
-    firstName TEXT  NOT NULL,
-    lastName  TEXT  NOT NULL,
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
 
     PRIMARY KEY (id)
 );
@@ -47,7 +47,7 @@ CREATE TABLE resource (
     release_date      DATE  NOT NULL,
     description       TEXT          ,
     series            TEXT          ,
-    status RESOURCE_STATUS  NOT NULL,
+    status RESOURCE_STATUS  NOT NULL DEFAULT 'AVAILABLE',
 
     PRIMARY KEY (id),
     FOREIGN KEY (author) REFERENCES author,
@@ -62,14 +62,16 @@ CREATE TABLE book (
     FOREIGN KEY (resource_id) REFERENCES resource
 );
 
-CREATE TYPE unit AS ENUM ('PDF', 'MOBI', 'EPUB');
+CREATE TYPE content_type AS ENUM ('PDF', 'MOBI', 'EPUB');
+CREATE TYPE size_unit AS ENUM ('kB', 'MB');
 
-CREATE TABLE e_book (
-    resource_id UUID  NOT NULL,
-    format      TEXT  NOT NULL,
-    content    BYTEA  NOT NULL,
-    size     NUMERIC  NOT NULL,
-    size_unit   UNIT  NOT NULL,
+CREATE TABLE ebook (
+    resource_id          UUID  NOT NULL,
+    format               TEXT  NOT NULL,
+    content             BYTEA  NOT NULL,
+    content_type CONTENT_TYPE  NOT NULL,
+    size              NUMERIC  NOT NULL,
+    size_unit       SIZE_UNIT  NOT NULL,
 
     PRIMARY KEY (resource_id, format),
     FOREIGN KEY (resource_id) REFERENCES resource
@@ -145,10 +147,10 @@ CREATE TABLE librarian (
     FOREIGN KEY (library_id) REFERENCES library
 );
 
-CREATE SEQUENCE card_seq MINVALUE 1000000000;
+CREATE SEQUENCE library_card_seq MINVALUE 1000000000;
 
 CREATE TABLE library_card (
-    number     BIGINT  NOT NULL,  -- card_seq
+    number     BIGINT  NOT NULL DEFAULT nextval('library_card_seq'),
     qr_code     BYTEA  NOT NULL,
     expiration   DATE  NOT NULL,
     is_active BOOLEAN  NOT NULL,

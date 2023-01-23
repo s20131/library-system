@@ -11,8 +11,8 @@ data class Book (
     val resourceId: ResourceId,
     val title: Title,
     val releaseDate: ReleaseDate,
-    val description: Description,
-    val series: Series,
+    val description: Description?,
+    val series: Series?,
     val resourceStatus: ResourceStatus,
     val isbn: ISBN,
 )

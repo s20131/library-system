@@ -11,24 +11,21 @@ data class Ebook(
     val resourceId: ResourceId,
     val title: Title,
     val releaseDate: ReleaseDate,
-    val description: Description,
-    val series: Series,
+    val description: Description?,
+    val series: Series?,
     val resourceStatus: ResourceStatus,
-    val format: Format,
     val content: Content,
+    //val contentType: ContentType,
     val size: Size,
-    val sizeUnit: SizeUnit
 )
 
-@JvmInline
-value class Format(val raw: String)
 
 @JvmInline
 value class Content(val raw: ByteArray)
 
+/*enum class ContentType {
+    PDF, MOBI, EPUB
+}*/
+
 @JvmInline
 value class Size(val raw: Double)
-
-enum class SizeUnit {
-    kB, MB
-}

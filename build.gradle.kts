@@ -29,6 +29,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.5.1")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("com.h2database:h2:2.1.214")
+    testImplementation("com.github.javafaker:javafaker:1.0.2")
 }
 
 tasks.withType<KotlinCompile> {
