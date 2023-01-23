@@ -62,14 +62,16 @@ CREATE TABLE book (
     FOREIGN KEY (resource_id) REFERENCES resource
 );
 
-CREATE TYPE unit AS ENUM ('PDF', 'MOBI', 'EPUB');
+CREATE TYPE content_type AS ENUM ('PDF', 'MOBI', 'EPUB');
+CREATE TYPE size_unit AS ENUM ('kB', 'MB');
 
-CREATE TABLE e_book (
-    resource_id UUID  NOT NULL,
-    format      TEXT  NOT NULL,
-    content    BYTEA  NOT NULL,
-    size     NUMERIC  NOT NULL,
-    size_unit   UNIT  NOT NULL,
+CREATE TABLE ebook (
+    resource_id          UUID  NOT NULL,
+    format               TEXT  NOT NULL,
+    content             BYTEA  NOT NULL,
+    content_type CONTENT_TYPE  NOT NULL,
+    size              NUMERIC  NOT NULL,
+    size_unit       SIZE_UNIT  NOT NULL,
 
     PRIMARY KEY (resource_id, format),
     FOREIGN KEY (resource_id) REFERENCES resource

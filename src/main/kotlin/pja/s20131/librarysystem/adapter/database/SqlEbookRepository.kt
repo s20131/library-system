@@ -11,33 +11,39 @@ import pja.s20131.librarysystem.domain.resource.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.ResourceId
 import pja.s20131.librarysystem.domain.resource.Series
 import pja.s20131.librarysystem.domain.resource.Title
-import pja.s20131.librarysystem.domain.resource.book.Book
-import pja.s20131.librarysystem.domain.resource.book.BookRepository
-import pja.s20131.librarysystem.domain.resource.book.ISBN
+import pja.s20131.librarysystem.domain.resource.ebook.Content
+//import pja.s20131.librarysystem.domain.resource.ebook.ContentType
+import pja.s20131.librarysystem.domain.resource.ebook.Ebook
+import pja.s20131.librarysystem.domain.resource.ebook.EbookRepository
+import pja.s20131.librarysystem.domain.resource.ebook.Size
 
 @Repository
-class SqlBookRepository : BookRepository {
+class SqlEbookRepository : EbookRepository {
 
-    override fun getAll(): List<Book> =
-        BookTable
+    override fun getAll(): List<Ebook> =
+        EbookTable
             .innerJoin(ResourceTable)
             .selectAll()
-            .map { it.toBook() }
+            .map { it.toEbook() }
 }
 
-private fun ResultRow.toBook() =
-    Book(
+private fun ResultRow.toEbook() =
+    Ebook(
         resourceId = ResourceId(this[ResourceTable.id].value),
         title = Title(this[ResourceTable.title]),
         releaseDate = ReleaseDate(this[ResourceTable.releaseDate]),
         description = this[ResourceTable.description]?.let { Description(it) },
         series = this[ResourceTable.series]?.let { Series(it) },
         resourceStatus = this[ResourceTable.resourceStatus],
-        isbn = ISBN(this[BookTable.isbn])
+        content = Content(this[EbookTable.content].bytes),
+        //contentType = this[EbookTable.contentType],
+        size = Size(this[EbookTable.size]),
     )
 
-object BookTable : IdTable<UUID>("book") {
+object EbookTable : IdTable<UUID>("ebook") {
     override val id = reference("resource_id", ResourceTable)
-    override val primaryKey = PrimaryKey(id)
-    val isbn = text("isbn")
+    val content = blob("content")
+    //val contentType = enumeration<ContentType>("content_type")
+    val size = double("size")
+    override val primaryKey = PrimaryKey(id/*, format*/)
 }
