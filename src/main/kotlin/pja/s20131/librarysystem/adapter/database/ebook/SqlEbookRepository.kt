@@ -1,5 +1,6 @@
-package pja.s20131.librarysystem.adapter.database
+package pja.s20131.librarysystem.adapter.database.ebook
 
+//import pja.s20131.librarysystem.domain.resource.ebook.ContentType
 import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -12,9 +13,7 @@ import pja.s20131.librarysystem.domain.resource.ResourceId
 import pja.s20131.librarysystem.domain.resource.Series
 import pja.s20131.librarysystem.domain.resource.Title
 import pja.s20131.librarysystem.domain.resource.ebook.Content
-//import pja.s20131.librarysystem.domain.resource.ebook.ContentType
 import pja.s20131.librarysystem.domain.resource.ebook.Ebook
-import pja.s20131.librarysystem.domain.resource.ebook.EbookRepository
 import pja.s20131.librarysystem.domain.resource.ebook.Size
 
 @Repository

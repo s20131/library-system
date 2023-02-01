@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.adapter.database
+package pja.s20131.librarysystem.adapter.database.book
 
 import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
@@ -12,7 +12,6 @@ import pja.s20131.librarysystem.domain.resource.ResourceId
 import pja.s20131.librarysystem.domain.resource.Series
 import pja.s20131.librarysystem.domain.resource.Title
 import pja.s20131.librarysystem.domain.resource.book.Book
-import pja.s20131.librarysystem.domain.resource.book.BookRepository
 import pja.s20131.librarysystem.domain.resource.book.ISBN
 
 @Repository

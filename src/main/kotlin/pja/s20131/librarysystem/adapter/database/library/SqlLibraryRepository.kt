@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.adapter.database
+package pja.s20131.librarysystem.adapter.database.library
 
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -9,7 +9,6 @@ import pja.s20131.librarysystem.domain.library.City
 import pja.s20131.librarysystem.domain.library.Library
 import pja.s20131.librarysystem.domain.library.LibraryId
 import pja.s20131.librarysystem.domain.library.LibraryName
-import pja.s20131.librarysystem.domain.library.LibraryRepository
 import pja.s20131.librarysystem.domain.library.Postcode
 import pja.s20131.librarysystem.domain.library.StreetName
 import pja.s20131.librarysystem.domain.library.StreetNumber

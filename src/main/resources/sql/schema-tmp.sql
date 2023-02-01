@@ -54,3 +54,24 @@ CREATE TABLE ebook (
     FOREIGN KEY (resource_id) REFERENCES resource,
     CHECK (size > 0)
 );
+
+CREATE TABLE "user" (
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
+    email      TEXT  NOT NULL,
+    login      TEXT  NOT NULL,
+    password   TEXT  NOT NULL,
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE user_settings (
+    user_id                         UUID  NOT NULL,
+    send_end_of_rental_reminder  BOOLEAN  NOT NULL,
+    send_when_available_reminder BOOLEAN  NOT NULL,
+    kindle_email                    TEXT          ,
+
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES "user"
+);

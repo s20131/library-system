@@ -6,7 +6,7 @@ import kotlin.random.Random
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
-import pja.s20131.librarysystem.adapter.database.EbookTable
+import pja.s20131.librarysystem.adapter.database.ebook.EbookTable
 import pja.s20131.librarysystem.adapter.database.shared.ResourceTable
 import pja.s20131.librarysystem.adapter.database.shared.SeriesTable
 import pja.s20131.librarysystem.domain.resource.Description
