@@ -6,3 +6,9 @@ GET http://localhost:8080/books
 
 ### Get ebooks
 GET http://localhost:8080/ebooks
+
+### Get user
+GET http://localhost:8080/users/{{userId}}
+
+### Get user settings
+GET http://localhost:8080/users/{{userId}}/user-settings

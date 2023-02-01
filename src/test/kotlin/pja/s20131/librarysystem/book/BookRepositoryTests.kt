@@ -7,10 +7,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.adapter.database.BookTable
+import pja.s20131.librarysystem.adapter.database.book.BookTable
 import pja.s20131.librarysystem.adapter.database.shared.ResourceTable
 import pja.s20131.librarysystem.adapter.database.shared.SeriesTable
-import pja.s20131.librarysystem.domain.resource.book.BookRepository
+import pja.s20131.librarysystem.adapter.database.book.BookRepository
 
 @SpringBootTest
 class BookRepositoryTests @Autowired constructor(

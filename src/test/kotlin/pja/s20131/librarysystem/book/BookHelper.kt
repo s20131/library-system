@@ -4,7 +4,7 @@ import com.github.javafaker.Faker
 import java.time.LocalDate
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import pja.s20131.librarysystem.adapter.database.BookTable
+import pja.s20131.librarysystem.adapter.database.book.BookTable
 import pja.s20131.librarysystem.adapter.database.shared.ResourceTable
 import pja.s20131.librarysystem.adapter.database.shared.SeriesTable
 import pja.s20131.librarysystem.domain.resource.Description

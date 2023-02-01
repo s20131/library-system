@@ -3,7 +3,7 @@ package pja.s20131.librarysystem.library
 import com.github.javafaker.Faker
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
-import pja.s20131.librarysystem.adapter.database.LibraryTable
+import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.domain.library.Address
 import pja.s20131.librarysystem.domain.library.City
 import pja.s20131.librarysystem.domain.library.Library

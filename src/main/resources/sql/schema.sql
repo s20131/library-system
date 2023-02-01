@@ -18,7 +18,7 @@ CREATE TABLE "user" (
     first_name TEXT  NOT NULL,
     last_name  TEXT  NOT NULL,
     email      TEXT  NOT NULL,
-    username   TEXT  NOT NULL,
+    login      TEXT  NOT NULL,
     password   TEXT  NOT NULL,
 
     PRIMARY KEY (id)
@@ -63,6 +63,7 @@ CREATE TABLE book (
 );
 
 CREATE TYPE content_type AS ENUM ('PDF', 'MOBI', 'EPUB');
+
 CREATE TYPE size_unit AS ENUM ('kB', 'MB');
 
 CREATE TABLE ebook (
@@ -188,7 +189,7 @@ CREATE TABLE reservation (
     FOREIGN KEY (copy_id) REFERENCES copy
 );
 
-CREATE TABLE settings (
+CREATE TABLE user_settings (
     user_id                         UUID  NOT NULL,
     send_end_of_rental_reminder  BOOLEAN  NOT NULL,
     send_when_available_reminder BOOLEAN  NOT NULL,
