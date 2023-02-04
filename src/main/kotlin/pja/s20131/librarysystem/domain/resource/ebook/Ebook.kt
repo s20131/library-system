@@ -21,11 +21,11 @@ data class Ebook(
 
 
 @JvmInline
-value class Content(val raw: ByteArray)
+value class Content(val value: ByteArray)
 
 /*enum class ContentType {
     PDF, MOBI, EPUB
 }*/
 
 @JvmInline
-value class Size(val raw: Double)
+value class Size(val value: Double)

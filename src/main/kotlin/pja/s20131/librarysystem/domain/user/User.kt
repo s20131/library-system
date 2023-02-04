@@ -20,23 +20,23 @@ data class UserBasicData(
 )
 
 @JvmInline
-value class UserId(val raw: UUID) {
+value class UserId(val value: UUID) {
     companion object {
         fun generate() = UserId(UUID.randomUUID())
     }
 }
 
 @JvmInline
-value class FirstName(val raw: String)
+value class FirstName(val value: String)
 
 @JvmInline
-value class LastName(val raw: String)
+value class LastName(val value: String)
 
 @JvmInline
-value class Email(val raw: String)
+value class Email(val value: String)
 
 @JvmInline
-value class Login(val raw: String)
+value class Login(val value: String)
 
 @JvmInline
-value class Password(val raw: String)
+value class Password(val value: String)

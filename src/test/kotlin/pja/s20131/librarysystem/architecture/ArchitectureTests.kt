@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem
+package pja.s20131.librarysystem.architecture
 
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes
 import org.junit.jupiter.api.Test

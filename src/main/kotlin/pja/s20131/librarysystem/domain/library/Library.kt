@@ -2,15 +2,14 @@ package pja.s20131.librarysystem.domain.library
 
 import java.util.UUID
 
-
-data class Library (
+data class Library(
     val libraryId: LibraryId,
     val libraryName: LibraryName,
     val address: Address
 )
 
 @JvmInline
-value class LibraryId(val raw: UUID) {
+value class LibraryId(val value: UUID) {
 
     companion object {
         fun generate() = LibraryId(UUID.randomUUID())
@@ -18,4 +17,4 @@ value class LibraryId(val raw: UUID) {
 }
 
 @JvmInline
-value class LibraryName(val raw: String)
+value class LibraryName(val value: String)

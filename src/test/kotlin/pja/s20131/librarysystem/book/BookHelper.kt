@@ -33,20 +33,20 @@ fun addBook(book: Book) {
     transaction {
         book.series?.let { series ->
             SeriesTable.insert {
-                it[id] = series.raw
+                it[id] = series.value
             }
         }
         ResourceTable.insert {
-            it[id] = book.resourceId.raw
-            it[title] = book.title.raw
-            it[releaseDate] = book.releaseDate.raw
-            it[description] = book.description?.raw
-            it[series] = book.series?.raw
+            it[id] = book.resourceId.value
+            it[title] = book.title.value
+            it[releaseDate] = book.releaseDate.value
+            it[description] = book.description?.value
+            it[series] = book.series?.value
             it[resourceStatus] = book.resourceStatus
         }
         BookTable.insert {
-            it[id] = book.resourceId.raw
-            it[isbn] = book.isbn.raw
+            it[id] = book.resourceId.value
+            it[isbn] = book.isbn.value
         }
     }
 }

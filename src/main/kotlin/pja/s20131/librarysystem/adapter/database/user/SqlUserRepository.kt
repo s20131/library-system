@@ -21,14 +21,14 @@ class SqlUserRepository : UserRepository {
 
     override fun get(userId: UserId): UserBasicData? {
         return UserTable
-            .select { UserTable.id eq userId.raw }
+            .select { UserTable.id eq userId.value }
             .singleOrNull()
             ?.toUserBasicData()
     }
 
     override fun getSettings(userId: UserId): UserSettings? {
         return UserSettingsTable
-            .select { UserSettingsTable.id eq userId.raw }
+            .select { UserSettingsTable.id eq userId.value }
             .singleOrNull()
             ?.toUserSettings()
     }

@@ -38,22 +38,22 @@ fun addEbook(ebook: Ebook) {
     transaction {
         ebook.series?.let { series ->
             SeriesTable.insert {
-                it[id] = series.raw
+                it[id] = series.value
             }
         }
         ResourceTable.insert {
-            it[id] = ebook.resourceId.raw
-            it[title] = ebook.title.raw
-            it[releaseDate] = ebook.releaseDate.raw
-            it[description] = ebook.description?.raw
-            it[series] = ebook.series?.raw
+            it[id] = ebook.resourceId.value
+            it[title] = ebook.title.value
+            it[releaseDate] = ebook.releaseDate.value
+            it[description] = ebook.description?.value
+            it[series] = ebook.series?.value
             it[resourceStatus] = ebook.resourceStatus
         }
         EbookTable.insert {
-            it[id] = ebook.resourceId.raw
-            it[content] = ExposedBlob(ebook.content.raw)
+            it[id] = ebook.resourceId.value
+            it[content] = ExposedBlob(ebook.content.value)
             //it[contentType] = ebook.contentType
-            it[size] = ebook.size.raw
+            it[size] = ebook.size.value
         }
     }
 }

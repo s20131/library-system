@@ -18,4 +18,4 @@ data class Book (
 )
 
 @JvmInline
-value class ISBN(val raw: String)
+value class ISBN(val value: String)
