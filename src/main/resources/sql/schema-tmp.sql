@@ -1,14 +1,12 @@
 CREATE TABLE series (
-    name TEXT  NOT NULL,
-
-    PRIMARY KEY (name)
+    name TEXT  PRIMARY KEY
 );
 
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
---CREATE TYPE content_type AS ENUM ('PDF', 'MOBI', 'EPUB');
+CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
 
-CREATE TYPE size_unit AS ENUM ('kB', 'MB');
+CREATE TYPE size_unit AS ENUM ('kB');
 
 CREATE TABLE library (
     id            UUID  NOT NULL,
@@ -19,6 +17,7 @@ CREATE TABLE library (
     city          TEXT  NOT NULL,
 
     PRIMARY KEY (id),
+
     CHECK (postcode ~ '^\d{2}-\d{3}$')
 );
 
@@ -43,15 +42,15 @@ CREATE TABLE book (
 );
 
 CREATE TABLE ebook (
-    resource_id          UUID  NOT NULL,
-  --format               TEXT  NOT NULL,
-    content             BYTEA  NOT NULL,
-  --content_type CONTENT_TYPE  NOT NULL,
-    size              DECIMAL(5, 2)  NOT NULL,
-  --size_unit       SIZE_UNIT  NOT NULL,
+    resource_id    UUID  NOT NULL,
+    content       BYTEA  NOT NULL,
+    format EBOOK_FORMAT  NOT NULL,
+    size  DECIMAL(5, 2)  NOT NULL,
+    size_unit SIZE_UNIT  NOT NULL,
 
-    PRIMARY KEY (resource_id/*, format*/),
+    PRIMARY KEY (resource_id, format),
     FOREIGN KEY (resource_id) REFERENCES resource,
+
     CHECK (size > 0)
 );
 

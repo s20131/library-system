@@ -15,7 +15,7 @@ data class Ebook(
     val series: Series?,
     val resourceStatus: ResourceStatus,
     val content: Content,
-    //val contentType: ContentType,
+    val ebookFormat: EbookFormat,
     val size: Size,
 )
 
@@ -23,9 +23,13 @@ data class Ebook(
 @JvmInline
 value class Content(val value: ByteArray)
 
-/*enum class ContentType {
+enum class EbookFormat {
     PDF, MOBI, EPUB
-}*/
+}
 
 @JvmInline
 value class Size(val value: Double)
+
+enum class SizeUnit {
+    kB
+}

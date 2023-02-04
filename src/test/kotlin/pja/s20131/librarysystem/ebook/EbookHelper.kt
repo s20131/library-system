@@ -16,9 +16,10 @@ import pja.s20131.librarysystem.domain.resource.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.Series
 import pja.s20131.librarysystem.domain.resource.Title
 import pja.s20131.librarysystem.domain.resource.ebook.Content
-//import pja.s20131.librarysystem.domain.resource.ebook.ContentType
+import pja.s20131.librarysystem.domain.resource.ebook.EbookFormat
 import pja.s20131.librarysystem.domain.resource.ebook.Ebook
 import pja.s20131.librarysystem.domain.resource.ebook.Size
+import pja.s20131.librarysystem.domain.resource.ebook.SizeUnit
 
 val faker = Faker()
 
@@ -30,9 +31,9 @@ fun ebook(
     series: Series? = Series(faker.elderScrolls().dragon()),
     resourceStatus: ResourceStatus = ResourceStatus.AVAILABLE,
     content: Content = Content(Random.nextBytes(10)),
-    //contentType: ContentType = ContentType.EPUB,
+    ebookFormat: EbookFormat = EbookFormat.EPUB,
     size: Size = Size(faker.number().randomDouble(2, 0, 800)),
-) = Ebook(id, title, releaseDate, description, series, resourceStatus, content, /*contentType,*/ size)
+) = Ebook(id, title, releaseDate, description, series, resourceStatus, content, ebookFormat, size)
 
 fun addEbook(ebook: Ebook) {
     transaction {
@@ -52,8 +53,9 @@ fun addEbook(ebook: Ebook) {
         EbookTable.insert {
             it[id] = ebook.resourceId.value
             it[content] = ExposedBlob(ebook.content.value)
-            //it[contentType] = ebook.contentType
+            it[format] = ebook.ebookFormat
             it[size] = ebook.size.value
+            it[sizeUnit] = SizeUnit.kB
         }
     }
 }
