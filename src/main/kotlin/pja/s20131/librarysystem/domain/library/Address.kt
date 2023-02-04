@@ -8,13 +8,13 @@ data class Address(
 )
 
 @JvmInline
-value class StreetName(val raw: String)
+value class StreetName(val value: String)
 
 @JvmInline
-value class StreetNumber(val raw: String)
+value class StreetNumber(val value: String)
 
 @JvmInline
-value class Postcode(val raw: String)
+value class Postcode(val value: String)
 
 @JvmInline
-value class City(val raw: String)
+value class City(val value: String)

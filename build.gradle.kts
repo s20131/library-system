@@ -16,7 +16,7 @@ repositories {
 }
 
 object Versions {
-    val exposed = "0.41.1"
+    const val exposed = "0.41.1"
 }
 
 dependencies {

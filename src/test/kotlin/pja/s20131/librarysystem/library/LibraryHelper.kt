@@ -27,12 +27,12 @@ fun library(
 fun addLibrary(library: Library) {
     transaction {
         LibraryTable.insert {
-            it[id] = library.libraryId.raw
-            it[name] = library.libraryName.raw
-            it[streetName] = library.address.streetName.raw
-            it[streetNumber] = library.address.streetNumber.raw
-            it[postcode] = library.address.postcode.raw
-            it[city] = library.address.city.raw
+            it[id] = library.libraryId.value
+            it[name] = library.libraryName.value
+            it[streetName] = library.address.streetName.value
+            it[streetNumber] = library.address.streetNumber.value
+            it[postcode] = library.address.postcode.value
+            it[city] = library.address.city.value
         }
     }
 }

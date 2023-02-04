@@ -44,12 +44,12 @@ object UserSettingsGenerator {
 fun addUser(user: User) {
     transaction {
         UserTable.insert {
-            it[id] = user.userId.raw
-            it[firstName] = user.firstName.raw
-            it[lastName] = user.lastName.raw
-            it[email] = user.email.raw
-            it[login] = user.email.raw
-            it[password] = user.password.raw
+            it[id] = user.userId.value
+            it[firstName] = user.firstName.value
+            it[lastName] = user.lastName.value
+            it[email] = user.email.value
+            it[login] = user.email.value
+            it[password] = user.password.value
         }
         addUserSettings(
             user.userId,
@@ -61,10 +61,10 @@ fun addUser(user: User) {
 fun addUserSettings(userId: UserId, userSettings: UserSettings) {
     transaction {
         UserSettingsTable.insert {
-            it[id] = userId.raw
-            it[sendEndOfRentalReminder] = userSettings.sendEndOfRentalReminder.raw
-            it[sendWhenAvailableReminder] = userSettings.sendWhenAvailableReminder.raw
-            it[kindleEmail] = userSettings.kindleEmail?.raw
+            it[id] = userId.value
+            it[sendEndOfRentalReminder] = userSettings.sendEndOfRentalReminder.value
+            it[sendWhenAvailableReminder] = userSettings.sendWhenAvailableReminder.value
+            it[kindleEmail] = userSettings.kindleEmail?.value
         }
     }
 }

@@ -7,10 +7,10 @@ data class UserSettings(
 )
 
 @JvmInline
-value class SendEndOfRentalReminder(val raw: Boolean)
+value class SendEndOfRentalReminder(val value: Boolean)
 
 @JvmInline
-value class SendWhenAvailableReminder(val raw: Boolean)
+value class SendWhenAvailableReminder(val value: Boolean)
 
 @JvmInline
-value class KindleEmail(val raw: String)
+value class KindleEmail(val value: String)
