@@ -10,11 +10,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.adapter.database.ebook.EbookRepository
-import pja.s20131.librarysystem.adapter.database.ebook.EbookTable
-import pja.s20131.librarysystem.adapter.database.shared.ResourceTable
-import pja.s20131.librarysystem.adapter.database.shared.SeriesTable
-import pja.s20131.librarysystem.domain.resource.ebook.Size
+import pja.s20131.librarysystem.domain.resource.port.EbookRepository
+import pja.s20131.librarysystem.adapter.database.resource.EbookTable
+import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
+import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
+import pja.s20131.librarysystem.domain.resource.model.Size
 
 @SpringBootTest
 class EbookRepositoryTests @Autowired constructor(

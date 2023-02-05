@@ -12,8 +12,8 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
-import pja.s20131.librarysystem.adapter.database.library.LibraryRepository
-import pja.s20131.librarysystem.domain.library.Postcode
+import pja.s20131.librarysystem.domain.library.port.LibraryRepository
+import pja.s20131.librarysystem.domain.library.model.Postcode
 
 @SpringBootTest
 class LibraryRepositoryTests @Autowired constructor(

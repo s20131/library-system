@@ -6,20 +6,20 @@ import kotlin.random.Random
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
-import pja.s20131.librarysystem.adapter.database.ebook.EbookTable
-import pja.s20131.librarysystem.adapter.database.shared.ResourceTable
-import pja.s20131.librarysystem.adapter.database.shared.SeriesTable
-import pja.s20131.librarysystem.domain.resource.Description
-import pja.s20131.librarysystem.domain.resource.ReleaseDate
-import pja.s20131.librarysystem.domain.resource.ResourceId
-import pja.s20131.librarysystem.domain.resource.ResourceStatus
-import pja.s20131.librarysystem.domain.resource.Series
-import pja.s20131.librarysystem.domain.resource.Title
-import pja.s20131.librarysystem.domain.resource.ebook.Content
-import pja.s20131.librarysystem.domain.resource.ebook.EbookFormat
-import pja.s20131.librarysystem.domain.resource.ebook.Ebook
-import pja.s20131.librarysystem.domain.resource.ebook.Size
-import pja.s20131.librarysystem.domain.resource.ebook.SizeUnit
+import pja.s20131.librarysystem.adapter.database.resource.EbookTable
+import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
+import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
+import pja.s20131.librarysystem.domain.resource.model.Description
+import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
+import pja.s20131.librarysystem.domain.resource.model.ResourceId
+import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
+import pja.s20131.librarysystem.domain.resource.model.Series
+import pja.s20131.librarysystem.domain.resource.model.Title
+import pja.s20131.librarysystem.domain.resource.model.Content
+import pja.s20131.librarysystem.domain.resource.model.EbookFormat
+import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.Size
+import pja.s20131.librarysystem.domain.resource.model.SizeUnit
 
 val faker = Faker()
 

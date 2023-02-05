@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
+import pja.s20131.librarysystem.domain.BadRequestException
+import pja.s20131.librarysystem.domain.ForbiddenException
+import pja.s20131.librarysystem.domain.NotFoundException
 
 @RestControllerAdvice
 class ExceptionHandler {
