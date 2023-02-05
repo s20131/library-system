@@ -31,8 +31,8 @@ private fun ResultRow.toBook() =
         releaseDate = ReleaseDate(this[ResourceTable.releaseDate]),
         description = this[ResourceTable.description]?.let { Description(it) },
         series = this[ResourceTable.series]?.let { Series(it) },
-        resourceStatus = this[ResourceTable.resourceStatus],
-        isbn = ISBN(this[BookTable.isbn])
+        status = this[ResourceTable.status],
+        isbn = ISBN(this[BookTable.isbn]),
     )
 
 object BookTable : IdTable<UUID>("book") {
