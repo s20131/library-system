@@ -25,9 +25,9 @@ fun book(
     releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
     description: Description? = Description(faker.yoda().quote()),
     series: Series? = Series(faker.book().title()),
-    resourceStatus: ResourceStatus = ResourceStatus.AVAILABLE,
+    status: ResourceStatus = ResourceStatus.AVAILABLE,
     isbn: ISBN = ISBN(faker.idNumber().valid())
-) = Book(resourceId, title, releaseDate, description, series, resourceStatus, isbn)
+) = Book(resourceId, title, releaseDate, description, series, status, isbn)
 
 fun addBook(book: Book) {
     transaction {
@@ -42,7 +42,7 @@ fun addBook(book: Book) {
             it[releaseDate] = book.releaseDate.value
             it[description] = book.description?.value
             it[series] = book.series?.value
-            it[resourceStatus] = book.resourceStatus
+            it[status] = book.status
         }
         BookTable.insert {
             it[id] = book.resourceId.value

@@ -14,12 +14,12 @@ data class GetEbookResponse(
     val releaseDate: ReleaseDate,
     val description: Description?,
     val series: Series?,
-    val resourceStatus: ResourceStatus,
+    val status: ResourceStatus,
     val content: Content,
     val size: Size,
 ) {
 
     companion object {
-        fun Ebook.toGetEbookResponse() = GetEbookResponse(title, releaseDate, description, series, resourceStatus, content, size)
+        fun Ebook.toGetEbookResponse() = GetEbookResponse(title, releaseDate, description, series, status, content, size)
     }
 }

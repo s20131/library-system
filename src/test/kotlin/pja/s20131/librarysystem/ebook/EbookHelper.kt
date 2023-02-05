@@ -29,11 +29,11 @@ fun ebook(
     releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
     description: Description? = Description(faker.witcher().quote()),
     series: Series? = Series(faker.elderScrolls().dragon()),
-    resourceStatus: ResourceStatus = ResourceStatus.AVAILABLE,
+    status: ResourceStatus = ResourceStatus.AVAILABLE,
     content: Content = Content(Random.nextBytes(10)),
     ebookFormat: EbookFormat = EbookFormat.EPUB,
     size: Size = Size(faker.number().randomDouble(2, 0, 800)),
-) = Ebook(id, title, releaseDate, description, series, resourceStatus, content, ebookFormat, size)
+) = Ebook(id, title, releaseDate, description, series, status, content, ebookFormat, size)
 
 fun addEbook(ebook: Ebook) {
     transaction {
@@ -48,7 +48,7 @@ fun addEbook(ebook: Ebook) {
             it[releaseDate] = ebook.releaseDate.value
             it[description] = ebook.description?.value
             it[series] = ebook.series?.value
-            it[resourceStatus] = ebook.resourceStatus
+            it[status] = ebook.status
         }
         EbookTable.insert {
             it[id] = ebook.resourceId.value

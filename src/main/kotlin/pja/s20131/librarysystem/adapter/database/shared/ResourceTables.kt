@@ -17,5 +17,5 @@ object ResourceTable : UUIDTable("resource") {
     val releaseDate = date("release_date")
     val description = text("description").nullable()
     val series = text("series").references(SeriesTable.id).nullable()
-    val resourceStatus = enumerationByName<ResourceStatus>("status", 255)
+    val status = enumerationByName<ResourceStatus>("status", 255)
 }

@@ -3,6 +3,17 @@ package pja.s20131.librarysystem.domain.resource
 import java.time.LocalDate
 import java.util.UUID
 
+abstract class Resource {
+    abstract val resourceId: ResourceId
+    abstract val title: Title
+    abstract val releaseDate: ReleaseDate
+    abstract val description: Description?
+    abstract val series: Series?
+    abstract val status: ResourceStatus
+
+    fun isAvailable() = status == ResourceStatus.AVAILABLE
+}
+
 @JvmInline
 value class ResourceId(val value: UUID) {
     companion object {
