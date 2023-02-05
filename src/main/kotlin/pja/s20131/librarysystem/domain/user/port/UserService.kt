@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
-import pja.s20131.librarysystem.infrastructure.exception.NotFoundException
+import pja.s20131.librarysystem.domain.NotFoundException
 
 @Service
 @Transactional

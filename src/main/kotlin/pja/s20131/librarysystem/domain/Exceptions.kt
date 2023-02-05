@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.infrastructure.exception
+package pja.s20131.librarysystem.domain
 
 open class DomainException(message: String) : BadRequestException(message)
 
