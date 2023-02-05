@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.adapter.database.ebook
 
-//import pja.s20131.librarysystem.domain.resource.ebook.ContentType
 import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -13,8 +12,10 @@ import pja.s20131.librarysystem.domain.resource.ResourceId
 import pja.s20131.librarysystem.domain.resource.Series
 import pja.s20131.librarysystem.domain.resource.Title
 import pja.s20131.librarysystem.domain.resource.ebook.Content
+import pja.s20131.librarysystem.domain.resource.ebook.EbookFormat
 import pja.s20131.librarysystem.domain.resource.ebook.Ebook
 import pja.s20131.librarysystem.domain.resource.ebook.Size
+import pja.s20131.librarysystem.domain.resource.ebook.SizeUnit
 
 @Repository
 class SqlEbookRepository : EbookRepository {
@@ -35,14 +36,15 @@ private fun ResultRow.toEbook() =
         series = this[ResourceTable.series]?.let { Series(it) },
         resourceStatus = this[ResourceTable.resourceStatus],
         content = Content(this[EbookTable.content].bytes),
-        //contentType = this[EbookTable.contentType],
+        ebookFormat = EbookFormat.valueOf(this[EbookTable.format].name),
         size = Size(this[EbookTable.size]),
     )
 
 object EbookTable : IdTable<UUID>("ebook") {
     override val id = reference("resource_id", ResourceTable)
     val content = blob("content")
-    //val contentType = enumeration<ContentType>("content_type")
+    val format = enumerationByName<EbookFormat>("format", 255)
     val size = double("size")
-    override val primaryKey = PrimaryKey(id/*, format*/)
+    val sizeUnit = enumerationByName<SizeUnit>("size_unit", 255)
+    override val primaryKey = PrimaryKey(id, format)
 }
