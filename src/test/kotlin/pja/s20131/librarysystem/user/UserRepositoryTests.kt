@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.adapter.database.user.UserRepository
+import pja.s20131.librarysystem.domain.user.port.UserRepository
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
 import pja.s20131.librarysystem.user.UserGenerator.user

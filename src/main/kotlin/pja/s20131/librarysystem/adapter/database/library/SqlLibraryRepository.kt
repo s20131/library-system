@@ -4,14 +4,15 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.domain.library.Address
-import pja.s20131.librarysystem.domain.library.City
-import pja.s20131.librarysystem.domain.library.Library
-import pja.s20131.librarysystem.domain.library.LibraryId
-import pja.s20131.librarysystem.domain.library.LibraryName
-import pja.s20131.librarysystem.domain.library.Postcode
-import pja.s20131.librarysystem.domain.library.StreetName
-import pja.s20131.librarysystem.domain.library.StreetNumber
+import pja.s20131.librarysystem.domain.library.model.Address
+import pja.s20131.librarysystem.domain.library.model.City
+import pja.s20131.librarysystem.domain.library.model.Library
+import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.library.model.LibraryName
+import pja.s20131.librarysystem.domain.library.model.Postcode
+import pja.s20131.librarysystem.domain.library.model.StreetName
+import pja.s20131.librarysystem.domain.library.model.StreetNumber
+import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 
 @Repository
 class SqlLibraryRepository : LibraryRepository {

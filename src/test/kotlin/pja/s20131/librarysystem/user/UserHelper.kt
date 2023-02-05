@@ -5,17 +5,17 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
-import pja.s20131.librarysystem.domain.user.Email
-import pja.s20131.librarysystem.domain.user.FirstName
-import pja.s20131.librarysystem.domain.user.KindleEmail
-import pja.s20131.librarysystem.domain.user.LastName
-import pja.s20131.librarysystem.domain.user.Login
-import pja.s20131.librarysystem.domain.user.Password
-import pja.s20131.librarysystem.domain.user.SendEndOfRentalReminder
-import pja.s20131.librarysystem.domain.user.SendWhenAvailableReminder
-import pja.s20131.librarysystem.domain.user.User
-import pja.s20131.librarysystem.domain.user.UserId
-import pja.s20131.librarysystem.domain.user.UserSettings
+import pja.s20131.librarysystem.domain.user.model.Email
+import pja.s20131.librarysystem.domain.user.model.FirstName
+import pja.s20131.librarysystem.domain.user.model.KindleEmail
+import pja.s20131.librarysystem.domain.user.model.LastName
+import pja.s20131.librarysystem.domain.user.model.Login
+import pja.s20131.librarysystem.domain.user.model.Password
+import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
+import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
+import pja.s20131.librarysystem.domain.user.model.User
+import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.user.UserSettingsGenerator.userSettings
 
 val faker = Faker()

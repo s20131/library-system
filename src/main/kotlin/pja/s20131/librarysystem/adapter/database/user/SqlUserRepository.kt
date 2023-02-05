@@ -6,15 +6,16 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.domain.user.Email
-import pja.s20131.librarysystem.domain.user.FirstName
-import pja.s20131.librarysystem.domain.user.KindleEmail
-import pja.s20131.librarysystem.domain.user.LastName
-import pja.s20131.librarysystem.domain.user.SendEndOfRentalReminder
-import pja.s20131.librarysystem.domain.user.SendWhenAvailableReminder
-import pja.s20131.librarysystem.domain.user.UserBasicData
-import pja.s20131.librarysystem.domain.user.UserId
-import pja.s20131.librarysystem.domain.user.UserSettings
+import pja.s20131.librarysystem.domain.user.model.Email
+import pja.s20131.librarysystem.domain.user.model.FirstName
+import pja.s20131.librarysystem.domain.user.model.KindleEmail
+import pja.s20131.librarysystem.domain.user.model.LastName
+import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
+import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
+import pja.s20131.librarysystem.domain.user.model.UserBasicData
+import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.domain.user.model.UserSettings
+import pja.s20131.librarysystem.domain.user.port.UserRepository
 
 @Repository
 class SqlUserRepository : UserRepository {
