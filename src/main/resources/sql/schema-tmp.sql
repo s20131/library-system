@@ -21,15 +21,25 @@ CREATE TABLE library (
     CHECK (postcode ~ '^\d{2}-\d{3}$')
 );
 
+CREATE TABLE author (
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
+
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE resource (
     id                UUID  NOT NULL,
     title             TEXT  NOT NULL,
+    author            UUID  NOT NULL,
     release_date      DATE  NOT NULL,
     description       TEXT          ,
     series            TEXT          ,
     status RESOURCE_STATUS  NOT NULL DEFAULT 'AVAILABLE',
 
     PRIMARY KEY (id),
+    FOREIGN KEY (author) REFERENCES author,
     FOREIGN KEY (series) REFERENCES series
 );
 

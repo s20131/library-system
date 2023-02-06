@@ -21,6 +21,7 @@ class SqlBookRepository : BookRepository {
     override fun getAll(): List<Book> =
         BookTable
             .innerJoin(ResourceTable)
+            .innerJoin(AuthorTable)
             .selectAll()
             .map { it.toBook() }
 }
@@ -34,6 +35,7 @@ private fun ResultRow.toBook() =
         series = this[ResourceTable.series]?.let { Series(it) },
         status = this[ResourceTable.status],
         isbn = ISBN(this[BookTable.isbn]),
+        author = toAuthor(),
     )
 
 object BookTable : IdTable<UUID>("book") {

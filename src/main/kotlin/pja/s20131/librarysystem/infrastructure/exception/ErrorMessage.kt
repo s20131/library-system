@@ -3,7 +3,7 @@ package pja.s20131.librarysystem.infrastructure.exception
 import java.time.LocalDateTime
 import org.springframework.http.HttpStatus
 
-class BasicException(
+class ErrorMessage(
     val status: HttpStatus,
     val time: LocalDateTime = LocalDateTime.now(),
     val message: String,

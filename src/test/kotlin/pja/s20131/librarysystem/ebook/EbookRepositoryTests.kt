@@ -10,11 +10,12 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.domain.resource.port.EbookRepository
+import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
 import pja.s20131.librarysystem.domain.resource.model.Size
+import pja.s20131.librarysystem.domain.resource.port.EbookRepository
 
 @SpringBootTest
 class EbookRepositoryTests @Autowired constructor(
@@ -26,12 +27,14 @@ class EbookRepositoryTests @Autowired constructor(
         transaction {
             EbookTable.deleteAll()
             ResourceTable.deleteAll()
+            AuthorTable.deleteAll()
             SeriesTable.deleteAll()
         }
     }
 
-    // TODO: currently not working because of byte arrays of contents 'inequality'
-    @Disabled
+    // TODO: currently not working because of byte arrays of contents 'inequality' (a value class cannot override 'equals')
+    // https://github.com/Kotlin/KEEP/blob/master/proposals/inline-classes.md#methods-from-kotlinany
+    @Disabled("byte array inequality")
     @Test
     fun `should get all ebooks`() {
         val ebook1 = ebook()

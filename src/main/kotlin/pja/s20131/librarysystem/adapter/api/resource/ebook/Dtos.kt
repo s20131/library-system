@@ -20,6 +20,6 @@ data class GetEbookResponse(
 ) {
 
     companion object {
-        fun Ebook.toGetEbookResponse() = GetEbookResponse(title, releaseDate, description, series, status, content, size)
+        fun Ebook.toResponse() = GetEbookResponse(title, releaseDate, description, series, status, content, size)
     }
 }
