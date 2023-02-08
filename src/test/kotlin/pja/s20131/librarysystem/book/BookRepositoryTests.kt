@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
@@ -22,6 +23,7 @@ class BookRepositoryTests @Autowired constructor(
         transaction {
             BookTable.deleteAll()
             ResourceTable.deleteAll()
+            AuthorTable.deleteAll()
             SeriesTable.deleteAll()
         }
     }

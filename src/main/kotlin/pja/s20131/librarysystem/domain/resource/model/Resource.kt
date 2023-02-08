@@ -6,6 +6,7 @@ import java.util.UUID
 sealed class Resource {
     abstract val resourceId: ResourceId
     abstract val title: Title
+    abstract val author: Author
     abstract val releaseDate: ReleaseDate
     abstract val description: Description?
     abstract val series: Series?

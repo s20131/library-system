@@ -14,8 +14,8 @@ import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 @SpringBootTest
 @Sql(scripts = ["/sql/schema-tmp.sql", "/sql/data.sql"])
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-@Disabled
-// TODO doesn't work
+// TODO doesn't work because test schema isn't dumped
+@Disabled("needs better/different configuration")
 class SqlTests {
 
     @Autowired

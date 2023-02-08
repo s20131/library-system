@@ -15,7 +15,7 @@ class ExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     fun badRequestExceptionMapper(exception: BadRequestException, request: WebRequest) =
-        BasicException(
+        ErrorMessage(
             status = HttpStatus.BAD_REQUEST,
             message = exception.message!!,
             description = request.getDescription(false)
@@ -24,7 +24,7 @@ class ExceptionHandler {
     @ExceptionHandler(ForbiddenException::class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     fun forbiddenExceptionMapper(exception: ForbiddenException, request: WebRequest) =
-        BasicException(
+        ErrorMessage(
             status = HttpStatus.FORBIDDEN,
             message = exception.message!!,
             description = request.getDescription(false)
@@ -33,7 +33,7 @@ class ExceptionHandler {
     @ExceptionHandler(NotFoundException::class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     fun notFoundExceptionMapper(exception: NotFoundException, request: WebRequest) =
-        BasicException(
+        ErrorMessage(
             status = HttpStatus.NOT_FOUND,
             message = exception.message!!,
             description = request.getDescription(false)
@@ -42,7 +42,7 @@ class ExceptionHandler {
     @ExceptionHandler(RuntimeException::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     fun generalExceptionMapper(exception: RuntimeException, request: WebRequest) =
-        BasicException(
+        ErrorMessage(
             status = HttpStatus.INTERNAL_SERVER_ERROR,
             message = exception.message!!,
             description = request.getDescription(false),
