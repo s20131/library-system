@@ -28,7 +28,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:${Versions.exposed}")
     implementation("org.jetbrains.exposed:exposed-java-time:${Versions.exposed}")
     implementation("org.jetbrains.exposed:spring-transaction:${Versions.exposed}")
-    implementation("org.postgresql:postgresql:42.5.3")
+    implementation("org.postgresql:postgresql:42.5.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:2.1.214")
