@@ -1,5 +1,7 @@
 package pja.s20131.librarysystem.domain.resource.model
 
+import pja.s20131.librarysystem.domain.exceptions.DomainException
+
 data class Ebook(
     override val resourceId: ResourceId,
     override val title: Title,
@@ -21,7 +23,13 @@ enum class EbookFormat {
 }
 
 @JvmInline
-value class Size(val value: Double)
+value class Size(val value: Double) {
+    init {
+        if (value < 0) throw NegativeSizeException(value)
+    }
+
+    class NegativeSizeException(value: Double) : DomainException("Size cannot be negative - given size=$value")
+}
 
 enum class SizeUnit {
     kB

@@ -1,15 +1,17 @@
 package pja.s20131.librarysystem.user
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.domain.user.port.UserRepository
+import pja.s20131.librarysystem.adapter.database.user.UserNotFoundException
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
+import pja.s20131.librarysystem.domain.user.port.UserRepository
 import pja.s20131.librarysystem.user.UserGenerator.user
 import pja.s20131.librarysystem.user.UserSettingsGenerator.basicUserSettings
 
@@ -37,11 +39,12 @@ class UserRepositoryTests @Autowired constructor(
     }
 
     @Test
-    fun `should return null if the requested user doesn't exist`() {
+    fun `should return NOT_FOUND if the requested user doesn't exist`() {
         val user = user()
 
-        val response = transaction { userRepository.get(user.userId) }
-        assertThat(response).isEqualTo(null)
+        assertThatThrownBy { transaction { userRepository.get(user.userId) } }
+            .isInstanceOf(UserNotFoundException::class.java)
+            .hasMessage("User with id=${user.userId.value} not found")
     }
 
     @Test

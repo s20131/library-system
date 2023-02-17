@@ -51,4 +51,16 @@ class ArchitectureTests {
             .that().resideInAPackage("..domain..")
             .should().dependOnClassesThat().resideInAPackage("..adapter..")
 
+    @ArchTest
+    val apiAdapterShouldHaveNoConnectionWithDatabase: ArchRule =
+        noClasses()
+            .that().resideInAPackage("..adapter.api..")
+            .should().dependOnClassesThat().resideInAPackage("..adapter.database..")
+
+    @ArchTest
+    val databaseAdapterShouldHaveNoConnectionWithApi: ArchRule =
+        noClasses()
+            .that().resideInAPackage("..adapter.database..")
+            .should().dependOnClassesThat().resideInAPackage("..adapter.api..")
+    
 }

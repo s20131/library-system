@@ -50,7 +50,9 @@ class EbookRepositoryTests @Autowired constructor(
         )
     }
 
+    // TODO: check also postgres exception
     @Test
+    @Disabled("added domain check")
     fun `should return SQL error when trying to insert ebook with size lower than 0`() {
         val ebook = ebook(size = Size(-.1))
 

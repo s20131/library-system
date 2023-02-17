@@ -1,6 +1,4 @@
-package pja.s20131.librarysystem.domain
-
-open class DomainException(message: String) : BadRequestException(message)
+package pja.s20131.librarysystem.adapter.exceptions
 
 sealed class RestException(message: String) : RuntimeException(message)
 

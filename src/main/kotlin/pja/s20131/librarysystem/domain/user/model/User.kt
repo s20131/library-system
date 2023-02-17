@@ -1,15 +1,18 @@
 package pja.s20131.librarysystem.domain.user.model
 
+import pja.s20131.librarysystem.domain.person.FirstName
+import pja.s20131.librarysystem.domain.person.LastName
+import pja.s20131.librarysystem.domain.person.Person
 import java.util.UUID
 
 data class User(
     val userId: UserId,
-    val firstName: FirstName,
-    val lastName: LastName,
+    override val firstName: FirstName,
+    override val lastName: LastName,
     val email: Email,
     val login: Login,
     val password: Password,
-) {
+) : Person {
     fun toBasicData() = UserBasicData(firstName, lastName, email)
 }
 
@@ -25,12 +28,6 @@ value class UserId(val value: UUID) {
         fun generate() = UserId(UUID.randomUUID())
     }
 }
-
-@JvmInline
-value class FirstName(val value: String)
-
-@JvmInline
-value class LastName(val value: String)
 
 @JvmInline
 value class Email(val value: String)

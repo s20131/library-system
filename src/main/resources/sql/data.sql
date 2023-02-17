@@ -21,4 +21,6 @@ BEGIN
     INSERT INTO ebook VALUES (wiedzmin2_id, md5(random()::text)::bytea, ''EPUB'', 25.123, ''kB'');
     INSERT INTO "user" VALUES (user_id, ''John'', ''Doe'', ''john.doe@gmail.com'', ''johndoe'', ''abc123'');
     INSERT INTO user_settings VALUES (user_id, true, false, ''kindle123@kindle.com'');
+    INSERT INTO genre VALUES (''przygodowe''), (''fantasy''), (''sci-fi'');
+    INSERT INTO genres VALUES (wiedzmin_id, ''przygodowe''), (wiedzmin_id, ''fantasy'');
 END;'

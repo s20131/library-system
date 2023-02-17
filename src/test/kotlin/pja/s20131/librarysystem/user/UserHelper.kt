@@ -5,10 +5,10 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
+import pja.s20131.librarysystem.domain.person.FirstName
+import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
-import pja.s20131.librarysystem.domain.user.model.FirstName
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
-import pja.s20131.librarysystem.domain.user.model.LastName
 import pja.s20131.librarysystem.domain.user.model.Login
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder

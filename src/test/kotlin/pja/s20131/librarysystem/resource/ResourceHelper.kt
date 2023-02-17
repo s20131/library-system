@@ -1,14 +1,14 @@
 package pja.s20131.librarysystem.resource
 
 import com.github.javafaker.Faker
-import java.util.UUID
 import org.jetbrains.exposed.sql.insert
 import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
+import pja.s20131.librarysystem.domain.person.FirstName
+import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
-import pja.s20131.librarysystem.domain.resource.model.FirstName
-import pja.s20131.librarysystem.domain.resource.model.LastName
 import pja.s20131.librarysystem.domain.resource.model.Resource
+import java.util.UUID
 
 val faker = Faker()
 

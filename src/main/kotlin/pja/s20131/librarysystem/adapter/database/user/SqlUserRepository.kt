@@ -1,37 +1,38 @@
 package pja.s20131.librarysystem.adapter.database.user
 
-import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
+import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
+import pja.s20131.librarysystem.domain.person.FirstName
+import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
-import pja.s20131.librarysystem.domain.user.model.FirstName
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
-import pja.s20131.librarysystem.domain.user.model.LastName
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.port.UserRepository
+import java.util.UUID
 
 @Repository
 class SqlUserRepository : UserRepository {
 
-    override fun get(userId: UserId): UserBasicData? {
+    override fun get(userId: UserId): UserBasicData {
         return UserTable
             .select { UserTable.id eq userId.value }
             .singleOrNull()
-            ?.toUserBasicData()
+            ?.toUserBasicData() ?: throw UserNotFoundException(userId)
     }
 
-    override fun getSettings(userId: UserId): UserSettings? {
+    override fun getSettings(userId: UserId): UserSettings {
         return UserSettingsTable
             .select { UserSettingsTable.id eq userId.value }
             .singleOrNull()
-            ?.toUserSettings()
+            ?.toUserSettings() ?: throw UserNotFoundException(userId)
     }
 
 }
@@ -49,6 +50,8 @@ private fun ResultRow.toUserSettings() =
         SendWhenAvailableReminder(this[UserSettingsTable.sendWhenAvailableReminder]),
         this[UserSettingsTable.kindleEmail]?.let { KindleEmail(it) },
     )
+
+class UserNotFoundException(id: UserId) : NotFoundException("User with id=${id.value} not found")
 
 object UserTable : UUIDTable("\"user\"") {
     val firstName = text("first_name")
