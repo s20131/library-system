@@ -40,8 +40,9 @@ fun ebook(
     size: Size = Size(faker.number().randomDouble(2, 0, 800)),
 ) = Ebook(id, title, author, releaseDate, description, series, status, content, ebookFormat, size)
 
-fun addEbook(ebook: Ebook) {
+fun insertEbook(ebook: Ebook) {
     val authorId = UUID.randomUUID()
+    // TODO replace with repo call
     transaction {
         ebook.series?.let { series ->
             SeriesTable.insert {

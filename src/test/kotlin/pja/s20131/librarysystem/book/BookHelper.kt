@@ -1,8 +1,6 @@
 package pja.s20131.librarysystem.book
 
 import com.github.javafaker.Faker
-import java.time.LocalDate
-import java.util.UUID
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.transactions.transaction
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
@@ -19,6 +17,8 @@ import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.resource.author
 import pja.s20131.librarysystem.resource.insertAuthor
 import pja.s20131.librarysystem.resource.insertResource
+import java.time.LocalDate
+import java.util.UUID
 
 
 val faker = Faker()
@@ -34,8 +34,9 @@ fun book(
     isbn: ISBN = ISBN(faker.idNumber().valid())
 ) = Book(resourceId, title, author, releaseDate, description, series, status, isbn)
 
-fun addBook(book: Book) {
+fun insertBook(book: Book) {
     val authorId = UUID.randomUUID()
+    // TODO change to repo call
     transaction {
         book.series?.let { series ->
             SeriesTable.insert {

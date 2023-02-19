@@ -2,10 +2,6 @@ CREATE TABLE series (
     name TEXT  PRIMARY KEY
 );
 
-CREATE TABLE genre (
-    name TEXT  PRIMARY KEY
-);
-
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
@@ -45,15 +41,6 @@ CREATE TABLE resource (
     PRIMARY KEY (id),
     FOREIGN KEY (author) REFERENCES author,
     FOREIGN KEY (series) REFERENCES series
-);
-
-CREATE TABLE resource_genres (
-    resource UUID  NOT NULL,
-    genre    TEXT  NOT NULL,
-
-    PRIMARY KEY (resource, genre),
-    FOREIGN KEY (resource) REFERENCES resource,
-    FOREIGN KEY (genre) REFERENCES genre
 );
 
 CREATE TABLE book (

@@ -40,8 +40,8 @@ class EbookRepositoryTests @Autowired constructor(
         val ebook1 = ebook()
         val ebook2 = ebook()
 
-        addEbook(ebook1)
-        addEbook(ebook2)
+        insertEbook(ebook1)
+        insertEbook(ebook2)
 
         val response = transaction { ebookRepository.getAll() }
 
@@ -56,7 +56,7 @@ class EbookRepositoryTests @Autowired constructor(
     fun `should return SQL error when trying to insert ebook with size lower than 0`() {
         val ebook = ebook(size = Size(-.1))
 
-        assertThrows<SQLException> { addEbook(ebook) }
+        assertThrows<SQLException> { insertEbook(ebook) }
     }
 
 }

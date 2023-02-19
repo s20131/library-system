@@ -7,15 +7,17 @@ import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
+import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Resource
 import java.util.UUID
 
 val faker = Faker()
 
 fun author(
+    authorId: AuthorId = AuthorId(UUID.randomUUID()),
     firstName: FirstName = FirstName(faker.name().firstName()),
     lastName: LastName = LastName(faker.name().lastName()),
-) = Author(firstName, lastName)
+) = Author(authorId, firstName, lastName)
 
 fun insertAuthor(authorId: UUID, author: Author) =
     AuthorTable.insert {

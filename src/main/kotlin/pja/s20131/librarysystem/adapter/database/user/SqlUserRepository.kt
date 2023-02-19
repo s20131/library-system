@@ -62,7 +62,7 @@ object UserTable : UUIDTable("\"user\"") {
 }
 
 object UserSettingsTable : IdTable<UUID>("user_settings") {
-    override val id = reference("user_id", UserTable.id)
+    override val id = reference("user_id", UserTable)
     override val primaryKey = PrimaryKey(id)
     val sendEndOfRentalReminder = bool("send_end_of_rental_reminder")
     val sendWhenAvailableReminder = bool("send_when_available_reminder")

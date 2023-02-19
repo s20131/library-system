@@ -2,7 +2,9 @@ package pja.s20131.librarysystem.adapter.database.resource
 
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -18,14 +20,23 @@ import pja.s20131.librarysystem.domain.resource.port.EbookRepository
 
 @Repository
 class SqlEbookRepository : EbookRepository {
-
-    // TODO select only available?
     override fun getAll(): List<Ebook> =
         EbookTable
             .innerJoin(ResourceTable)
             .innerJoin(AuthorTable)
             .selectAll()
             .map { it.toEbook() }
+
+    override fun insert(ebook: Ebook) {
+        insertResourcePropertiesFrom(ebook)
+        EbookTable.insert {
+            it[id] = ebook.resourceId.value
+            it[content] = ExposedBlob(ebook.content.value)
+            it[format] = ebook.ebookFormat
+            it[size] = ebook.size.value
+            it[sizeUnit] = SizeUnit.kB
+        }
+    }
 }
 
 private fun ResultRow.toEbook() =

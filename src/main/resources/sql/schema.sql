@@ -84,6 +84,10 @@ CREATE TABLE category (
     PRIMARY KEY (name)
 );
 
+/*CREATE TABLE genre (
+    name TEXT  PRIMARY KEY
+);*/
+
 INSERT INTO category VALUES ('adventure'), ('fantasy'), ('crime'), ('romance');
 
 CREATE TABLE resource_categories (
@@ -94,6 +98,15 @@ CREATE TABLE resource_categories (
     FOREIGN KEY (resource_id) REFERENCES resource,
     FOREIGN KEY (category) REFERENCES category
 );
+
+/*CREATE TABLE resource_genres (
+    resource UUID  NOT NULL,
+    genre    TEXT  NOT NULL,
+
+    PRIMARY KEY (resource, genre),
+    FOREIGN KEY (resource) REFERENCES resource,
+    FOREIGN KEY (genre) REFERENCES genre
+);*/
 
 CREATE TABLE copy (
     id          UUID  NOT NULL,
