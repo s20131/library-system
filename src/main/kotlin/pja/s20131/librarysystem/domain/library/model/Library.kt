@@ -10,7 +10,6 @@ data class Library(
 
 @JvmInline
 value class LibraryId(val value: UUID) {
-
     companion object {
         fun generate() = LibraryId(UUID.randomUUID())
     }

@@ -4,4 +4,5 @@ import pja.s20131.librarysystem.domain.resource.model.Ebook
 
 interface EbookRepository {
     fun getAll(): List<Ebook>
+    fun insert(ebook: Ebook)
 }

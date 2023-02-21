@@ -5,12 +5,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
-import pja.s20131.librarysystem.domain.BadRequestException
-import pja.s20131.librarysystem.domain.ForbiddenException
-import pja.s20131.librarysystem.domain.NotFoundException
+import pja.s20131.librarysystem.adapter.exceptions.BadRequestException
+import pja.s20131.librarysystem.adapter.exceptions.ForbiddenException
+import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
+import pja.s20131.librarysystem.domain.exceptions.DomainException
 
 @RestControllerAdvice
 class ExceptionHandler {
+
+    @ExceptionHandler(DomainException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun domainExceptionMapper(exception: DomainException, request: WebRequest) =
+        ErrorMessage(
+            status = HttpStatus.BAD_REQUEST,
+            message = exception.message!!,
+            description = request.getDescription(false)
+        )
 
     @ExceptionHandler(BadRequestException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
