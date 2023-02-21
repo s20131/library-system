@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Size.NegativeSizeException
+import pja.s20131.librarysystem.ebook.EbookGen.ebook
 
 @SpringBootTest
 class EbookDomainTests {
