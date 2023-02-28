@@ -3,6 +3,7 @@ package pja.s20131.librarysystem.adapter.database.user
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
@@ -12,6 +13,7 @@ import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
+import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
@@ -33,6 +35,24 @@ class SqlUserRepository : UserRepository {
             .select { UserSettingsTable.id eq userId.value }
             .singleOrNull()
             ?.toUserSettings() ?: throw UserNotFoundException(userId)
+    }
+
+    override fun findBy(email: Email): UserBasicData? {
+        return UserTable
+            .select { UserTable.email eq email.value }
+            .singleOrNull()
+            ?.toUserBasicData()
+    }
+
+    override fun insertUser(user: User) {
+        UserTable.insert {
+            it[id] = user.userId.value
+            it[firstName] = user.firstName.value
+            it[lastName] = user.lastName.value
+            it[email] = user.email.value
+            it[login] = user.login.value
+            it[password] = user.password.value
+        }
     }
 
 }

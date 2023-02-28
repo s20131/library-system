@@ -1,14 +1,32 @@
-### Get libraries
+###
+# @name Get libraries
 GET http://localhost:8080/libraries
 
-### Get books
+###
+# @name Get books
 GET http://localhost:8080/books
 
-### Get ebooks
+###
+# @name Get ebooks
 GET http://localhost:8080/ebooks
 
-### Get user
+###
+# @name Register user
+POST http://localhost:8080/users
+Content-Type: application/json
+
+{
+  "firstName": "Jan",
+  "lastName": "Nowak",
+  "email": "{{$random.email}}",
+  "login": "{{$random.alphabetic(10)}}",
+  "password": "{{$random.alphanumeric(8)}}"
+}
+
+###
+# @name Get user
 GET http://localhost:8080/users/{{userId}}
 
-### Get user settings
+###
+# @name Get user settings
 GET http://localhost:8080/users/{{userId}}/user-settings
