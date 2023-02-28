@@ -17,7 +17,6 @@ CREATE TABLE library (
     city          TEXT  NOT NULL,
 
     PRIMARY KEY (id),
-
     CHECK (postcode ~ '^\d{2}-\d{3}$')
 );
 

@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.domain.user.model
 
+import pja.s20131.librarysystem.domain.exceptions.DomainException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.person.Person
@@ -36,4 +37,15 @@ value class Email(val value: String)
 value class Login(val value: String)
 
 @JvmInline
-value class Password(val value: String)
+value class Password(val value: String) {
+
+    private fun hasMin8Characters() = value.length >= 8
+
+    fun validate() {
+        when {
+            hasMin8Characters().not() -> throw PasswordTooShortException()
+        }
+    }
+
+    class PasswordTooShortException : DomainException("Password is too short")
+}

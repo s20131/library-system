@@ -50,11 +50,11 @@ class UserRepositoryTests @Autowired constructor(
     @Test
     fun `should add user settings when adding a user`() {
         val user = user()
+
         // TODO test real implementation
         userDatabaseHelper.insertUser(user)
 
         val response = userRepository.getSettings(user.userId)
-
         assertThat(response).isEqualTo(basicUserSettings())
     }
 
