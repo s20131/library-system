@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.port.EbookService
 
@@ -18,8 +18,9 @@ class EbookEndpoints(
 ) {
 
     @GetMapping
-    fun getAllEbooks(): List<GetEbookResponse> =
-        ebookService.getAllEbooks().map { it.toResponse() }
+    fun getAllEbooks(): List<ResourceBasicData> {
+        return ebookService.getAllEbooks()
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -27,6 +28,3 @@ class EbookEndpoints(
         return ebookService.addEbook(addEbookRequest.toCommand())
     }
 }
-
-private fun Ebook.toResponse() = GetEbookResponse(title, releaseDate, description, series, status, content, size)
-

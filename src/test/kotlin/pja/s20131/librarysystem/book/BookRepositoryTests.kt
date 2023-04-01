@@ -47,7 +47,7 @@ class BookRepositoryTests @Autowired constructor(
         val book = book()
         resourceDatabaseHelper.insertResourceDependencies(book.author, book.series!!)
 
-        bookRepository.insert(book)
+        bookRepository.save(book)
 
         val response = bookDatabaseHelper.getAllBooks()
         assertThat(response).containsExactly(book)

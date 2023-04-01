@@ -9,15 +9,6 @@ import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.AddBookCommand
 
-data class GetBookResponse(
-    val title: Title,
-    val releaseDate: ReleaseDate,
-    val description: Description?,
-    val series: Series?,
-    val status: ResourceStatus,
-    val isbn: ISBN,
-)
-
 data class AddBookRequest(
     val title: Title,
     val authorId: AuthorId,

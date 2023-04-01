@@ -11,16 +11,6 @@ import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.AddEbookCommand
 
-data class GetEbookResponse(
-    val title: Title,
-    val releaseDate: ReleaseDate,
-    val description: Description?,
-    val series: Series?,
-    val status: ResourceStatus,
-    val content: Content,
-    val size: Size,
-)
-
 data class AddEbookRequest(
     val title: Title,
     val releaseDate: ReleaseDate,

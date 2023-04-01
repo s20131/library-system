@@ -9,6 +9,7 @@ import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.EbookFormat
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
+import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
@@ -22,7 +23,8 @@ class EbookService(
     val authorRepository: AuthorRepository,
 ) {
 
-    fun getAllEbooks() = ebookRepository.getAll()
+    fun getAllEbooks(): List<ResourceBasicData> =
+        ebookRepository.getAll().map { ResourceBasicData(it.title, it.author) }
 
     fun addEbook(addEbookCommand: AddEbookCommand): ResourceId {
         val author = authorRepository.get(addEbookCommand.authorId)
