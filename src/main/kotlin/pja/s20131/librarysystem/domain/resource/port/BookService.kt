@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
+import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
@@ -19,12 +20,15 @@ class BookService(
     val bookRepository: BookRepository,
     val authorRepository: AuthorRepository,
 ) {
-    fun getAllBooks() = bookRepository.getAll()
+    fun getAllBooks(): List<ResourceBasicData> {
+        val books = bookRepository.getAll()
+        return books.map { ResourceBasicData(it.title, it.author) }
+    }
 
     fun addBook(addBookCommand: AddBookCommand): ResourceId {
         val author = authorRepository.get(addBookCommand.authorId)
         val newBook = addBookCommand.toBook(author)
-        bookRepository.insert(newBook)
+        bookRepository.save(newBook)
         return newBook.resourceId
     }
 }

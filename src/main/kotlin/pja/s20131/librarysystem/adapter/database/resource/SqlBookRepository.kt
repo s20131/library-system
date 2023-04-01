@@ -25,7 +25,7 @@ class SqlBookRepository : BookRepository {
             .selectAll()
             .map { it.toBook() }
 
-    override fun insert(book: Book) {
+    override fun save(book: Book) {
         insertResourcePropertiesFrom(book)
         BookTable.insert {
             it[id] = book.resourceId.value

@@ -1,6 +1,6 @@
 package pja.s20131.librarysystem.domain.resource.model
 
-data class Book (
+data class Book(
     override val resourceId: ResourceId,
     override val title: Title,
     override val author: Author,
