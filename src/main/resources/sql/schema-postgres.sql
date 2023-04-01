@@ -1,1 +1,0 @@
-DROP OWNED BY test;
