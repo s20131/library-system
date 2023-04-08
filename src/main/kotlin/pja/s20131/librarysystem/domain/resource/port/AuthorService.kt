@@ -10,8 +10,13 @@ import pja.s20131.librarysystem.domain.resource.model.AuthorId
 @Service
 @Transactional
 class AuthorService(
-    val authorRepository: AuthorRepository,
+    private val authorRepository: AuthorRepository,
 ) {
+
+    fun getAuthor(authorId: AuthorId): Author {
+        return authorRepository.get(authorId)
+    }
+
     fun addAuthor(addAuthorCommand: AddAuthorCommand): AuthorId {
         val newAuthor = addAuthorCommand.toAuthor()
         authorRepository.insert(newAuthor)

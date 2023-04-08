@@ -1,10 +1,12 @@
 package pja.s20131.librarysystem.adapter.api.resource.resource
 
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.port.AuthorService
@@ -18,6 +20,11 @@ class ResourceEndpoints(
 ) {
 
     // TODO add endpoints tests
+
+    @GetMapping("/authors/{authorId}")
+    fun getAuthor(@PathVariable authorId: AuthorId): GetAuthorResponse {
+        return authorService.getAuthor(authorId).toResponse()
+    }
 
     @PostMapping(Paths.AUTHORS)
     fun addAuthor(@RequestBody addAuthorRequest: AddAuthorRequest):  AuthorId {
@@ -39,3 +46,5 @@ class ResourceEndpoints(
         const val SERIES = "/series"
     }
 }
+
+private fun Author.toResponse() = GetAuthorResponse(authorId, firstName, lastName)

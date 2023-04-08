@@ -30,5 +30,5 @@ object EbookGen {
         content: Content = Content(Random.nextBytes(10)),
         ebookFormat: EbookFormat = EbookFormat.EPUB,
         size: Size = Size(faker.number().randomDouble(2, 0, 800)),
-    ) = Ebook(id, title, author, releaseDate, description, series, status, content, ebookFormat, size)
+    ) = Ebook(id, title, author.authorId, releaseDate, description, series, status, content, ebookFormat, size)
 }

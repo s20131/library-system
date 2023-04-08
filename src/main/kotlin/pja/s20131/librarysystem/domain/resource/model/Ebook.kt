@@ -5,7 +5,7 @@ import pja.s20131.librarysystem.domain.exceptions.DomainException
 data class Ebook(
     override val resourceId: ResourceId,
     override val title: Title,
-    override val author: Author,
+    override val authorId: AuthorId,
     override val releaseDate: ReleaseDate,
     override val description: Description?,
     override val series: Series?,
