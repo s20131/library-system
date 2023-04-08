@@ -6,10 +6,9 @@ import org.jetbrains.exposed.sql.selectAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
-import pja.s20131.librarysystem.adapter.database.resource.toAuthor
+import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ISBN
@@ -18,6 +17,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.resource.ResourceDatabaseHelper
+import pja.s20131.librarysystem.resource.ResourceGen
 
 @Component
 @Transactional
@@ -27,13 +27,12 @@ class BookDatabaseHelper @Autowired constructor(
     fun getAllBooks() =
         BookTable
             .innerJoin(ResourceTable)
-            .innerJoin(AuthorTable)
             .selectAll()
             .map { it.toBook() }
 
     fun insertBook(book: Book) {
         book.series?.let { series -> resourceDatabaseHelper.insertSeries(series) }
-        resourceDatabaseHelper.insertAuthor(book.author)
+        resourceDatabaseHelper.insertAuthor(ResourceGen.author(book.authorId))
         resourceDatabaseHelper.insertResource(book)
         BookTable.insert {
             it[id] = book.resourceId.value
@@ -49,7 +48,7 @@ class BookDatabaseHelper @Autowired constructor(
         series = this[ResourceTable.series]?.let { Series(it) },
         status = this[ResourceTable.status],
         isbn = ISBN(this[BookTable.isbn]),
-        author = this.toAuthor(),
+        authorId = AuthorId(this[ResourceTable.author]),
     )
 
 }

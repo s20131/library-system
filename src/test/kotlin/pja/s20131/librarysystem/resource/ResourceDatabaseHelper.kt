@@ -39,15 +39,15 @@ class ResourceDatabaseHelper {
         ResourceTable.insert {
             it[id] = resource.resourceId.value
             it[title] = resource.title.value
-            it[author] = resource.author.authorId.value
+            it[author] = resource.authorId.value
             it[releaseDate] = resource.releaseDate.value
             it[description] = resource.description?.value
             it[series] = resource.series?.value
             it[status] = resource.status
         }
 
-    fun insertResourceDependencies(author: Author, series: Series) {
-        insertAuthor(author)
+    fun insertResourceDependencies(authorId: AuthorId, series: Series) {
+        insertAuthor(ResourceGen.author(authorId))
         insertSeries(series)
     }
 }

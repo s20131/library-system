@@ -45,7 +45,7 @@ class BookRepositoryTests @Autowired constructor(
     @Test
     fun `should correctly add a book`() {
         val book = book()
-        resourceDatabaseHelper.insertResourceDependencies(book.author, book.series!!)
+        resourceDatabaseHelper.insertResourceDependencies(book.authorId, book.series!!)
 
         bookRepository.save(book)
 

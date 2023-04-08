@@ -2,13 +2,13 @@ package pja.s20131.librarysystem.domain.resource.port
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.domain.resource.model.Author
+import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
-import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
+import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
@@ -20,21 +20,37 @@ class BookService(
     val bookRepository: BookRepository,
     val authorRepository: AuthorRepository,
 ) {
-    fun getAllBooks(): List<ResourceBasicData> {
+    fun getAllBooks(): List<ResourceWithAuthorBasicData> {
         val books = bookRepository.getAll()
-        return books.map { ResourceBasicData(it.title, it.author) }
+        val authors = authorRepository.getAll()
+        return books.map { book ->
+            ResourceWithAuthorBasicData(
+                book.toBasicData(),
+                authors.first { it.authorId == book.authorId }.let { AuthorBasicData(it.firstName, it.lastName) }
+            )
+        }
+    }
+
+    fun getBook(bookId: ResourceId): Book {
+        return bookRepository.get(bookId)
     }
 
     fun addBook(addBookCommand: AddBookCommand): ResourceId {
         val author = authorRepository.get(addBookCommand.authorId)
-        val newBook = addBookCommand.toBook(author)
+        val newBook = addBookCommand.toBook(author.authorId)
         bookRepository.save(newBook)
         return newBook.resourceId
     }
 }
 
+data class ResourceWithAuthorBasicData(
+    val resource: ResourceBasicData,
+    val author: AuthorBasicData,
+)
+
 data class AddBookCommand(
     val title: Title,
+    // TODO get or create
     val authorId: AuthorId,
     val releaseDate: ReleaseDate,
     val description: Description?,
@@ -42,5 +58,7 @@ data class AddBookCommand(
     val status: ResourceStatus,
     val isbn: ISBN,
 ) {
-    fun toBook(author: Author) = Book(ResourceId.generate(), title, author, releaseDate, description, series, status, isbn)
+    // TODO create in domain class
+    fun toBook(authorId: AuthorId) =
+        Book(ResourceId.generate(), title, authorId, releaseDate, description, series, status, isbn)
 }

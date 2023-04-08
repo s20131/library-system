@@ -1,8 +1,10 @@
 package pja.s20131.librarysystem.domain.resource.port
 
 import pja.s20131.librarysystem.domain.resource.model.Book
+import pja.s20131.librarysystem.domain.resource.model.ResourceId
 
 interface BookRepository {
     fun getAll(): List<Book>
+    fun get(bookId: ResourceId): Book
     fun save(book: Book)
 }

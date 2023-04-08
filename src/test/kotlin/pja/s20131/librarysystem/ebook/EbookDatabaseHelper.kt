@@ -9,6 +9,7 @@ import pja.s20131.librarysystem.adapter.database.resource.EbookTable
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.SizeUnit
 import pja.s20131.librarysystem.resource.ResourceDatabaseHelper
+import pja.s20131.librarysystem.resource.ResourceGen
 
 @Component
 @Transactional
@@ -17,7 +18,7 @@ class EbookDatabaseHelper @Autowired constructor(
 ) {
     fun insertEbook(ebook: Ebook) {
         ebook.series?.let { series -> resourceDatabaseHelper.insertSeries(series) }
-        resourceDatabaseHelper.insertAuthor(ebook.author)
+        resourceDatabaseHelper.insertAuthor(ResourceGen.author(ebook.authorId))
         resourceDatabaseHelper.insertResource(ebook)
         EbookTable.insert {
             it[id] = ebook.resourceId.value

@@ -6,13 +6,15 @@ import java.util.UUID
 sealed class Resource {
     abstract val resourceId: ResourceId
     abstract val title: Title
-    abstract val author: Author
+    abstract val authorId: AuthorId
     abstract val releaseDate: ReleaseDate
     abstract val description: Description?
     abstract val series: Series?
     abstract val status: ResourceStatus
 
-    fun isAvailable() = status == ResourceStatus.AVAILABLE
+    fun isAvailable(): Boolean = status == ResourceStatus.AVAILABLE
+
+    fun toBasicData(): ResourceBasicData = ResourceBasicData(resourceId, title)
 }
 
 @JvmInline
@@ -37,3 +39,8 @@ value class Series(val value: String)
 enum class ResourceStatus {
     AVAILABLE, WITHDRAWN
 }
+
+data class ResourceBasicData(
+    val id: ResourceId,
+    val title: Title,
+)

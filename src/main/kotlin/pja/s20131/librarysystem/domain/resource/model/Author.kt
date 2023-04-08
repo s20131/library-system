@@ -9,7 +9,9 @@ data class Author(
     val authorId: AuthorId,
     override val firstName: FirstName,
     override val lastName: LastName,
-) : Person
+) : Person {
+    fun toBasicData(): AuthorBasicData = AuthorBasicData(firstName, lastName)
+}
 
 @JvmInline
 value class AuthorId(val value: UUID) {
@@ -17,3 +19,8 @@ value class AuthorId(val value: UUID) {
         fun generate() = AuthorId(UUID.randomUUID())
     }
 }
+
+data class AuthorBasicData(
+    val firstName: FirstName,
+    val lastName: LastName,
+)

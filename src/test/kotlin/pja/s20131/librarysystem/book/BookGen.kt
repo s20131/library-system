@@ -25,5 +25,5 @@ object BookGen {
         series: Series? = Series(faker.book().title()),
         status: ResourceStatus = ResourceStatus.AVAILABLE,
         isbn: ISBN = ISBN(faker.idNumber().valid())
-    ) = Book(resourceId, title, author, releaseDate, description, series, status, isbn)
+    ) = Book(resourceId, title, author.authorId, releaseDate, description, series, status, isbn)
 }
