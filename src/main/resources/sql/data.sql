@@ -44,7 +44,7 @@ BEGIN
     INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', 'abc123');
     INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');
 
-    FOR i in 1..15 LOOP
+    FOR i in 1..10 LOOP
         CALL create_book('Book ' || i, 'Series X', 'John', 'Doe');
     END LOOP;
 END; $$;
