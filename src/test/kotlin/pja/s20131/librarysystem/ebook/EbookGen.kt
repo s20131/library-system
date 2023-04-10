@@ -5,7 +5,7 @@ import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.Ebook
-import pja.s20131.librarysystem.domain.resource.model.EbookFormat
+import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
@@ -28,7 +28,7 @@ object EbookGen {
         series: Series? = Series(faker.elderScrolls().dragon()),
         status: ResourceStatus = ResourceStatus.AVAILABLE,
         content: Content = Content(Random.nextBytes(10)),
-        ebookFormat: EbookFormat = EbookFormat.EPUB,
+        format: Format = Format.EPUB,
         size: Size = Size(faker.number().randomDouble(2, 0, 800)),
-    ) = Ebook(id, title, author.authorId, releaseDate, description, series, status, content, ebookFormat, size)
+    ) = Ebook(id, title, author.authorId, releaseDate, description, series, status, content, format, size)
 }

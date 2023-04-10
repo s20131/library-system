@@ -23,7 +23,7 @@ class EbookDatabaseHelper @Autowired constructor(
         EbookTable.insert {
             it[id] = ebook.resourceId.value
             it[content] = ExposedBlob(ebook.content.value)
-            it[format] = ebook.ebookFormat
+            it[format] = ebook.format
             it[size] = ebook.size.value
             it[sizeUnit] = SizeUnit.kB
         }

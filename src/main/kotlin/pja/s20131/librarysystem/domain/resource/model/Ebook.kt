@@ -11,14 +11,14 @@ data class Ebook(
     override val series: Series?,
     override val status: ResourceStatus,
     val content: Content,
-    val ebookFormat: EbookFormat,
+    val format: Format,
     val size: Size,
 ) : Resource()
 
 @JvmInline
 value class Content(val value: ByteArray)
 
-enum class EbookFormat {
+enum class Format {
     PDF, MOBI, EPUB
 }
 

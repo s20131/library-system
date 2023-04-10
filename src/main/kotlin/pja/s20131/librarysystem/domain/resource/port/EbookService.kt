@@ -7,7 +7,7 @@ import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.Ebook
-import pja.s20131.librarysystem.domain.resource.model.EbookFormat
+import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
@@ -33,6 +33,10 @@ class EbookService(
         }
     }
 
+    fun getEbook(ebookId: ResourceId): Ebook {
+        return ebookRepository.get(ebookId)
+    }
+
     fun addEbook(addEbookCommand: AddEbookCommand): ResourceId {
         val author = authorRepository.get(addEbookCommand.authorId)
         val newEbook = addEbookCommand.toEbook(author.authorId)
@@ -49,8 +53,8 @@ data class AddEbookCommand(
     val series: Series?,
     val status: ResourceStatus,
     val content: Content,
-    val ebookFormat: EbookFormat,
+    val format: Format,
     val size: Size,
 ) {
-    fun toEbook(authorId: AuthorId) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, ebookFormat, size)
+    fun toEbook(authorId: AuthorId) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
 }
