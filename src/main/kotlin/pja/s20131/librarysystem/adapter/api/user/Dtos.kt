@@ -1,23 +1,46 @@
 package pja.s20131.librarysystem.adapter.api.user
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
-import pja.s20131.librarysystem.domain.user.model.Login
+import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
-import pja.s20131.librarysystem.domain.user.port.AddUserCommand
+import pja.s20131.librarysystem.domain.user.port.Credentials
+import pja.s20131.librarysystem.domain.user.port.RegisterUserCommand
 
-data class AddUserRequest(
+data class RegisterUserRequest(
     val firstName: FirstName,
     val lastName: LastName,
     val email: Email,
-    val login: Login,
+    val username: Username,
     val password: Password,
 ) {
-    fun toCommand() = AddUserCommand(firstName, lastName, email, login, password)
+    fun toCommand(): RegisterUserCommand = RegisterUserCommand(firstName, lastName, email, username, password)
+
+    companion object {
+        @JvmStatic
+        @JsonCreator
+        fun creator(firstName: String, lastName: String, email: String, username: String, password: String) =
+            RegisterUserRequest(FirstName(firstName), LastName(lastName), Email(email), Username(username), Password(password))
+    }
+}
+
+data class AuthenticateUserRequest(
+    val username: Username,
+    val password: Password,
+) {
+    fun toCredentials(): Credentials = Credentials(username, password)
+    
+    companion object{
+        @JvmStatic
+        @JsonCreator
+        fun creator(username: String, password: String) =
+            AuthenticateUserRequest(Username(username), Password(password))
+    }
 }
 
 data class GetUserResponse(

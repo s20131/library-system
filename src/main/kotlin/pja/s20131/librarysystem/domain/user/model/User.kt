@@ -11,7 +11,7 @@ data class User(
     override val firstName: FirstName,
     override val lastName: LastName,
     val email: Email,
-    val login: Login,
+    val username: Username,
     val password: Password,
 ) : Person {
     fun toBasicData() = UserBasicData(firstName, lastName, email)
@@ -34,7 +34,7 @@ value class UserId(val value: UUID) {
 value class Email(val value: String)
 
 @JvmInline
-value class Login(val value: String)
+value class Username(val value: String)
 
 @JvmInline
 value class Password(val value: String) {

@@ -5,7 +5,7 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
-import pja.s20131.librarysystem.domain.user.model.Login
+import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
@@ -21,9 +21,9 @@ object UserGen {
         firstName: FirstName = FirstName(faker.name().firstName()),
         lastName: LastName = LastName(faker.name().lastName()),
         email: Email = Email(faker.internet().emailAddress()),
-        login: Login = Login(faker.idNumber().valid()),
+        username: Username = Username(faker.idNumber().valid()),
         password: Password = Password(faker.internet().password()),
-    ) = User(userId, firstName, lastName, email, login, password)
+    ) = User(userId, firstName, lastName, email, username, password)
 
     fun userSettings(
         sendEndOfRentalReminder: SendEndOfRentalReminder = SendEndOfRentalReminder(true),

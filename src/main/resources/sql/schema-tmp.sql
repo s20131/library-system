@@ -63,12 +63,26 @@ CREATE TABLE ebook (
     CHECK (size > 0)
 );
 
+CREATE TABLE copy (
+    id          UUID  NOT NULL,
+    available    INT  NOT NULL,
+    library_id  UUID  NOT NULL,
+    resource_id UUID  NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (library_id) REFERENCES library,
+    FOREIGN KEY (resource_id) REFERENCES resource,
+
+    CHECK (available >= 0)
+
+);
+
 CREATE TABLE "user" (
     id         UUID  NOT NULL,
     first_name TEXT  NOT NULL,
     last_name  TEXT  NOT NULL,
     email      TEXT  NOT NULL,
-    login      TEXT  NOT NULL,
+    username      TEXT  NOT NULL,
     password   TEXT  NOT NULL,
 
     PRIMARY KEY (id)
@@ -82,4 +96,14 @@ CREATE TABLE user_settings (
 
     PRIMARY KEY (user_id),
     FOREIGN KEY (user_id) REFERENCES "user"
+);
+
+CREATE TABLE storage (
+    user_id       UUID  NOT NULL,
+    resource_id   UUID  NOT NULL,
+    added_at TIMESTAMP  NOT NULL,
+
+    PRIMARY KEY (user_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (resource_id) REFERENCES resource
 );

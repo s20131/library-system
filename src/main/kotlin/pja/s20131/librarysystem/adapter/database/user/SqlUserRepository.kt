@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.adapter.database.user
 
+import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
@@ -11,23 +12,23 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
+import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
 import pja.s20131.librarysystem.domain.user.model.User
-import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
+import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.port.UserRepository
-import java.util.UUID
 
 @Repository
 class SqlUserRepository : UserRepository {
 
-    override fun get(userId: UserId): UserBasicData {
+    override fun getBy(userId: UserId): User {
         return UserTable
             .select { UserTable.id eq userId.value }
             .singleOrNull()
-            ?.toUserBasicData() ?: throw UserNotFoundException(userId)
+            ?.toUser() ?: throw UserNotFoundException(userId)
     }
 
     override fun getSettings(userId: UserId): UserSettings {
@@ -37,11 +38,18 @@ class SqlUserRepository : UserRepository {
             ?.toUserSettings() ?: throw UserNotFoundException(userId)
     }
 
-    override fun findBy(email: Email): UserBasicData? {
+    override fun findBy(email: Email): User? {
         return UserTable
             .select { UserTable.email eq email.value }
             .singleOrNull()
-            ?.toUserBasicData()
+            ?.toUser()
+    }
+
+    override fun findBy(username: Username): User? {
+        return UserTable
+            .select { UserTable.username eq username.value }
+            .singleOrNull()
+            ?.toUser()
     }
 
     override fun insertUser(user: User) {
@@ -50,26 +58,27 @@ class SqlUserRepository : UserRepository {
             it[firstName] = user.firstName.value
             it[lastName] = user.lastName.value
             it[email] = user.email.value
-            it[login] = user.login.value
+            it[username] = user.username.value
             it[password] = user.password.value
         }
     }
 
 }
 
-private fun ResultRow.toUserBasicData() =
-    UserBasicData(
-        FirstName(this[UserTable.firstName]),
-        LastName(this[UserTable.lastName]),
-        Email(this[UserTable.email]),
-    )
+private fun ResultRow.toUser() = User(
+    UserId(this[UserTable.id].value),
+    FirstName(this[UserTable.firstName]),
+    LastName(this[UserTable.lastName]),
+    Email(this[UserTable.email]),
+    Username(this[UserTable.username]),
+    Password(this[UserTable.password]),
+)
 
-private fun ResultRow.toUserSettings() =
-    UserSettings(
-        SendEndOfRentalReminder(this[UserSettingsTable.sendEndOfRentalReminder]),
-        SendWhenAvailableReminder(this[UserSettingsTable.sendWhenAvailableReminder]),
-        this[UserSettingsTable.kindleEmail]?.let { KindleEmail(it) },
-    )
+private fun ResultRow.toUserSettings() = UserSettings(
+    SendEndOfRentalReminder(this[UserSettingsTable.sendEndOfRentalReminder]),
+    SendWhenAvailableReminder(this[UserSettingsTable.sendWhenAvailableReminder]),
+    this[UserSettingsTable.kindleEmail]?.let { KindleEmail(it) },
+)
 
 class UserNotFoundException(id: UserId) : NotFoundException("User with id=${id.value} not found")
 
@@ -77,7 +86,7 @@ object UserTable : UUIDTable("\"user\"") {
     val firstName = text("first_name")
     val lastName = text("last_name")
     val email = text("email")
-    val login = text("login")
+    val username = text("username")
     val password = text("password")
 }
 
