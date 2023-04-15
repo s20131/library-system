@@ -9,9 +9,7 @@ data class Author(
     val authorId: AuthorId,
     override val firstName: FirstName,
     override val lastName: LastName,
-) : Person {
-    fun toBasicData(): AuthorBasicData = AuthorBasicData(firstName, lastName)
-}
+) : Person
 
 @JvmInline
 value class AuthorId(val value: UUID) {

@@ -1,8 +1,3 @@
-INSERT INTO library VALUES (gen_random_uuid(), 'Biblioteka Publiczna Wesoła - 1', 'Ulica', '1', '05-077', 'Warszawa'),
-                           (gen_random_uuid(), 'Biblioteka Publiczna Wesoła - 2', 'Ulica', '2a', '05-077', 'Warszawa'),
-                           (gen_random_uuid(), 'Biblioteka Publiczna Wesoła - 4', 'Ulica', '3b', '05-077', 'Warszawa');
-
-
 CREATE PROCEDURE create_book(title text, series text, author_first_name text, author_last_name text, release_date date default CURRENT_DATE)
 LANGUAGE plpgsql
 AS $$
@@ -29,22 +24,32 @@ END; $$;
 
 
 DO $$
-    DECLARE author1_id uuid;
-    DECLARE ebook1_id uuid;
+    DECLARE library_id uuid;
+    DECLARE author_id uuid;
+    DECLARE ebook_id uuid;
     DECLARE user_id uuid;
 BEGIN
-    author1_id := gen_random_uuid();
-    ebook1_id := gen_random_uuid();
+    library_id := gen_random_uuid();
+    author_id := gen_random_uuid();
+    ebook_id := gen_random_uuid();
     user_id := gen_random_uuid();
 
-    INSERT INTO author VALUES (author1_id, 'Andrzej', 'Sapkowski');
+    INSERT INTO library VALUES (library_id, 'Biblioteka Publiczna Wesoła - 1', 'Ulica', '1', '05-077', 'Warszawa');
+
+    INSERT INTO author VALUES (author_id, 'Andrzej', 'Sapkowski');
     CALL create_book('Wieża Jaskółki', 'Wiedźmin', 'Andrzej', 'Sapkowski');
-    INSERT INTO resource(id, title, author, release_date, series) VALUES (ebook1_id, 'Pani Jeziora', author1_id, CURRENT_DATE, 'Wiedźmin');
-    INSERT INTO ebook VALUES (ebook1_id, md5(random()::text)::bytea, 'EPUB', 25.123, 'kB');
-    INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', 'abc123');
-    INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');
+
+    INSERT INTO resource(id, title, author, release_date, series) VALUES (ebook_id, 'Pani Jeziora', author_id, CURRENT_DATE, 'Wiedźmin');
+    INSERT INTO ebook VALUES (ebook_id, md5(random()::text)::bytea, 'EPUB', 25.123, 'kB');
 
     FOR i in 1..10 LOOP
         CALL create_book('Book ' || i, 'Series X', 'John', 'Doe');
     END LOOP;
+
+    INSERT INTO copy (id, available, library_id, resource_id) VALUES (gen_random_uuid(), 3, library_id, ebook_id);
+
+    INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', '$2a$10$buxxCLdRTA3gPwZfLQS7NO921gcMhjRqZGyTaBDFqTQf9HKV3mizy'); --abc123
+    INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');
+
+    INSERT INTO storage (user_id, resource_id, added_at) VALUES (user_id, ebook_id, now());
 END; $$;

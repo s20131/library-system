@@ -33,16 +33,16 @@ class UserRepositoryTests @Autowired constructor(
         val user = user()
         userDatabaseHelper.insertUser(user)
 
-        val response = userRepository.get(user.userId)
+        val response = userRepository.getBy(user.userId)
 
-        assertThat(response).isEqualTo(user.toBasicData())
+        assertThat(response).isEqualTo(user)
     }
 
     @Test
     fun `should return NOT_FOUND if the requested user doesn't exist`() {
         val user = user()
 
-        assertThatThrownBy { userRepository.get(user.userId) }
+        assertThatThrownBy { userRepository.getBy(user.userId) }
             .isInstanceOf(UserNotFoundException::class.java)
             .hasMessage("User with id=${user.userId.value} not found")
     }
