@@ -6,7 +6,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.domain.exceptions.DomainException
+import pja.s20131.librarysystem.adapter.exceptions.BadRequestException
+import pja.s20131.librarysystem.adapter.exceptions.ForbiddenException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
@@ -44,7 +45,7 @@ class AuthService(
             throw BadCredentialsException()
         }
         return UsernamePasswordAuthenticationToken(
-            username, password, listOf()
+            user.userId.value, password, listOf()
         )
     }
 
@@ -73,7 +74,7 @@ data class Credentials(
     val password: Password,
 )
 
-class EmailAlreadyExistsException(email: Email) : DomainException("Email \"${email.value}\" is already in use")
+class EmailAlreadyExistsException(email: Email) : BadRequestException("Email \"${email.value}\" is already in use")
 
-class BadCredentialsException : DomainException("Wrong username or password were provided")
+class BadCredentialsException : ForbiddenException("Wrong username or password were provided")
 

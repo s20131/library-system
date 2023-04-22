@@ -82,7 +82,7 @@ CREATE TABLE "user" (
     first_name TEXT  NOT NULL,
     last_name  TEXT  NOT NULL,
     email      TEXT  NOT NULL,
-    username      TEXT  NOT NULL,
+    username   TEXT  NOT NULL,
     password   TEXT  NOT NULL,
 
     PRIMARY KEY (id)
@@ -99,9 +99,9 @@ CREATE TABLE user_settings (
 );
 
 CREATE TABLE storage (
-    user_id       UUID  NOT NULL,
-    resource_id   UUID  NOT NULL,
-    added_at TIMESTAMP  NOT NULL,
+    user_id     UUID  NOT NULL,
+    resource_id UUID  NOT NULL,
+    since  TIMESTAMP  NOT NULL,
 
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",

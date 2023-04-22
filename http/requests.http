@@ -29,4 +29,8 @@ GET http://localhost:8080/users/{{userId}}
 
 ###
 # @name Get user settings
-GET http://localhost:8080/users/{{userId}}/user-settings
+GET http://localhost:8080/users/{{userId}}/settings
+
+###
+# @name Get user storage
+GET http://localhost:8080/storage
