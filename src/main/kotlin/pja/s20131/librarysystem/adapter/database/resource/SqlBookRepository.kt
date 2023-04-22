@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
+import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
@@ -45,8 +46,12 @@ class SqlBookRepository : BookRepository {
     }
 }
 
-private fun ResultRow.toBook() =
-    Book(
+object BookTable : IdTable<UUID>("book") {
+    override val id = reference("resource_id", ResourceTable)
+    override val primaryKey = PrimaryKey(id)
+    val isbn = text("isbn")
+
+    fun ResultRow.toBook() = Book(
         ResourceId(this[ResourceTable.id].value),
         Title(this[ResourceTable.title]),
         AuthorId(this[ResourceTable.author]),
@@ -54,13 +59,8 @@ private fun ResultRow.toBook() =
         this[ResourceTable.description]?.let { Description(it) },
         this[ResourceTable.series]?.let { Series(it) },
         this[ResourceTable.status],
-        ISBN(this[BookTable.isbn]),
+        ISBN(this[isbn]),
     )
-
-object BookTable : IdTable<UUID>("book") {
-    override val id = reference("resource_id", ResourceTable)
-    override val primaryKey = PrimaryKey(id)
-    val isbn = text("isbn")
 }
 
 class BookNotFoundException(bookId: ResourceId) : NotFoundException("Book with id=${bookId.value} doesn't exist")

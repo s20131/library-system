@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.springframework.stereotype.Repository
+import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
@@ -50,20 +51,6 @@ class SqlEbookRepository : EbookRepository {
     }
 }
 
-private fun ResultRow.toEbook() =
-    Ebook(
-        ResourceId(this[ResourceTable.id].value),
-        Title(this[ResourceTable.title]),
-        AuthorId(this[ResourceTable.author]),
-        ReleaseDate(this[ResourceTable.releaseDate]),
-        this[ResourceTable.description]?.let { Description(it) },
-        this[ResourceTable.series]?.let { Series(it) },
-        this[ResourceTable.status],
-        Content(this[EbookTable.content].bytes),
-        Format.valueOf(this[EbookTable.format].name),
-        Size(this[EbookTable.size]),
-    )
-
 object EbookTable : Table("ebook") {
     val id = reference("resource_id", ResourceTable)
     val content = blob("content")
@@ -71,6 +58,19 @@ object EbookTable : Table("ebook") {
     val size = double("size")
     val sizeUnit = enumerationByName<SizeUnit>("size_unit", 255)
     override val primaryKey = PrimaryKey(id, format)
+
+    fun ResultRow.toEbook() = Ebook(
+        ResourceId(this[ResourceTable.id].value),
+        Title(this[ResourceTable.title]),
+        AuthorId(this[ResourceTable.author]),
+        ReleaseDate(this[ResourceTable.releaseDate]),
+        this[ResourceTable.description]?.let { Description(it) },
+        this[ResourceTable.series]?.let { Series(it) },
+        this[ResourceTable.status],
+        Content(this[content].bytes),
+        this[format],
+        Size(this[size]),
+    )
 }
 
-class EbookNotFoundException(ebookId: ResourceId): NotFoundException("Ebook with id=${ebookId} was not found")
+class EbookNotFoundException(ebookId: ResourceId) : NotFoundException("Ebook with id=${ebookId} was not found")

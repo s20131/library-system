@@ -40,6 +40,10 @@ enum class ResourceStatus {
     AVAILABLE, WITHDRAWN
 }
 
+enum class ResourceType {
+    BOOK, EBOOK
+}
+
 data class ResourceBasicData(
     val id: ResourceId,
     val title: Title,
