@@ -30,7 +30,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:${Versions.exposed}")
     implementation("org.jetbrains.exposed:spring-transaction:${Versions.exposed}")
     implementation("org.postgresql:postgresql:42.6.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2:2.1.214")
     testImplementation("com.github.javafaker:javafaker:1.0.2")
