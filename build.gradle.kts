@@ -17,6 +17,11 @@ repositories {
 
 object Versions {
     const val exposed = "0.41.1"
+    const val postgres = "42.6.0"
+    const val jackson = "2.14.2"
+    const val h2 = "2.1.214"
+    const val faker = "1.0.2"
+    const val archunit = "1.0.1"
 }
 
 dependencies {
@@ -29,12 +34,12 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:${Versions.exposed}")
     implementation("org.jetbrains.exposed:exposed-java-time:${Versions.exposed}")
     implementation("org.jetbrains.exposed:spring-transaction:${Versions.exposed}")
-    implementation("org.postgresql:postgresql:42.6.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    implementation("org.postgresql:postgresql:${Versions.postgres}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson}")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("com.h2database:h2:2.1.214")
-    testImplementation("com.github.javafaker:javafaker:1.0.2")
-    testImplementation("com.tngtech.archunit:archunit-junit5:1.0.1")
+    testImplementation("com.h2database:h2:${Versions.h2}")
+    testImplementation("com.github.javafaker:javafaker:${Versions.faker}")
+    testImplementation("com.tngtech.archunit:archunit-junit5:${Versions.archunit}")
 }
 
 tasks.withType<KotlinCompile> {
