@@ -5,8 +5,8 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.model.UserId
 
 interface StorageRepository {
-    fun getFromStorageBy(userId: UserId): List<StoredResource>
-    fun getIsInUserStorage(userId: UserId, resourceId: ResourceId): Boolean
-    fun addToUserStorage(userId: UserId, resourceId: ResourceId, since: Instant)
-    fun removeFromUserStorage(userId: UserId, resourceId: ResourceId)
+    fun getAllBy(userId: UserId): List<StoredResource>
+    fun isInUserStorage(userId: UserId, resourceId: ResourceId): Boolean
+    fun add(userId: UserId, resourceId: ResourceId, since: Instant)
+    fun remove(userId: UserId, resourceId: ResourceId)
 }
