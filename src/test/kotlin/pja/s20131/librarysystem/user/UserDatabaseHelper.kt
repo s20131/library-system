@@ -22,7 +22,7 @@ class UserDatabaseHelper {
             it[firstName] = user.firstName.value
             it[lastName] = user.lastName.value
             it[email] = user.email.value
-            it[username] = user.email.value
+            it[username] = user.username.value
             it[password] = user.password.value
         }
         insertUserSettings(

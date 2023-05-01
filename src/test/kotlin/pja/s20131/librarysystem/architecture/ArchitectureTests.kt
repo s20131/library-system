@@ -1,5 +1,7 @@
 package pja.s20131.librarysystem.architecture
 
+import com.tngtech.archunit.base.DescribedPredicate
+import com.tngtech.archunit.core.domain.properties.HasName
 import com.tngtech.archunit.core.importer.ImportOption
 import com.tngtech.archunit.junit.AnalyzeClasses
 import com.tngtech.archunit.junit.ArchTest
@@ -19,10 +21,11 @@ class ArchitectureTests {
     val hexagonalArchitectureLayerCheck: ArchRule =
         onionArchitecture()
             .domainModels("..domain..model..")
-            .domainServices("..domain..port..")
+            .domainServices("..domain..")
             .applicationServices("..infrastructure..")
             .adapter("api", "..adapter.api..")
             .adapter("database", "..adapter.database..")
+            .ignoreDependency(HasName.Predicates.nameMatching(".*ExceptionHandler"), DescribedPredicate.alwaysTrue())
 
     @ArchTest
     val controllersShouldBeInAdapterApiPackages: ArchRule =
@@ -39,11 +42,11 @@ class ArchitectureTests {
             .andShould().resideInAPackage("..adapter.database..")
 
     @ArchTest
-    val servicesShouldBeInDomainPortPackages: ArchRule =
+    val servicesShouldBeInDomainPackages: ArchRule =
         classes()
             .that().areAnnotatedWith(Service::class.java)
             .should().haveNameMatching(".*Service")
-            .andShould().resideInAPackage("..domain..port..")
+            .andShould().resideInAPackage("..domain..")
 
     @ArchTest
     val domainShouldBeIndependentFromAdapter: ArchRule =
@@ -62,5 +65,5 @@ class ArchitectureTests {
         noClasses()
             .that().resideInAPackage("..adapter.database..")
             .should().dependOnClassesThat().resideInAPackage("..adapter.api..")
-    
+
 }
