@@ -1,0 +1,13 @@
+package pja.s20131.librarysystem.exception
+
+enum class ErrorCode {
+    AUTHOR_NOT_FOUND,
+    BAD_CREDENTIALS,
+    BOOK_NOT_FOUND,
+    EBOOK_NOT_FOUND,
+    EBOOK_NEGATIVE_FILE_SIZE,
+    EMAIL_ALREADY_EXISTS,
+    PASSWORD_TOO_SHORT,
+    UNKNOWN_EXCEPTION,
+    USER_NOT_FOUND,
+}

@@ -6,8 +6,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.adapter.exceptions.BadRequestException
-import pja.s20131.librarysystem.adapter.exceptions.ForbiddenException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
@@ -16,13 +14,14 @@ import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.port.UserRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Service
 @Transactional
 class AuthService(
     val userRepository: UserRepository,
     val passwordEncoder: PasswordEncoder,
-): AuthenticationProvider {
+) : AuthenticationProvider {
 
     fun register(command: RegisterUserCommand) {
         validateUserData(command)
@@ -75,7 +74,7 @@ data class Credentials(
     val password: Password,
 )
 
-class EmailAlreadyExistsException(email: Email) : BadRequestException("Email \"${email.value}\" is already in use")
+class EmailAlreadyExistsException(email: Email) : BaseException("Email \"${email.value}\" is already in use")
 
-class BadCredentialsException : ForbiddenException("Wrong username or password were provided")
+class BadCredentialsException : BaseException("Wrong username or password were provided")
 

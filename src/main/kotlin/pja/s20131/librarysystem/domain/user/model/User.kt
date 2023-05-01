@@ -46,6 +46,6 @@ value class Password(val value: String) {
             hasMin8Characters().not() -> throw PasswordTooShortException()
         }
     }
-
-    class PasswordTooShortException : BaseException("Password is too short")
 }
+
+class PasswordTooShortException : BaseException("Password is too short")

@@ -7,7 +7,6 @@ import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
@@ -20,6 +19,7 @@ import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.port.UserRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlUserRepository : UserRepository {
@@ -80,7 +80,7 @@ private fun ResultRow.toUserSettings() = UserSettings(
     this[UserSettingsTable.kindleEmail]?.let { KindleEmail(it) },
 )
 
-class UserNotFoundException(id: UserId) : NotFoundException("User with id=${id.value} not found")
+class UserNotFoundException(id: UserId) : BaseException("User with id=${id.value} not found")
 
 object UserTable : UUIDTable("\"user\"") {
     val firstName = text("first_name")
