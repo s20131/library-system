@@ -1,10 +1,10 @@
 package pja.s20131.librarysystem.domain.user.model
 
-import pja.s20131.librarysystem.domain.exceptions.DomainException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.person.Person
 import java.util.UUID
+import pja.s20131.librarysystem.exception.BaseException
 
 data class User(
     val userId: UserId,
@@ -47,5 +47,5 @@ value class Password(val value: String) {
         }
     }
 
-    class PasswordTooShortException : DomainException("Password is too short")
+    class PasswordTooShortException : BaseException("Password is too short")
 }

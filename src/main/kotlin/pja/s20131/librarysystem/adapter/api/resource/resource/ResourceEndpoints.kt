@@ -10,10 +10,10 @@ import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.domain.resource.port.AuthorService
-import pja.s20131.librarysystem.domain.resource.port.ResourceCopy
-import pja.s20131.librarysystem.domain.resource.port.ResourceService
-import pja.s20131.librarysystem.domain.resource.port.SeriesService
+import pja.s20131.librarysystem.domain.resource.AuthorService
+import pja.s20131.librarysystem.domain.resource.ResourceCopy
+import pja.s20131.librarysystem.domain.resource.ResourceService
+import pja.s20131.librarysystem.domain.resource.SeriesService
 
 @RestController
 @RequestMapping("/resources")
@@ -46,7 +46,7 @@ class ResourceEndpoints(
     }
 
     @GetMapping("${Paths.COPIES}/{resourceId}/libraries")
-    fun getCopyInLibraries(@PathVariable resourceId: ResourceId): List<GetCopyResponse> {
+    fun getResourceCopyInLibraries(@PathVariable resourceId: ResourceId): List<GetResourceCopyResponse> {
         return resourceService.getResourceCopyInLibraries(resourceId).toResponse()
     }
 
@@ -58,4 +58,4 @@ class ResourceEndpoints(
 }
 
 private fun Author.toResponse() = GetAuthorResponse(authorId, firstName, lastName)
-private fun List<ResourceCopy>.toResponse() = map { GetCopyResponse(it.libraryId, it.available) }
+private fun List<ResourceCopy>.toResponse() = map { GetResourceCopyResponse(it.libraryId, it.available) }

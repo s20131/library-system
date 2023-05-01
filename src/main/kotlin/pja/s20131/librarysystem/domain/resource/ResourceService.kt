@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.domain.resource.port
+package pja.s20131.librarysystem.domain.resource
 
 import java.time.Instant
 import org.springframework.stereotype.Service
@@ -9,6 +9,8 @@ import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
+import pja.s20131.librarysystem.domain.resource.port.CopyRepository
+import pja.s20131.librarysystem.domain.resource.port.StorageRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Service

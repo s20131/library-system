@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.port.BookService
-import pja.s20131.librarysystem.domain.resource.port.ResourceWithAuthorBasicData
+import pja.s20131.librarysystem.domain.resource.BookService
+import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 
 @RestController
 @RequestMapping("/books")

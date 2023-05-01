@@ -8,7 +8,7 @@ import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.port.CopyRepository
-import pja.s20131.librarysystem.domain.resource.port.ResourceCopy
+import pja.s20131.librarysystem.domain.resource.ResourceCopy
 
 @Repository
 class SqlCopyRepository : CopyRepository {

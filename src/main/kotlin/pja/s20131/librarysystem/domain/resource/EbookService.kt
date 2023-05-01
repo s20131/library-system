@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.domain.resource.port
+package pja.s20131.librarysystem.domain.resource
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +14,8 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
+import pja.s20131.librarysystem.domain.resource.port.AuthorRepository
+import pja.s20131.librarysystem.domain.resource.port.EbookRepository
 
 @Service
 @Transactional

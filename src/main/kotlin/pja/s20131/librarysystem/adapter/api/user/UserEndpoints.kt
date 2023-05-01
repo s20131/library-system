@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
-import pja.s20131.librarysystem.domain.user.port.UserService
+import pja.s20131.librarysystem.domain.user.UserService
 
 @RestController
 class UserEndpoints(
