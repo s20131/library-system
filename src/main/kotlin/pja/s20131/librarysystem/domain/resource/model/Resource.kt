@@ -36,6 +36,9 @@ value class Description(val value: String)
 @JvmInline
 value class Series(val value: String)
 
+@JvmInline
+value class Available(val value: Int)
+
 enum class ResourceStatus {
     AVAILABLE, WITHDRAWN
 }

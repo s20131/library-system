@@ -73,6 +73,7 @@ CREATE TABLE copy (
     FOREIGN KEY (library_id) REFERENCES library,
     FOREIGN KEY (resource_id) REFERENCES resource,
 
+    UNIQUE (library_id, resource_id),
     CHECK (available >= 0)
 
 );

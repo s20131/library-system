@@ -24,14 +24,14 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
-import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
+import pja.s20131.librarysystem.domain.resource.port.StorageRepository
 import pja.s20131.librarysystem.domain.resource.port.StoredResource
 import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Repository
-class SqlResourceRepository : ResourceRepository {
+class SqlStorageRepository : StorageRepository {
 
-    override fun getFromStorageBy(userId: UserId): List<StoredResource> {
+    override fun getAllBy(userId: UserId): List<StoredResource> {
         val sinceAlias = StorageTable.since.alias("timestamps")
         val columns = listOf(sinceAlias, *AuthorTable.columns.toTypedArray(), ResourceTable.id, ResourceTable.title)
         val booksQuery = StorageTable
@@ -61,7 +61,7 @@ class SqlResourceRepository : ResourceRepository {
             }
     }
 
-    override fun getIsInUserStorage(userId: UserId, resourceId: ResourceId): Boolean {
+    override fun isInUserStorage(userId: UserId, resourceId: ResourceId): Boolean {
         // TODO with database query
         //val existsOp = exists(StorageTable.select { eqKey(userId, resourceId) })
         return StorageTable.select {
@@ -69,7 +69,7 @@ class SqlResourceRepository : ResourceRepository {
         }.any()
     }
 
-    override fun addToUserStorage(userId: UserId, resourceId: ResourceId, since: Instant) {
+    override fun add(userId: UserId, resourceId: ResourceId, since: Instant) {
         StorageTable.replace {
             it[this.userId] = userId.value
             it[this.resourceId] = resourceId.value
@@ -77,7 +77,7 @@ class SqlResourceRepository : ResourceRepository {
         }
     }
 
-    override fun removeFromUserStorage(userId: UserId, resourceId: ResourceId) {
+    override fun remove(userId: UserId, resourceId: ResourceId) {
         StorageTable.deleteWhere {
             it.eqKey(userId, resourceId)
         }
