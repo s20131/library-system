@@ -6,12 +6,12 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.port.AuthorRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlAuthorRepository : AuthorRepository {
@@ -24,7 +24,7 @@ class SqlAuthorRepository : AuthorRepository {
     }
 
     override fun get(authorId: AuthorId): Author {
-        return find(authorId) ?: throw AuthorNotFound(authorId)
+        return find(authorId) ?: throw AuthorNotFoundException(authorId)
     }
 
     override fun getAll(): List<Author> {
@@ -53,4 +53,4 @@ object AuthorTable : UUIDTable("author") {
     val lastName = text("last_name")
 }
 
-class AuthorNotFound(authorId: AuthorId) : NotFoundException("Author with id=${authorId.value} doesn't exist")
+class AuthorNotFoundException(authorId: AuthorId) : BaseException("Author with id=${authorId.value} doesn't exist")

@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
-import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -18,6 +17,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.BookRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlBookRepository : BookRepository {
@@ -63,4 +63,4 @@ object BookTable : IdTable<UUID>("book") {
     )
 }
 
-class BookNotFoundException(bookId: ResourceId) : NotFoundException("Book with id=${bookId.value} doesn't exist")
+class BookNotFoundException(bookId: ResourceId) : BaseException("Book with id=${bookId.value} doesn't exist")

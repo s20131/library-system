@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
-import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -21,6 +20,7 @@ import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.SizeUnit
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.EbookRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlEbookRepository : EbookRepository {
@@ -73,4 +73,4 @@ object EbookTable : Table("ebook") {
     )
 }
 
-class EbookNotFoundException(ebookId: ResourceId) : NotFoundException("Ebook with id=${ebookId} was not found")
+class EbookNotFoundException(ebookId: ResourceId) : BaseException("Ebook with id=${ebookId} was not found")

@@ -27,10 +27,10 @@ value class Size(val value: Double) {
     init {
         if (value < 0) throw NegativeSizeException(value)
     }
-
-    class NegativeSizeException(value: Double) : BaseException("Size cannot be negative - given size=$value")
 }
 
 enum class SizeUnit {
     kB
 }
+
+class NegativeSizeException(value: Double) : BaseException("Size cannot be negative, but was $value")
