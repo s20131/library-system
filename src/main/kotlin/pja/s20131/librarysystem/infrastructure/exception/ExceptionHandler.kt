@@ -8,17 +8,17 @@ import org.springframework.web.context.request.WebRequest
 import pja.s20131.librarysystem.adapter.exceptions.BadRequestException
 import pja.s20131.librarysystem.adapter.exceptions.ForbiddenException
 import pja.s20131.librarysystem.adapter.exceptions.NotFoundException
-import pja.s20131.librarysystem.domain.exceptions.DomainException
+import pja.s20131.librarysystem.exception.BaseException
 
 @RestControllerAdvice
 class ExceptionHandler {
 
-    @ExceptionHandler(DomainException::class)
+    @ExceptionHandler(BaseException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun domainExceptionMapper(exception: DomainException, request: WebRequest) =
+    fun baseExceptionMapper(exception: BaseException, request: WebRequest) =
         ErrorMessage(
             status = HttpStatus.BAD_REQUEST,
-            message = exception.message!!,
+            message = exception.message,
             description = request.getDescription(false)
         )
 

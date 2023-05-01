@@ -1,10 +1,11 @@
-package pja.s20131.librarysystem.domain.user.port
+package pja.s20131.librarysystem.domain.user
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
+import pja.s20131.librarysystem.domain.user.port.UserRepository
 
 @Service
 @Transactional

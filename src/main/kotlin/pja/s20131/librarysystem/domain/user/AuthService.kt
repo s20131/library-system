@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.domain.user.port
+package pja.s20131.librarysystem.domain.user
 
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -15,6 +15,7 @@ import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.Username
+import pja.s20131.librarysystem.domain.user.port.UserRepository
 
 @Service
 @Transactional

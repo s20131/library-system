@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.domain.resource.port
+package pja.s20131.librarysystem.domain.resource
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -6,6 +6,7 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
+import pja.s20131.librarysystem.domain.resource.port.AuthorRepository
 
 @Service
 @Transactional

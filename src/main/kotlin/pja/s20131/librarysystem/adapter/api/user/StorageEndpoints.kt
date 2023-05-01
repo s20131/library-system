@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.adapter.api.resource.resource.GetStoredResourceResponse
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.port.ResourceService
-import pja.s20131.librarysystem.domain.resource.port.StoredResource
+import pja.s20131.librarysystem.domain.resource.ResourceService
+import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.infrastructure.security.PrincipalConverter
 
 @RestController

@@ -9,8 +9,8 @@ import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
-import pja.s20131.librarysystem.domain.user.port.Credentials
-import pja.s20131.librarysystem.domain.user.port.RegisterUserCommand
+import pja.s20131.librarysystem.domain.user.Credentials
+import pja.s20131.librarysystem.domain.user.RegisterUserCommand
 
 data class RegisterUserRequest(
     val firstName: FirstName,

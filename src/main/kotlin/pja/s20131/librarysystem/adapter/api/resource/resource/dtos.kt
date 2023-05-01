@@ -9,7 +9,7 @@ import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
-import pja.s20131.librarysystem.domain.resource.port.AddAuthorCommand
+import pja.s20131.librarysystem.domain.resource.AddAuthorCommand
 
 data class AddAuthorRequest(
     val firstName: FirstName,
@@ -31,7 +31,7 @@ data class GetStoredResourceResponse(
     val since: Instant,
 )
 
-data class GetCopyResponse(
+data class GetResourceCopyResponse(
     val libraryId: LibraryId,
     val available: Available,
 )

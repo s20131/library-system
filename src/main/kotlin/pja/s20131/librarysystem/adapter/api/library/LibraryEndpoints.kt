@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.library.model.Library
-import pja.s20131.librarysystem.domain.library.port.LibraryService
+import pja.s20131.librarysystem.domain.library.LibraryService
 
 @RestController
 @RequestMapping("/libraries")

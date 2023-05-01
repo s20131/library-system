@@ -9,7 +9,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
-import pja.s20131.librarysystem.domain.resource.port.AddBookCommand
+import pja.s20131.librarysystem.domain.resource.AddBookCommand
 
 data class AddBookRequest(
     val title: Title,

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.adapter.api.resource.book.GetResourceWithAuthorBasicDataResponse
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.port.EbookService
-import pja.s20131.librarysystem.domain.resource.port.ResourceWithAuthorBasicData
+import pja.s20131.librarysystem.domain.resource.EbookService
+import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 
 @RestController
 @RequestMapping("/ebooks")

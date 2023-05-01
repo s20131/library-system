@@ -25,7 +25,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.StorageRepository
-import pja.s20131.librarysystem.domain.resource.port.StoredResource
+import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Repository
