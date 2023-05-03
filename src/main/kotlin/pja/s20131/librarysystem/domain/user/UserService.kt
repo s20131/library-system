@@ -10,7 +10,7 @@ import pja.s20131.librarysystem.domain.user.port.UserRepository
 @Service
 @Transactional
 class UserService(
-    val userRepository: UserRepository,
+    private val userRepository: UserRepository,
 ) {
 
     fun getUser(userId: UserId): UserBasicData {
@@ -18,7 +18,7 @@ class UserService(
     }
 
     fun getUserSettings(userId: UserId): UserSettings {
-        return userRepository.getSettings(userId)
+        return userRepository.getSettingsBy(userId)
     }
 
 }

@@ -2,7 +2,6 @@ package pja.s20131.librarysystem.domain.resource
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -20,8 +19,8 @@ import pja.s20131.librarysystem.domain.resource.port.EbookRepository
 @Service
 @Transactional
 class EbookService(
-    val ebookRepository: EbookRepository,
-    val authorRepository: AuthorRepository,
+    private val ebookRepository: EbookRepository,
+    private val authorRepository: AuthorRepository,
 ) {
 
     fun getAllEbooks(): List<ResourceWithAuthorBasicData> {
@@ -30,7 +29,7 @@ class EbookService(
         return ebooks.map { ebook ->
             ResourceWithAuthorBasicData(
                 ebook.toBasicData(),
-                authors.first { it.authorId == ebook.authorId }.let { AuthorBasicData(it.firstName, it.lastName) }
+                authors.first { it.authorId == ebook.authorId }.toBasicData()
             )
         }
     }
@@ -58,5 +57,6 @@ data class AddEbookCommand(
     val format: Format,
     val size: Size,
 ) {
-    fun toEbook(authorId: AuthorId) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
+    fun toEbook(authorId: AuthorId) =
+        Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
 }

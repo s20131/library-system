@@ -1,7 +1,9 @@
 package pja.s20131.librarysystem.book
 
-import com.github.javafaker.Faker
+import net.datafaker.Faker
+import pja.s20131.librarysystem.domain.resource.AddBookCommand
 import pja.s20131.librarysystem.domain.resource.model.Author
+import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ISBN
@@ -22,8 +24,18 @@ object BookGen {
         author: Author = ResourceGen.author(),
         releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
         description: Description? = Description(faker.yoda().quote()),
-        series: Series? = Series(faker.book().title()),
+        series: Series? = null,
         status: ResourceStatus = ResourceStatus.AVAILABLE,
         isbn: ISBN = ISBN(faker.idNumber().valid())
     ) = Book(resourceId, title, author.authorId, releaseDate, description, series, status, isbn)
+
+    fun addBookCommand(
+        title: Title = Title(faker.book().title()),
+        authorId: AuthorId = AuthorId.generate(),
+        releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
+        description: Description? = Description(faker.yoda().quote()),
+        series: Series? = null,
+        status: ResourceStatus = ResourceStatus.AVAILABLE,
+        isbn: ISBN = ISBN(faker.idNumber().valid())
+    ) = AddBookCommand(title, authorId, releaseDate, description, series, status, isbn)
 }

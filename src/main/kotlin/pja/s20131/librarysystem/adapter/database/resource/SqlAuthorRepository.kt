@@ -11,7 +11,6 @@ import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.port.AuthorRepository
-import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlAuthorRepository : AuthorRepository {
@@ -21,10 +20,6 @@ class SqlAuthorRepository : AuthorRepository {
             .select { AuthorTable.id eq authorId.value }
             .singleOrNull()
             ?.toAuthor()
-    }
-
-    override fun get(authorId: AuthorId): Author {
-        return find(authorId) ?: throw AuthorNotFoundException(authorId)
     }
 
     override fun getAll(): List<Author> {
@@ -52,5 +47,3 @@ object AuthorTable : UUIDTable("author") {
     val firstName = text("first_name")
     val lastName = text("last_name")
 }
-
-class AuthorNotFoundException(authorId: AuthorId) : BaseException("Author with id=${authorId.value} doesn't exist")

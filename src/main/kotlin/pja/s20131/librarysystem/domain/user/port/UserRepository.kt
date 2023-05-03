@@ -5,11 +5,17 @@ import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.model.Username
+import pja.s20131.librarysystem.exception.BaseException
 
 interface UserRepository {
-    fun getBy(userId: UserId): User
-    fun getSettings(userId: UserId): UserSettings
+    fun getBy(userId: UserId): User = findBy(userId) ?: throw UserNotFoundException(userId)
+    fun getSettingsBy(userId: UserId): UserSettings
+    fun findBy(userId: UserId): User?
     fun findBy(email: Email): User?
     fun findBy(username: Username): User?
-    fun insertUser(user: User)
+    fun save(user: User)
+    fun saveSettings(userId: UserId, userSettings: UserSettings)
 }
+
+class UserNotFoundException(id: UserId) : BaseException("User with id=${id.value} not found")
+
