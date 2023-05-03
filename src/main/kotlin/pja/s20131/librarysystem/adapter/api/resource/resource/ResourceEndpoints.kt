@@ -47,7 +47,7 @@ class ResourceEndpoints(
 
     @GetMapping("${Paths.COPIES}/{resourceId}/libraries")
     fun getResourceCopyInLibraries(@PathVariable resourceId: ResourceId): List<GetResourceCopyResponse> {
-        return resourceService.getResourceCopyInLibraries(resourceId).toResponse()
+        return resourceService.getResourceCopiesInLibraries(resourceId).toResponse()
     }
 
     object Paths {

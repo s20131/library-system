@@ -1,12 +1,13 @@
 package pja.s20131.librarysystem.adapter.database.user
 
-import java.util.UUID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
+import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable.toUserSettings
+import pja.s20131.librarysystem.adapter.database.user.UserTable.toUser
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
@@ -18,24 +19,25 @@ import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.model.Username
+import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
 import pja.s20131.librarysystem.domain.user.port.UserRepository
-import pja.s20131.librarysystem.exception.BaseException
+import java.util.UUID
 
 @Repository
 class SqlUserRepository : UserRepository {
 
-    override fun getBy(userId: UserId): User {
-        return UserTable
-            .select { UserTable.id eq userId.value }
-            .singleOrNull()
-            ?.toUser() ?: throw UserNotFoundException(userId)
-    }
-
-    override fun getSettings(userId: UserId): UserSettings {
+    override fun getSettingsBy(userId: UserId): UserSettings {
         return UserSettingsTable
             .select { UserSettingsTable.id eq userId.value }
             .singleOrNull()
             ?.toUserSettings() ?: throw UserNotFoundException(userId)
+    }
+
+    override fun findBy(userId: UserId): User? {
+        return UserTable
+            .select { UserTable.id eq userId.value }
+            .singleOrNull()
+            ?.toUser()
     }
 
     override fun findBy(email: Email): User? {
@@ -52,7 +54,7 @@ class SqlUserRepository : UserRepository {
             ?.toUser()
     }
 
-    override fun insertUser(user: User) {
+    override fun save(user: User) {
         UserTable.insert {
             it[id] = user.userId.value
             it[firstName] = user.firstName.value
@@ -63,24 +65,16 @@ class SqlUserRepository : UserRepository {
         }
     }
 
+    override fun saveSettings(userId: UserId, userSettings: UserSettings) {
+        UserSettingsTable.insert {
+            it[id] = userId.value
+            it[sendEndOfRentalReminder] = userSettings.sendEndOfRentalReminder.value
+            it[sendWhenAvailableReminder] = userSettings.sendWhenAvailableReminder.value
+            it[kindleEmail] = userSettings.kindleEmail?.value
+        }
+    }
+
 }
-
-private fun ResultRow.toUser() = User(
-    UserId(this[UserTable.id].value),
-    FirstName(this[UserTable.firstName]),
-    LastName(this[UserTable.lastName]),
-    Email(this[UserTable.email]),
-    Username(this[UserTable.username]),
-    Password(this[UserTable.password]),
-)
-
-private fun ResultRow.toUserSettings() = UserSettings(
-    SendEndOfRentalReminder(this[UserSettingsTable.sendEndOfRentalReminder]),
-    SendWhenAvailableReminder(this[UserSettingsTable.sendWhenAvailableReminder]),
-    this[UserSettingsTable.kindleEmail]?.let { KindleEmail(it) },
-)
-
-class UserNotFoundException(id: UserId) : BaseException("User with id=${id.value} not found")
 
 object UserTable : UUIDTable("\"user\"") {
     val firstName = text("first_name")
@@ -88,6 +82,15 @@ object UserTable : UUIDTable("\"user\"") {
     val email = text("email")
     val username = text("username")
     val password = text("password")
+
+    fun ResultRow.toUser() = User(
+        UserId(this[id].value),
+        FirstName(this[firstName]),
+        LastName(this[lastName]),
+        Email(this[email]),
+        Username(this[username]),
+        Password(this[password]),
+    )
 }
 
 object UserSettingsTable : IdTable<UUID>("user_settings") {
@@ -96,4 +99,10 @@ object UserSettingsTable : IdTable<UUID>("user_settings") {
     val sendEndOfRentalReminder = bool("send_end_of_rental_reminder")
     val sendWhenAvailableReminder = bool("send_when_available_reminder")
     val kindleEmail = text("kindle_email").nullable()
+
+    fun ResultRow.toUserSettings() = UserSettings(
+        SendEndOfRentalReminder(this[sendEndOfRentalReminder]),
+        SendWhenAvailableReminder(this[sendWhenAvailableReminder]),
+        this[kindleEmail]?.let { KindleEmail(it) },
+    )
 }

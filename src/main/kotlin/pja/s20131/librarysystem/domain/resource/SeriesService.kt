@@ -8,7 +8,7 @@ import pja.s20131.librarysystem.domain.resource.port.SeriesRepository
 @Service
 @Transactional
 class SeriesService(
-    val seriesRepository: SeriesRepository,
+    private val seriesRepository: SeriesRepository,
 ) {
     fun getAllSeries(): List<Series> {
         return seriesRepository.getAll()

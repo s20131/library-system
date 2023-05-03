@@ -12,6 +12,7 @@ import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.port.UserRepository
 import pja.s20131.librarysystem.exception.BaseException
@@ -19,11 +20,11 @@ import pja.s20131.librarysystem.exception.BaseException
 @Service
 @Transactional
 class AuthService(
-    val userRepository: UserRepository,
-    val passwordEncoder: PasswordEncoder,
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
 ) : AuthenticationProvider {
 
-    fun register(command: RegisterUserCommand) {
+    fun register(command: RegisterUserCommand): UserId {
         validateUserData(command)
         val user = User(
             UserId.generate(),
@@ -33,7 +34,9 @@ class AuthService(
             command.username,
             Password(passwordEncoder.encode(command.password.value)),
         )
-        userRepository.insertUser(user)
+        userRepository.save(user)
+        userRepository.saveSettings(user.userId, UserSettings.basic())
+        return user.userId
     }
 
     //TODO should be extracted as custom provider?
@@ -76,5 +79,5 @@ data class Credentials(
 
 class EmailAlreadyExistsException(email: Email) : BaseException("Email \"${email.value}\" is already in use")
 
-class BadCredentialsException : BaseException("Wrong username or password were provided")
+class BadCredentialsException : BaseException("Wrong username or password")
 

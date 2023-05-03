@@ -19,8 +19,8 @@ import pja.s20131.librarysystem.domain.resource.port.BookRepository
 @Service
 @Transactional
 class BookService(
-    val bookRepository: BookRepository,
-    val authorRepository: AuthorRepository,
+    private val bookRepository: BookRepository,
+    private val authorRepository: AuthorRepository,
 ) {
     fun getAllBooks(): List<ResourceWithAuthorBasicData> {
         val books = bookRepository.getAll()
@@ -28,7 +28,7 @@ class BookService(
         return books.map { book ->
             ResourceWithAuthorBasicData(
                 book.toBasicData(),
-                authors.first { it.authorId == book.authorId }.let { AuthorBasicData(it.firstName, it.lastName) }
+                authors.first { it.authorId == book.authorId }.toBasicData()
             )
         }
     }

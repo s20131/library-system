@@ -1,6 +1,6 @@
 package pja.s20131.librarysystem.library
 
-import com.github.javafaker.Faker
+import net.datafaker.Faker
 import pja.s20131.librarysystem.domain.library.model.Address
 import pja.s20131.librarysystem.domain.library.model.City
 import pja.s20131.librarysystem.domain.library.model.Library

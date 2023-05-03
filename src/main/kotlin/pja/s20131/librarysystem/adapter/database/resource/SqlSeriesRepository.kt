@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.TextIdTable
+import pja.s20131.librarysystem.adapter.database.resource.SeriesTable.toSeries
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.port.SeriesRepository
 
@@ -23,6 +24,6 @@ class SqlSeriesRepository : SeriesRepository {
     }
 }
 
-private fun ResultRow.toSeries() = Series(this[SeriesTable.id].value)
-
-object SeriesTable : TextIdTable("series", "name")
+object SeriesTable : TextIdTable("series", "name") {
+    fun ResultRow.toSeries() = Series(this[SeriesTable.id].value)
+}

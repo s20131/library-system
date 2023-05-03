@@ -4,7 +4,15 @@ data class UserSettings(
     val sendEndOfRentalReminder: SendEndOfRentalReminder,
     val sendWhenAvailableReminder: SendWhenAvailableReminder,
     val kindleEmail: KindleEmail?,
-)
+) {
+    companion object {
+        fun basic() = UserSettings(
+            SendEndOfRentalReminder(false),
+            SendWhenAvailableReminder(false),
+            kindleEmail = null,
+        )
+    }
+}
 
 @JvmInline
 value class SendEndOfRentalReminder(val value: Boolean)
