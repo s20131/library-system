@@ -13,8 +13,6 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
 import pja.s20131.librarysystem.preconditions.Preconditions
 import pja.s20131.librarysystem.user.UserGen
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 @SpringBootTest
 class ResourceServiceTests @Autowired constructor(
@@ -29,17 +27,15 @@ class ResourceServiceTests @Autowired constructor(
             .withBook(series = ResourceGen.defaultSeries)
             .withEbook(series = ResourceGen.defaultSeries)
             .build()
-        // TODO otherwise its value changes on CI
-        val now = NOW
         val user = assuming.user.exists(
-            itemsInStorage = books.map { it.resourceId to now } + ebooks.map { it.resourceId to now }
+            itemsInStorage = books.map { it.resourceId to clock.now() } + ebooks.map { it.resourceId to clock.now() }
         )
 
         val response = resourceService.getUserStorage(user.userId)
 
         assertThat(response).containsExactlyInAnyOrder(
-            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, now),
-            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, now),
+            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, clock.now()),
+            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, clock.now()),
         )
     }
 
@@ -51,20 +47,16 @@ class ResourceServiceTests @Autowired constructor(
             .withEbook(series = ResourceGen.defaultSeries)
             .withEbook()
             .build()
-        // TODO otherwise its value changes on CI
-        val now = NOW
-        val yesterday = YESTERDAY
-        val lastWeek = LAST_WEEK
         val user = assuming.user.exists(
-            itemsInStorage = listOf(ebooks[0].resourceId to lastWeek, books[0].resourceId to now, ebooks[1].resourceId to yesterday)
+            itemsInStorage = listOf(ebooks[0].resourceId to clock.lastWeek(), books[0].resourceId to clock.now(), ebooks[1].resourceId to clock.yesterday())
         )
 
         val response = resourceService.getUserStorage(user.userId)
 
         assertThat(response).containsExactly(
-            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, now),
-            StoredResource(ebooks[1].toBasicData(), author.toBasicData(), ResourceType.EBOOK, yesterday),
-            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, lastWeek),
+            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, clock.now()),
+            StoredResource(ebooks[1].toBasicData(), author.toBasicData(), ResourceType.EBOOK, clock.yesterday()),
+            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, clock.lastWeek()),
         )
     }
 
@@ -97,17 +89,10 @@ class ResourceServiceTests @Autowired constructor(
     @Test
     fun `should remove item from user's storage`() {
         val book = assuming.author.exists().withBook().build().second[0]
-        val user = assuming.user.exists(itemsInStorage = listOf(book.resourceId to YESTERDAY))
+        val user = assuming.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant()))
 
         resourceService.removeFromUserStorage(user.userId, book.resourceId)
 
         assert.resource.isNotSavedInStorage(user.userId, book.resourceId)
-    }
-
-    companion object {
-        // TODO replace with clock injection
-        private val NOW = Instant.now()
-        private val YESTERDAY = Instant.now().minus(1, ChronoUnit.DAYS)
-        private val LAST_WEEK = Instant.now().minus(7, ChronoUnit.DAYS)
     }
 }
