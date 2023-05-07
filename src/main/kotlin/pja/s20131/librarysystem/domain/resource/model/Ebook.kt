@@ -13,7 +13,22 @@ data class Ebook(
     val content: Content,
     val format: Format,
     val size: Size,
-) : Resource()
+) : Resource() {
+
+    companion object {
+        fun from(
+            title: Title,
+            authorId: AuthorId,
+            releaseDate: ReleaseDate,
+            description: Description?,
+            series: Series?,
+            status: ResourceStatus,
+            content: Content,
+            format: Format,
+            size: Size,
+        ) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
+    }
+}
 
 @JvmInline
 value class Content(val value: ByteArray)

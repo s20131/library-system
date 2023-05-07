@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
+import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.SizeUnit
@@ -40,5 +41,12 @@ class EbookDatabaseHelper @Autowired constructor(
 
         assertThat(ebook).isNotNull
         assertThat(ebook?.resourceId).isEqualTo(ebookId)
+    }
+
+    fun getBy(authorId: AuthorId): List<Ebook> {
+        return EbookTable
+            .innerJoin(ResourceTable)
+            .select { ResourceTable.author eq authorId.value }
+            .map { it.toEbook() }
     }
 }

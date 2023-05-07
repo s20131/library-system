@@ -6,56 +6,65 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.book.BookDatabaseHelper
-import pja.s20131.librarysystem.book.BookGen
 import pja.s20131.librarysystem.domain.resource.ResourceService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
-import pja.s20131.librarysystem.ebook.EbookDatabaseHelper
-import pja.s20131.librarysystem.ebook.EbookGen
-import pja.s20131.librarysystem.user.UserDatabaseHelper
+import pja.s20131.librarysystem.preconditions.Preconditions
 import pja.s20131.librarysystem.user.UserGen
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @SpringBootTest
 class ResourceServiceTests @Autowired constructor(
     private val resourceService: ResourceService,
-    private val bookDatabaseHelper: BookDatabaseHelper,
-    private val ebookDatabaseHelper: EbookDatabaseHelper,
-    private val authorDatabaseHelper: AuthorDatabaseHelper,
-    private val seriesDatabaseHelper: SeriesDatabaseHelper,
-    private val userDatabaseHelper: UserDatabaseHelper,
+    private val preconditions: Preconditions,
     private val storageDatabaseHelper: StorageDatabaseHelper,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get user's storage`() {
-        authorDatabaseHelper.insertAuthor(DEFAULT_AUTHOR)
-        seriesDatabaseHelper.insertSeries(DEFAULT_SERIES)
-        val book = BookGen.book(author = DEFAULT_AUTHOR, series = DEFAULT_SERIES)
-        bookDatabaseHelper.insertBook(book)
-        val ebook = EbookGen.ebook(author = DEFAULT_AUTHOR, series = DEFAULT_SERIES)
-        ebookDatabaseHelper.insertEbook(ebook)
-        val since = Instant.now()
-        val user = UserGen.user()
-        userDatabaseHelper.insertUser(user)
-        storageDatabaseHelper.insertToStorage(user.userId, book.resourceId, since)
-        storageDatabaseHelper.insertToStorage(user.userId, ebook.resourceId, since)
+        val (author, books, ebooks) = preconditions.resource.authorExists()
+            .withBook(series = DEFAULT_SERIES)
+            .withEbook(series = DEFAULT_SERIES)
+            .build()
+        val user = preconditions.user.exists(
+            itemsInStorage = books.map { it.resourceId to NOW } + ebooks.map { it.resourceId to NOW }
+        )
+
+        val response = resourceService.getUserStorage(user.userId)
+
+        assertThat(response).containsExactlyInAnyOrder(
+            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, NOW),
+            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, NOW),
+        )
+    }
+
+    // TODO parametrized
+    @Test
+    fun `should get user's storage ordered by added time`() {
+        val (author, books, ebooks) = preconditions.resource.authorExists()
+            .withBook(series = DEFAULT_SERIES)
+            .withEbook(series = DEFAULT_SERIES)
+            .withEbook()
+            .build()
+        val user = preconditions.user.exists(
+            itemsInStorage = listOf(ebooks[0].resourceId to LAST_WEEK, books[0].resourceId to NOW, ebooks[1].resourceId to YESTERDAY)
+        )
 
         val response = resourceService.getUserStorage(user.userId)
 
         assertThat(response).containsExactly(
-            StoredResource(book.toBasicData(), DEFAULT_AUTHOR.toBasicData(), ResourceType.BOOK, since),
-            StoredResource(ebook.toBasicData(), DEFAULT_AUTHOR.toBasicData(), ResourceType.EBOOK, since),
+            StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, NOW),
+            StoredResource(ebooks[1].toBasicData(), author.toBasicData(), ResourceType.EBOOK, YESTERDAY),
+            StoredResource(ebooks[0].toBasicData(), author.toBasicData(), ResourceType.EBOOK, LAST_WEEK),
         )
     }
 
     @Test
     fun `should get empty user's storage when nothing was added`() {
-        val user = UserGen.user()
-        userDatabaseHelper.insertUser(user)
+        val user = preconditions.user.exists()
 
         val response = resourceService.getUserStorage(user.userId)
 
@@ -71,19 +80,18 @@ class ResourceServiceTests @Autowired constructor(
 
     @Test
     fun `should add resource to user's storage`() {
-        val user = UserGen.user()
-        userDatabaseHelper.insertUser(user)
-        authorDatabaseHelper.insertAuthor(DEFAULT_AUTHOR)
-        val book = BookGen.book(author = DEFAULT_AUTHOR)
-        bookDatabaseHelper.insertBook(book)
+        val user = preconditions.user.exists()
+        val (_, books) = preconditions.resource.authorExists().withBook().build()
 
-        resourceService.addToUserStorage(user.userId, book.resourceId)
+        resourceService.addToUserStorage(user.userId, books[0].resourceId)
 
-        storageDatabaseHelper.assertResourceIsSavedInStorage(user.userId, book.resourceId, ResourceType.BOOK)
+        storageDatabaseHelper.assertResourceIsSavedInStorage(user.userId, books[0].resourceId, ResourceType.BOOK)
     }
 
     companion object {
-        private val DEFAULT_AUTHOR = ResourceGen.author()
+        private val NOW = Instant.now()
+        private val YESTERDAY = Instant.now().minus(1, ChronoUnit.DAYS)
+        private val LAST_WEEK = Instant.now().minus(7, ChronoUnit.DAYS)
         private val DEFAULT_SERIES = Series("series")
     }
 }
