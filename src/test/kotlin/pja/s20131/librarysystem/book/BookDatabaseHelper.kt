@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
+import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.resource.ResourceDatabaseHelper
@@ -36,6 +37,13 @@ class BookDatabaseHelper @Autowired constructor(
 
         assertThat(book).isNotNull
         assertThat(book?.resourceId).isEqualTo(bookId)
+    }
+
+    fun getBy(authorId: AuthorId): List<Book> {
+        return BookTable
+            .innerJoin(ResourceTable)
+            .select { ResourceTable.author eq authorId.value }
+            .map { it.toBook() }
     }
 
 }

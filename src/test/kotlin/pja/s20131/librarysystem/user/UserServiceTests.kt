@@ -9,17 +9,17 @@ import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.domain.user.UserService
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
+import pja.s20131.librarysystem.preconditions.Preconditions
 
 @SpringBootTest
 class UserServiceTests @Autowired constructor(
     val userService: UserService,
-    val userDatabaseHelper: UserDatabaseHelper,
+    val preconditions: Preconditions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get the user`() {
-        val user = UserGen.user()
-        userDatabaseHelper.insertUser(user)
+        val user = preconditions.user.exists()
 
         val response = userService.getUser(user.userId)
 
@@ -35,8 +35,7 @@ class UserServiceTests @Autowired constructor(
 
     @Test
     fun `should get basic user settings after adding a new user`() {
-        val user = UserGen.user()
-        userDatabaseHelper.insertUser(user)
+        val user = preconditions.user.exists()
 
         val response = userService.getUserSettings(user.userId)
 

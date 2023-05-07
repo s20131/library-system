@@ -13,6 +13,9 @@ data class Author(
 
     fun toBasicData(): AuthorBasicData = AuthorBasicData(firstName, lastName)
 
+    companion object {
+        fun from(firstName: FirstName, lastName: LastName) = Author(AuthorId.generate(), firstName, lastName)
+    }
 }
 
 @JvmInline

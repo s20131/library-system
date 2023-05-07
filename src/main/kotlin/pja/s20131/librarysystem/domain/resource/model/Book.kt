@@ -9,7 +9,19 @@ data class Book(
     override val series: Series?,
     override val status: ResourceStatus,
     val isbn: ISBN,
-) : Resource()
+) : Resource() {
+
+    companion object {
+        fun from(
+            title: Title,
+            authorId: AuthorId,
+            releaseDate: ReleaseDate,
+            description: Description?,
+            series: Series?,
+            status: ResourceStatus, isbn: ISBN
+        ) = Book(ResourceId.generate(), title, authorId, releaseDate, description, series, status, isbn)
+    }
+}
 
 @JvmInline
 value class ISBN(val value: String)
