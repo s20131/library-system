@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.resource
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Component
@@ -14,14 +13,11 @@ import pja.s20131.librarysystem.domain.resource.model.AuthorId
 @Transactional
 class AuthorDatabaseHelper {
 
-    fun assertAuthorIsSaved(authorId: AuthorId) {
-        val author = AuthorTable
+    fun findBy(authorId: AuthorId): Author? {
+        return AuthorTable
             .select { AuthorTable.id eq authorId.value }
             .singleOrNull()
             ?.toAuthor()
-
-        assertThat(author).isNotNull
-        assertThat(author?.authorId).isEqualTo(authorId)
     }
 
     fun insertAuthor(author: Author) =

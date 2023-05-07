@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.user
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Component
@@ -20,20 +19,19 @@ import pja.s20131.librarysystem.user.UserGen.userSettings
 @Transactional
 class UserDatabaseHelper {
 
-    fun assertUserIsSaved(userId: UserId) {
-        val user = UserTable
+    fun findBy(userId: UserId): User? {
+        return UserTable
             .select { UserTable.id eq userId.value }
             .singleOrNull()
             ?.toUser()
-        val settings = UserSettingsTable
+    }
+
+    fun findSettingsBy(userId: UserId): UserSettings? {
+        return UserSettingsTable
             .innerJoin(UserTable)
             .select { UserSettingsTable.id eq userId.value }
             .singleOrNull()
             ?.toUserSettings()
-
-        assertThat(user).isNotNull
-        assertThat(user?.userId).isEqualTo(userId)
-        assertThat(settings).isNotNull
     }
 
     fun insertUser(user: User) {

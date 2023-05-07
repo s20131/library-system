@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.adapter.database.resource.ResourceTable.series
+import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.SeriesService
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.preconditions.Preconditions
@@ -14,7 +14,7 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 class SeriesServiceTests @Autowired constructor(
     private val seriesService: SeriesService,
     private val preconditions: Preconditions,
-    private val seriesDatabaseHelper: SeriesDatabaseHelper,
+    private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
@@ -32,7 +32,7 @@ class SeriesServiceTests @Autowired constructor(
         val series = Series("biografia")
         seriesService.addSeries(series)
 
-        seriesDatabaseHelper.assertSeriesIsSaved(series)
+        assert.series.isSaved(series)
     }
 
 }

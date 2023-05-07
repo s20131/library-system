@@ -1,6 +1,6 @@
 package pja.s20131.librarysystem.resource
 
-import org.assertj.core.api.Assertions.assertThat
+import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Component
@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.adapter.database.resource.StorageTable
 import pja.s20131.librarysystem.adapter.database.resource.StorageTable.eqKey
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.model.UserId
 import java.time.Instant
 
@@ -24,13 +23,9 @@ class StorageDatabaseHelper {
         }
     }
 
-    fun assertResourceIsSavedInStorage(userId: UserId, resourceId: ResourceId, resourceType: ResourceType) {
-        val result = StorageTable
+    fun getResultBy(userId: UserId, resourceId: ResourceId): ResultRow {
+        return StorageTable
             .select { eqKey(userId, resourceId) }
             .single()
-
-        assertThat(result[StorageTable.resourceId].value).isEqualTo(resourceId.value)
-        assertThat(result[StorageTable.userId].value).isEqualTo(userId.value)
     }
-
 }

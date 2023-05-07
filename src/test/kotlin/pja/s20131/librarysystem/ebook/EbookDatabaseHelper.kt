@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.ebook
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
@@ -32,15 +31,12 @@ class EbookDatabaseHelper @Autowired constructor(
         }
     }
 
-    fun assertEbookIsSaved(ebookId: ResourceId) {
-        val ebook = EbookTable
+    fun findBy(ebookId: ResourceId): Ebook? {
+        return EbookTable
             .innerJoin(ResourceTable)
             .select { EbookTable.id eq ebookId.value }
             .singleOrNull()
             ?.toEbook()
-
-        assertThat(ebook).isNotNull
-        assertThat(ebook?.resourceId).isEqualTo(ebookId)
     }
 
     fun getBy(authorId: AuthorId): List<Ebook> {

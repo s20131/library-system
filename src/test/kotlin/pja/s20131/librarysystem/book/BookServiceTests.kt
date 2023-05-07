@@ -7,20 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
+import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.BookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.preconditions.Preconditions
-import pja.s20131.librarysystem.resource.AuthorDatabaseHelper
-import pja.s20131.librarysystem.resource.ResourceGen
-import pja.s20131.librarysystem.resource.SeriesDatabaseHelper
 
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
     private val bookService: BookService,
     private val preconditions: Preconditions,
-    private val bookDatabaseHelper: BookDatabaseHelper,
+    private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
@@ -58,7 +56,7 @@ class BookServiceTests @Autowired constructor(
 
         val bookId = bookService.addBook(command)
 
-        bookDatabaseHelper.assertBookIsSaved(bookId)
+        assert.book.isSaved(bookId)
     }
 
     @Test
