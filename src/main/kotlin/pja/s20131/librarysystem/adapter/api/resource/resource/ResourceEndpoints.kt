@@ -23,8 +23,6 @@ class ResourceEndpoints(
     val seriesService: SeriesService,
 ) {
 
-    // TODO add endpoints tests
-
     @GetMapping("/authors/{authorId}")
     fun getAuthor(@PathVariable authorId: AuthorId): GetAuthorResponse {
         return authorService.getAuthor(authorId).toResponse()

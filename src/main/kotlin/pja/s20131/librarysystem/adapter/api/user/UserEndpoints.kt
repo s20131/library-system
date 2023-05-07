@@ -12,8 +12,6 @@ import pja.s20131.librarysystem.domain.user.UserService
 class UserEndpoints(
     private val userService: UserService,
 ) {
-    // TODO add (endpoint) tests
-
     @GetMapping("/{userId}")
     fun getUser(@PathVariable userId: UserId): GetUserResponse {
         return userService.getUser(userId).toResponse()

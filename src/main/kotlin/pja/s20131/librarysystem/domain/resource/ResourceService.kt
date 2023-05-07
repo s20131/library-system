@@ -13,6 +13,7 @@ import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.resource.port.StorageRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.port.UserRepository
+import java.time.Clock
 
 @Service
 @Transactional
@@ -20,6 +21,7 @@ class ResourceService(
     private val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
     private val copyRepository: CopyRepository,
+    private val clock: Clock,
 ) {
 
     fun getUserStorage(userId: UserId): List<StoredResource> {
@@ -35,7 +37,7 @@ class ResourceService(
     fun addToUserStorage(userId: UserId, resourceId: ResourceId) {
         // TODO clock, inject time
         val user = userRepository.getBy(userId)
-        storageRepository.add(user.userId, resourceId, Instant.now())
+        storageRepository.add(user.userId, resourceId, clock.instant())
     }
 
     fun removeFromUserStorage(userId: UserId, resourceId: ResourceId) {
