@@ -10,20 +10,20 @@ import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.BookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
-import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
     private val bookService: BookService,
-    private val preconditions: Preconditions,
+    private val assuming: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should return all books`() {
-        val (author, books) = preconditions.resource.authorExists().withBook(series = DEFAULT_SERIES).withBook().build()
+        val (author, books) = assuming.author.exists().withBook(series = ResourceGen.defaultSeries).withBook().build()
 
         val response = bookService.getAllBooks()
 
@@ -35,7 +35,7 @@ class BookServiceTests @Autowired constructor(
 
     @Test
     fun `should return a book`() {
-        val book = preconditions.resource.authorExists().withBook().build().second[0]
+        val book = assuming.author.exists().withBook().build().second[0]
 
         val response = bookService.getBook(book.resourceId)
 
@@ -51,7 +51,7 @@ class BookServiceTests @Autowired constructor(
 
     @Test
     fun `should correctly add a book`() {
-        val (author) = preconditions.resource.authorExists().build()
+        val (author) = assuming.author.exists().build()
         val command = BookGen.addBookCommand(authorId = author.authorId)
 
         val bookId = bookService.addBook(command)
@@ -64,9 +64,5 @@ class BookServiceTests @Autowired constructor(
         val command = BookGen.addBookCommand()
 
         assertThrows<AuthorNotFoundException> { bookService.addBook(command) }
-    }
-
-    companion object {
-        private val DEFAULT_SERIES = Series("series")
     }
 }

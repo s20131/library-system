@@ -11,20 +11,20 @@ import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
 import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
-import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class EbookServiceTests @Autowired constructor(
     private val ebookService: EbookService,
-    private val preconditions: Preconditions,
+    private val assuming: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get all ebooks`() {
-        val (author, _, ebooks) = preconditions.resource.authorExists().withEbook(series = DEFAULT_SERIES).withEbook().build()
+        val (author, _, ebooks) = assuming.author.exists().withEbook(series = ResourceGen.defaultSeries).withEbook().build()
 
         val response = ebookService.getAllEbooks()
 
@@ -38,7 +38,7 @@ class EbookServiceTests @Autowired constructor(
     @Disabled("content comparison")
     @Test
     fun `should return an ebook`() {
-        val ebook = preconditions.resource.authorExists().withEbook().build().third[0]
+        val ebook = assuming.author.exists().withEbook().build().third[0]
 
         val response = ebookService.getEbook(ebook.resourceId)
 
@@ -54,8 +54,8 @@ class EbookServiceTests @Autowired constructor(
 
     @Test
     fun `should correctly add an ebook`() {
-        val (author) = preconditions.resource.authorExists().build()
-        val series = preconditions.resource.seriesExists()
+        val (author) = assuming.author.exists().build()
+        val series = assuming.series.exists()
         val command = EbookGen.addEbookCommand(authorId = author.authorId, series = series)
 
         val ebookId = ebookService.addEbook(command)
@@ -68,9 +68,5 @@ class EbookServiceTests @Autowired constructor(
         val command = EbookGen.addEbookCommand()
 
         assertThrows<AuthorNotFoundException> { ebookService.addEbook(command) }
-    }
-
-    companion object {
-        private val DEFAULT_SERIES = Series("series")
     }
 }

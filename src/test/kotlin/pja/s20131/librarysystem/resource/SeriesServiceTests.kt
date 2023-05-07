@@ -13,14 +13,14 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 @SpringBootTest
 class SeriesServiceTests @Autowired constructor(
     private val seriesService: SeriesService,
-    private val preconditions: Preconditions,
+    private val assuming: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get all series`() {
-        val series1 = preconditions.resource.seriesExists()
-        val series2 = preconditions.resource.seriesExists()
+        val series1 = assuming.series.exists()
+        val series2 = assuming.series.exists()
 
         val response = seriesService.getAllSeries()
 

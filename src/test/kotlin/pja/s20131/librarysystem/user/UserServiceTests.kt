@@ -14,12 +14,12 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 @SpringBootTest
 class UserServiceTests @Autowired constructor(
     val userService: UserService,
-    val preconditions: Preconditions,
+    val assuming: Preconditions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get the user`() {
-        val user = preconditions.user.exists()
+        val user = assuming.user.exists()
 
         val response = userService.getUser(user.userId)
 
@@ -35,7 +35,7 @@ class UserServiceTests @Autowired constructor(
 
     @Test
     fun `should get basic user settings after adding a new user`() {
-        val user = preconditions.user.exists()
+        val user = assuming.user.exists()
 
         val response = userService.getUserSettings(user.userId)
 
