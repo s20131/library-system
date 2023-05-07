@@ -23,9 +23,9 @@ class StorageDatabaseHelper {
         }
     }
 
-    fun getResultBy(userId: UserId, resourceId: ResourceId): ResultRow {
+    fun findResultBy(userId: UserId, resourceId: ResourceId): ResultRow? {
         return StorageTable
             .select { eqKey(userId, resourceId) }
-            .single()
+            .singleOrNull()
     }
 }

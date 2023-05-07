@@ -12,13 +12,13 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 @SpringBootTest
 class AuthorServiceTests @Autowired constructor(
     private val authorService: AuthorService,
-    private val preconditions: Preconditions,
+    private val assuming: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should correctly retrieve an author`() {
-        val (author) = preconditions.resource.authorExists().build()
+        val (author) = assuming.author.exists().build()
 
         val retrievedAuthor = authorService.getAuthor(author.authorId)
 

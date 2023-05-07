@@ -6,9 +6,12 @@ import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.AddAuthorCommand
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
+import pja.s20131.librarysystem.domain.resource.model.Series
 
 object ResourceGen {
     private val faker = Faker()
+
+    val defaultSeries = Series("series")
 
     fun author(
         authorId: AuthorId = AuthorId.generate(),
