@@ -6,6 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.ResourceService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
@@ -20,7 +21,7 @@ import java.time.temporal.ChronoUnit
 class ResourceServiceTests @Autowired constructor(
     private val resourceService: ResourceService,
     private val preconditions: Preconditions,
-    private val storageDatabaseHelper: StorageDatabaseHelper,
+    private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
@@ -85,7 +86,7 @@ class ResourceServiceTests @Autowired constructor(
 
         resourceService.addToUserStorage(user.userId, books[0].resourceId)
 
-        storageDatabaseHelper.assertResourceIsSavedInStorage(user.userId, books[0].resourceId, ResourceType.BOOK)
+        assert.resource.isSavedInStorage(user.userId, books[0].resourceId, ResourceType.BOOK)
     }
 
     companion object {

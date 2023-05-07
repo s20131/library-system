@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.AuthorService
 import pja.s20131.librarysystem.preconditions.Preconditions
 
@@ -12,7 +13,7 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 class AuthorServiceTests @Autowired constructor(
     private val authorService: AuthorService,
     private val preconditions: Preconditions,
-    private val authorDatabaseHelper: AuthorDatabaseHelper,
+    private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
@@ -30,6 +31,6 @@ class AuthorServiceTests @Autowired constructor(
 
         val authorId = authorService.addAuthor(command)
 
-        authorDatabaseHelper.assertAuthorIsSaved(authorId)
+        assert.author.isSaved(authorId)
     }
 }

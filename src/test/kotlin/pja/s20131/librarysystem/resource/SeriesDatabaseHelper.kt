@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.resource
 
-import org.assertj.core.api.Assertions
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Component
@@ -13,13 +12,11 @@ import pja.s20131.librarysystem.domain.resource.model.Series
 @Transactional
 class SeriesDatabaseHelper {
 
-    fun assertSeriesIsSaved(series: Series) {
-        val retrievedSeries = SeriesTable
+    fun findBy(series: Series): Series? {
+        return SeriesTable
             .select { SeriesTable.id eq series.value }
             .singleOrNull()
             ?.toSeries()
-
-        Assertions.assertThat(retrievedSeries).isEqualTo(retrievedSeries)
     }
 
     fun insertSeries(series: Series) =

@@ -1,6 +1,5 @@
 package pja.s20131.librarysystem.book
 
-import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,15 +27,12 @@ class BookDatabaseHelper @Autowired constructor(
         }
     }
 
-    fun assertBookIsSaved(bookId: ResourceId) {
-        val book = BookTable
+    fun findBy(bookId: ResourceId): Book? {
+        return BookTable
             .innerJoin(ResourceTable)
             .select { BookTable.id eq bookId.value }
             .singleOrNull()
             ?.toBook()
-
-        assertThat(book).isNotNull
-        assertThat(book?.resourceId).isEqualTo(bookId)
     }
 
     fun getBy(authorId: AuthorId): List<Book> {
