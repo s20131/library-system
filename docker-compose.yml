@@ -1,14 +1,15 @@
 version: '3'
 services:
+
   database:
-    image: postgres
+    image: postgis/postgis
     container_name: library-database
     environment:
-      POSTGRES_USER: test
+      POSTGRES_USER: admin
       POSTGRES_PASSWORD: test
       POSTGRES_DB: library
     ports:
-      - '5434:5432'
+      - '5432:5432'
     volumes:
       - ./src/main/resources/sql/schema-tmp.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ./src/main/resources/sql/data.sql:/docker-entrypoint-initdb.d/2-data.sql

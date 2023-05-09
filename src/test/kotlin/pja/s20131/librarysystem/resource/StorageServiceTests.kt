@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.assertions.Assertions
-import pja.s20131.librarysystem.domain.resource.ResourceService
+import pja.s20131.librarysystem.domain.resource.StorageService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
@@ -15,8 +15,8 @@ import pja.s20131.librarysystem.preconditions.Preconditions
 import pja.s20131.librarysystem.user.UserGen
 
 @SpringBootTest
-class ResourceServiceTests @Autowired constructor(
-    private val resourceService: ResourceService,
+class StorageServiceTests @Autowired constructor(
+    private val storageService: StorageService,
     private val assuming: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
@@ -31,7 +31,7 @@ class ResourceServiceTests @Autowired constructor(
             itemsInStorage = books.map { it.resourceId to clock.now() } + ebooks.map { it.resourceId to clock.now() }
         )
 
-        val response = resourceService.getUserStorage(user.userId)
+        val response = storageService.getUserStorage(user.userId)
 
         assertThat(response).containsExactlyInAnyOrder(
             StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, clock.now()),
@@ -51,7 +51,7 @@ class ResourceServiceTests @Autowired constructor(
             itemsInStorage = listOf(ebooks[0].resourceId to clock.lastWeek(), books[0].resourceId to clock.now(), ebooks[1].resourceId to clock.yesterday())
         )
 
-        val response = resourceService.getUserStorage(user.userId)
+        val response = storageService.getUserStorage(user.userId)
 
         assertThat(response).containsExactly(
             StoredResource(books[0].toBasicData(), author.toBasicData(), ResourceType.BOOK, clock.now()),
@@ -64,7 +64,7 @@ class ResourceServiceTests @Autowired constructor(
     fun `should get empty user's storage when nothing was added`() {
         val user = assuming.user.exists()
 
-        val response = resourceService.getUserStorage(user.userId)
+        val response = storageService.getUserStorage(user.userId)
 
         assertThat(response).isEqualTo(emptyList<StoredResource>())
     }
@@ -73,7 +73,7 @@ class ResourceServiceTests @Autowired constructor(
     fun `should throw exception when getting not existing user's storage`() {
         val user = UserGen.user()
 
-        assertThrows<UserNotFoundException> { resourceService.getUserStorage(user.userId) }
+        assertThrows<UserNotFoundException> { storageService.getUserStorage(user.userId) }
     }
 
     @Test
@@ -81,7 +81,7 @@ class ResourceServiceTests @Autowired constructor(
         val user = assuming.user.exists()
         val (_, books) = assuming.author.exists().withBook().build()
 
-        resourceService.addToUserStorage(user.userId, books[0].resourceId)
+        storageService.addToUserStorage(user.userId, books[0].resourceId)
 
         assert.resource.isSavedInStorage(user.userId, books[0].resourceId, ResourceType.BOOK)
     }
@@ -91,7 +91,7 @@ class ResourceServiceTests @Autowired constructor(
         val book = assuming.author.exists().withBook().build().second[0]
         val user = assuming.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant()))
 
-        resourceService.removeFromUserStorage(user.userId, book.resourceId)
+        storageService.removeFromUserStorage(user.userId, book.resourceId)
 
         assert.resource.isNotSavedInStorage(user.userId, book.resourceId)
     }

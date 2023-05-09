@@ -1,26 +1,22 @@
 package pja.s20131.librarysystem.domain.resource
 
-import java.time.Instant
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
-import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
-import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.resource.port.StorageRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.port.UserRepository
 import java.time.Clock
+import java.time.Instant
 
 @Service
 @Transactional
-class ResourceService(
+class StorageService(
     private val storageRepository: StorageRepository,
     private val userRepository: UserRepository,
-    private val copyRepository: CopyRepository,
     private val clock: Clock,
 ) {
 
@@ -35,7 +31,6 @@ class ResourceService(
     }
 
     fun addToUserStorage(userId: UserId, resourceId: ResourceId) {
-        // TODO clock, inject time
         val user = userRepository.getBy(userId)
         storageRepository.add(user.userId, resourceId, clock.instant())
     }
@@ -45,9 +40,6 @@ class ResourceService(
         storageRepository.remove(user.userId, resourceId)
     }
 
-    fun getResourceCopiesInLibraries(resourceId: ResourceId): List<ResourceCopy> {
-        return copyRepository.getAllBy(resourceId)
-    }
 }
 
 data class StoredResource(
@@ -55,9 +47,4 @@ data class StoredResource(
     val author: AuthorBasicData,
     val resourceType: ResourceType,
     val since: Instant,
-)
-
-data class ResourceCopy(
-    val libraryId: LibraryId,
-    val available: Available,
 )

@@ -9,12 +9,13 @@ CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
 CREATE TYPE size_unit AS ENUM ('kB');
 
 CREATE TABLE library (
-    id            UUID  NOT NULL,
-    name          TEXT  NOT NULL,
-    street_name   TEXT  NOT NULL,
-    street_number TEXT  NOT NULL,
-    postcode      TEXT  NOT NULL,
-    city          TEXT  NOT NULL,
+    id                        UUID  NOT NULL,
+    name                      TEXT  NOT NULL,
+    street_name               TEXT  NOT NULL,
+    street_number             TEXT  NOT NULL,
+    postcode                  TEXT  NOT NULL,
+    city                      TEXT  NOT NULL,
+    location GEOMETRY(Point, 4326)  NOT NULL,
 
     PRIMARY KEY (id),
     CHECK (postcode ~ '^\d{2}-\d{3}$')
@@ -64,16 +65,14 @@ CREATE TABLE ebook (
 );
 
 CREATE TABLE copy (
-    id          UUID  NOT NULL,
-    available    INT  NOT NULL,
     library_id  UUID  NOT NULL,
     resource_id UUID  NOT NULL,
+    available    INT  NOT NULL,
 
-    PRIMARY KEY (id),
+    PRIMARY KEY (library_id, resource_id),
     FOREIGN KEY (library_id) REFERENCES library,
     FOREIGN KEY (resource_id) REFERENCES resource,
 
-    UNIQUE (library_id, resource_id),
     CHECK (available >= 0)
 
 );
