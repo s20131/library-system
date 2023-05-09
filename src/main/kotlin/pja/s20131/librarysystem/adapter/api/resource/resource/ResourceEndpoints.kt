@@ -6,19 +6,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import pja.s20131.librarysystem.domain.resource.AuthorService
+import pja.s20131.librarysystem.domain.resource.SeriesService
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
-import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.domain.resource.AuthorService
-import pja.s20131.librarysystem.domain.resource.ResourceCopy
-import pja.s20131.librarysystem.domain.resource.ResourceService
-import pja.s20131.librarysystem.domain.resource.SeriesService
 
 @RestController
 @RequestMapping("/resources")
 class ResourceEndpoints(
-    val resourceService: ResourceService,
     val authorService: AuthorService,
     val seriesService: SeriesService,
 ) {
@@ -43,17 +39,10 @@ class ResourceEndpoints(
         return seriesService.addSeries(series)
     }
 
-    @GetMapping("${Paths.COPIES}/{resourceId}/libraries")
-    fun getResourceCopyInLibraries(@PathVariable resourceId: ResourceId): List<GetResourceCopyResponse> {
-        return resourceService.getResourceCopiesInLibraries(resourceId).toResponse()
-    }
-
     object Paths {
         const val AUTHORS = "/authors"
         const val SERIES = "/series"
-        const val COPIES = "/copies"
     }
 }
 
 private fun Author.toResponse() = GetAuthorResponse(authorId, firstName, lastName)
-private fun List<ResourceCopy>.toResponse() = map { GetResourceCopyResponse(it.libraryId, it.available) }

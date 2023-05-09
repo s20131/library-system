@@ -30,8 +30,3 @@ data class GetStoredResourceResponse(
     val resourceType: ResourceType,
     val since: Instant,
 )
-
-data class GetResourceCopyResponse(
-    val libraryId: LibraryId,
-    val available: Available,
-)

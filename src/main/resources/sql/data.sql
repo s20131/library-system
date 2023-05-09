@@ -37,9 +37,9 @@ BEGIN
     ebook_id := gen_random_uuid();
     user_id := uuid('45d859ad-d03d-4a3b-ba59-31ae20a99992');
 
-    INSERT INTO library VALUES (library_id, 'Biblioteka Publiczna - 1', 'Ulica', '1', '01-011', 'Warszawa');
-    INSERT INTO library VALUES (gen_random_uuid(), 'Biblioteka Publiczna - 2', 'Ulica', '2', '02-022', 'Warszawa');
-    INSERT INTO library VALUES (gen_random_uuid(), 'Biblioteka Publiczna - 3', 'Ulica', '3', '03-033', 'Warszawa');
+    INSERT INTO library VALUES (library_id, 'Biblioteka Publiczna - 1', 'Ulica', '1', '01-011', 'Warszawa', st_point(52.21644380014136, 21.23889248476246));
+    INSERT INTO library VALUES (gen_random_uuid(), 'Biblioteka Publiczna - 2', 'Ulica', '2', '02-022', 'Warszawa', st_point(52.25069576608673, 21.222656961936707));
+    INSERT INTO library VALUES (gen_random_uuid(), 'Biblioteka Publiczna - 3', 'Ulica', '3', '03-033', 'Warszawa', st_point(52.24268951970279, 21.02521989189416));
 
     INSERT INTO author VALUES (author_id, 'Andrzej', 'Sapkowski');
     book_id := create_book('Wieża Jaskółki', 'Wiedźmin', 'Andrzej', 'Sapkowski');
@@ -51,7 +51,8 @@ BEGIN
         PERFORM create_book(title => 'Book ' || i, series => 'Series X', author_first_name => 'John', author_last_name => 'Doe');
     END LOOP;
 
-    INSERT INTO copy (id, available, library_id, resource_id) VALUES (gen_random_uuid(), 3, library_id, ebook_id);
+    INSERT INTO copy (library_id, resource_id, available) VALUES (library_id, ebook_id, 3);
+    INSERT INTO copy (library_id, resource_id, available) VALUES (library_id, book_id, 3);
 
     INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', '$2a$12$ca76zYFD.OyRZYIwEmnlxO2FMBipevX0dB/r.ga2eZ21lgCWNsTj6'); --abc123!#
     INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');

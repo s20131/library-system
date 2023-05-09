@@ -17,6 +17,7 @@ repositories {
 
 val exposed = "0.41.1"
 val postgres = "42.6.0"
+val postgis = "2021.1.0"
 val jackson = "2.15.0"
 val faker = "1.9.0"
 val archunit = "1.0.1"
@@ -33,6 +34,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed")
     implementation("org.jetbrains.exposed:spring-transaction:$exposed")
     implementation("org.postgresql:postgresql:$postgres")
+    implementation("net.postgis:postgis-jdbc:$postgis")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("net.datafaker:datafaker:$faker")

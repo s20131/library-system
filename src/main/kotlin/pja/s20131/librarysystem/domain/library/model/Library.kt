@@ -5,7 +5,7 @@ import java.util.UUID
 data class Library(
     val libraryId: LibraryId,
     val libraryName: LibraryName,
-    val address: Address
+    val address: Address,
 )
 
 @JvmInline

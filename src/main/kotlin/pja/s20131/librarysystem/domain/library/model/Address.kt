@@ -1,13 +1,16 @@
 package pja.s20131.librarysystem.domain.library.model
 
+import net.postgis.jdbc.geometry.Point
 import pja.s20131.librarysystem.exception.BaseException
 
 data class Address(
     val streetName: StreetName,
     val streetNumber: StreetNumber,
     val postcode: Postcode,
-    val city: City
-)
+    val city: City,
+    val location: Location,
+
+    )
 
 @JvmInline
 value class StreetName(val value: String)
@@ -28,6 +31,9 @@ value class Postcode(val value: String) {
 
 @JvmInline
 value class City(val value: String)
+
+@JvmInline
+value class Location(val value: Point)
 
 class InvalidPostcodePatternException(value: String) :
     BaseException("Expected postcode to match \"2 digits, dash, 3 digits\" pattern, but was $value")
