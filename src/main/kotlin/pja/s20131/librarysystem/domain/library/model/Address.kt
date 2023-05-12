@@ -9,8 +9,16 @@ data class Address(
     val postcode: Postcode,
     val city: City,
     val location: Location,
+) {
+    fun toBasic() = BasicAddress(streetName, streetNumber, postcode, city)
+}
 
-    )
+data class BasicAddress(
+    val streetName: StreetName,
+    val streetNumber: StreetNumber,
+    val postcode: Postcode,
+    val city: City,
+)
 
 @JvmInline
 value class StreetName(val value: String)
@@ -34,6 +42,9 @@ value class City(val value: String)
 
 @JvmInline
 value class Location(val value: Point)
+
+@JvmInline
+value class Distance(val value: Double)
 
 class InvalidPostcodePatternException(value: String) :
     BaseException("Expected postcode to match \"2 digits, dash, 3 digits\" pattern, but was $value")

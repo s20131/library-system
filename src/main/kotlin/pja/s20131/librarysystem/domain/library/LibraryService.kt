@@ -1,7 +1,9 @@
 package pja.s20131.librarysystem.domain.library
 
+import net.postgis.jdbc.geometry.Point
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import pja.s20131.librarysystem.domain.library.model.Distance
 import pja.s20131.librarysystem.domain.library.model.Library
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 import pja.s20131.librarysystem.domain.resource.model.Available
@@ -16,12 +18,13 @@ class LibraryService(
 ) {
     fun getAllLibraries(): List<Library> = libraryRepository.getAll()
 
-    fun getResourceCopiesInLibraries(resourceId: ResourceId): List<ResourceCopy> {
-        return copyRepository.getAllBy(resourceId)
+    fun getResourceCopiesInLibraries(resourceId: ResourceId, userLocation: Point?): List<ResourceCopy> {
+        return copyRepository.getAllBy(resourceId, userLocation)
     }
 }
 
 data class ResourceCopy(
     val library: Library,
     val available: Available,
+    val distance: Distance?,
 )
