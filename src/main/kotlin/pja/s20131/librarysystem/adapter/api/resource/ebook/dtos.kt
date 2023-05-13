@@ -9,7 +9,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
-import pja.s20131.librarysystem.domain.resource.AddEbookCommand
+import pja.s20131.librarysystem.domain.resource.AddEbookDto
 
 data class AddEbookRequest(
     val title: Title,
@@ -22,7 +22,7 @@ data class AddEbookRequest(
     val size: Size,
     val authorId: AuthorId,
 ) {
-    fun toCommand() = AddEbookCommand(title, authorId, releaseDate, description, series, status, content, format, size)
+    fun toDto() = AddEbookDto(title, authorId, releaseDate, description, series, status, content, format, size)
 }
 
 data class GetEbookResponse(

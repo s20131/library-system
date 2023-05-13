@@ -29,7 +29,7 @@ class BookEndpoints(
 
     @PostMapping
     fun addBook(@RequestBody addBookRequest: AddBookRequest): ResourceId {
-        return bookService.addBook(addBookRequest.toCommand())
+        return bookService.addBook(addBookRequest.toDto())
     }
 
 }

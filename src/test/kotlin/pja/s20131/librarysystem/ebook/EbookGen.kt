@@ -1,7 +1,7 @@
 package pja.s20131.librarysystem.ebook
 
 import net.datafaker.Faker
-import pja.s20131.librarysystem.domain.resource.AddEbookCommand
+import pja.s20131.librarysystem.domain.resource.AddEbookDto
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
@@ -34,7 +34,7 @@ object EbookGen {
         size: Size = Size(faker.number().randomDouble(2, 0, 800)),
     ) = Ebook(id, title, author.authorId, releaseDate, description, series, status, content, format, size)
 
-    fun addEbookCommand(
+    fun addEbookDto(
         title: Title = Title(faker.book().title()),
         authorId: AuthorId = AuthorId.generate(),
         releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
@@ -44,5 +44,5 @@ object EbookGen {
         content: Content = Content(Random.nextBytes(10)),
         format: Format = Format.PDF,
         size: Size = Size(faker.number().randomDouble(2, 0, 800)),
-    ) = AddEbookCommand(title, authorId, releaseDate, description, series, status, content, format, size)
+    ) = AddEbookDto(title, authorId, releaseDate, description, series, status, content, format, size)
 }

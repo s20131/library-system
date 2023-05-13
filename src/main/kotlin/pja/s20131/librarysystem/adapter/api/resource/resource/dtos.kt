@@ -2,7 +2,7 @@ package pja.s20131.librarysystem.adapter.api.resource.resource
 
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
-import pja.s20131.librarysystem.domain.resource.AddAuthorCommand
+import pja.s20131.librarysystem.domain.resource.AddAuthorDto
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
@@ -13,7 +13,7 @@ data class AddAuthorRequest(
     val firstName: FirstName,
     val lastName: LastName,
 ) {
-    fun toCommand(): AddAuthorCommand = AddAuthorCommand(firstName, lastName)
+    fun toDto(): AddAuthorDto = AddAuthorDto(firstName, lastName)
 }
 
 data class GetAuthorResponse(

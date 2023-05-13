@@ -33,7 +33,7 @@ class EbookEndpoints(
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun addEbook(@RequestBody addEbookRequest: AddEbookRequest): ResourceId {
-        return ebookService.addEbook(addEbookRequest.toCommand())
+        return ebookService.addEbook(addEbookRequest.toDto())
     }
 }
 

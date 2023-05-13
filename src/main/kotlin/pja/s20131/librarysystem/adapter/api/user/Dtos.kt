@@ -10,7 +10,7 @@ import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
 import pja.s20131.librarysystem.domain.user.Credentials
-import pja.s20131.librarysystem.domain.user.RegisterUserCommand
+import pja.s20131.librarysystem.domain.user.RegisterUserDto
 
 data class RegisterUserRequest(
     val firstName: FirstName,
@@ -19,7 +19,7 @@ data class RegisterUserRequest(
     val username: Username,
     val password: Password,
 ) {
-    fun toCommand(): RegisterUserCommand = RegisterUserCommand(firstName, lastName, email, username, password)
+    fun toDto(): RegisterUserDto = RegisterUserDto(firstName, lastName, email, username, password)
 
     companion object {
         @JvmStatic

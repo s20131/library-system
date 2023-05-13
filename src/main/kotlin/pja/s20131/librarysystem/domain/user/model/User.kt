@@ -3,6 +3,7 @@ package pja.s20131.librarysystem.domain.user.model
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.person.Person
+import pja.s20131.librarysystem.domain.user.RegisterUserDto
 import java.util.UUID
 import pja.s20131.librarysystem.exception.BaseException
 
@@ -15,6 +16,10 @@ data class User(
     val password: Password,
 ) : Person {
     fun toBasicData() = UserBasicData(firstName, lastName, email)
+
+    companion object {
+        fun from(dto: RegisterUserDto) = User(UserId.generate(), dto.firstName, dto.lastName, dto.email, dto.username, dto.password)
+    }
 }
 
 data class UserBasicData(
