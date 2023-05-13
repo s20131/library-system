@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.AuthorService
-import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.Preconditions
 
 @SpringBootTest
 class AuthorServiceTests @Autowired constructor(

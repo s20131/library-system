@@ -1,5 +1,7 @@
 package pja.s20131.librarysystem.domain.resource.model
 
+import pja.s20131.librarysystem.domain.resource.AddBookCommand
+
 data class Book(
     override val resourceId: ResourceId,
     override val title: Title,
@@ -20,6 +22,9 @@ data class Book(
             series: Series?,
             status: ResourceStatus, isbn: ISBN
         ) = Book(ResourceId.generate(), title, authorId, releaseDate, description, series, status, isbn)
+
+        fun from(command: AddBookCommand) =
+            Book(ResourceId.generate(), command.title, command.authorId, command.releaseDate, command.description, command.series, command.status, command.isbn)
     }
 }
 

@@ -1,9 +1,8 @@
-package pja.s20131.librarysystem.preconditions
+package pja.s20131.librarysystem.resource
 
 import net.datafaker.Faker
 import org.springframework.stereotype.Component
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.resource.SeriesDatabaseHelper
 
 @Component
 class SeriesPreconditions(

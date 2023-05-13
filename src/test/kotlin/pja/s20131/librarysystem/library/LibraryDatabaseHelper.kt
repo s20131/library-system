@@ -18,6 +18,7 @@ class LibraryDatabaseHelper {
             it[streetNumber] = library.address.streetNumber.value
             it[postcode] = library.address.postcode.value
             it[city] = library.address.city.value
+            it[location] = library.address.location.value
         }
     }
 }

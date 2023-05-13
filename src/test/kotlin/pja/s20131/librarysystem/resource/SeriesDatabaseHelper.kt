@@ -19,7 +19,7 @@ class SeriesDatabaseHelper {
             ?.toSeries()
     }
 
-    fun insertSeries(series: Series) =
+    private fun insertSeries(series: Series) =
         SeriesTable.insert {
             it[SeriesTable.id] = series.value
         }
@@ -30,7 +30,7 @@ class SeriesDatabaseHelper {
         }
     }
 
-    fun insertSeriesWithoutConflict(series: Series) {
+    private fun insertSeriesWithoutConflict(series: Series) {
         val result = SeriesTable.select { SeriesTable.id eq series.value }.singleOrNull()
         result ?: insertSeries(series)
     }

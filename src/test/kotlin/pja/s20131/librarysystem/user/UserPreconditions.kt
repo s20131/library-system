@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.preconditions
+package pja.s20131.librarysystem.user
 
 import net.datafaker.Faker
 import org.springframework.stereotype.Component
@@ -11,7 +11,6 @@ import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.resource.StorageDatabaseHelper
-import pja.s20131.librarysystem.user.UserDatabaseHelper
 import java.time.Instant
 
 @Component

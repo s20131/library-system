@@ -9,7 +9,7 @@ import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.domain.user.UserService
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
-import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.Preconditions
 
 @SpringBootTest
 class UserServiceTests @Autowired constructor(

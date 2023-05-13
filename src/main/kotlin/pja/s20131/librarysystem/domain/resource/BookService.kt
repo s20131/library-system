@@ -37,11 +37,15 @@ class BookService(
         return bookRepository.get(bookId)
     }
 
-    fun addBook(addBookCommand: AddBookCommand): ResourceId {
-        val author = authorRepository.get(addBookCommand.authorId)
-        val newBook = addBookCommand.toBook(author.authorId)
+    fun addBook(command: AddBookCommand): ResourceId {
+        checkIfAuthorExists(command.authorId)
+        val newBook = Book.from(command)
         bookRepository.save(newBook)
         return newBook.resourceId
+    }
+
+    private fun checkIfAuthorExists(authorId: AuthorId) {
+        authorRepository.get(authorId)
     }
 }
 
@@ -61,6 +65,5 @@ data class AddBookCommand(
     val isbn: ISBN,
 ) {
     // TODO create in domain class
-    fun toBook(authorId: AuthorId) =
-        Book(ResourceId.generate(), title, authorId, releaseDate, description, series, status, isbn)
+    fun toBook(authorId: AuthorId) = Book.from(title, authorId, releaseDate, description, series, status, isbn)
 }

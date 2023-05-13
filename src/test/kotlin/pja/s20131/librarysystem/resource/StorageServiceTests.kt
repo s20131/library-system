@@ -11,7 +11,7 @@ import pja.s20131.librarysystem.domain.resource.StorageService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
-import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.user.UserGen
 
 @SpringBootTest
