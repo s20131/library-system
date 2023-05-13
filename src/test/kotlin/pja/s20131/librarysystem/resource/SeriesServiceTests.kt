@@ -8,7 +8,7 @@ import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.SeriesService
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.Preconditions
 
 @SpringBootTest
 class SeriesServiceTests @Autowired constructor(

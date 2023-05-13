@@ -2,8 +2,9 @@ package pja.s20131.librarysystem.adapter.database.resource
 
 import net.postgis.jdbc.geometry.Point
 import org.jetbrains.exposed.sql.Query
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.pgStDistance
@@ -20,8 +21,8 @@ class SqlCopyRepository : CopyRepository {
 
     override fun getAllBy(resourceId: ResourceId, userLocation: Point?): List<ResourceCopy> {
         return (CopyTable innerJoin LibraryTable)
-            .select { CopyTable.resourceId eq resourceId.value and (CopyTable.available greater 0) }
-            .applyUserLocation(userLocation)
+            .select { CopyTable.resourceId eq resourceId.value }
+            .applyOrderBy(userLocation)
             .map {
                 ResourceCopy(
                     it.toLibrary(),
@@ -31,10 +32,12 @@ class SqlCopyRepository : CopyRepository {
             }
     }
 
-    private fun Query.applyUserLocation(userLocation: Point?) = apply {
+    private fun Query.applyOrderBy(userLocation: Point?) = apply {
         if (userLocation != null) {
             adjustSlice { slice(it.fields + pgStDistance(userLocation)) }
-                .orderBy(pgStDistance(userLocation))
+                .orderBy(CopyTable.available eq 0 to SortOrder.ASC, pgStDistance(userLocation) to SortOrder.ASC)
+        } else {
+            orderBy(CopyTable.available to SortOrder.DESC)
         }
     }
 }

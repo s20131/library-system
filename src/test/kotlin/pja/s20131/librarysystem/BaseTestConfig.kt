@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
+import pja.s20131.librarysystem.adapter.database.resource.CopyTable
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
@@ -29,6 +30,7 @@ class BaseTestConfig {
     fun clear() {
         transaction {
             StorageTable.deleteAll()
+            CopyTable.deleteAll()
             BookTable.deleteAll()
             EbookTable.deleteAll()
             ResourceTable.deleteAll()

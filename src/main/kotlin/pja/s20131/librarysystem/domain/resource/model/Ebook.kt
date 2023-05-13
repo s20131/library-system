@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.domain.resource.model
 
+import pja.s20131.librarysystem.domain.resource.AddEbookCommand
 import pja.s20131.librarysystem.exception.BaseException
 
 data class Ebook(
@@ -27,6 +28,19 @@ data class Ebook(
             format: Format,
             size: Size,
         ) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
+
+        fun from(command: AddEbookCommand) = Ebook(
+            ResourceId.generate(),
+            command.title,
+            command.authorId,
+            command.releaseDate,
+            command.description,
+            command.series,
+            command.status,
+            command.content,
+            command.format,
+            command.size
+        )
     }
 }
 

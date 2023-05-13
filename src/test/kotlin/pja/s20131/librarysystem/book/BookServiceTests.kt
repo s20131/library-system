@@ -11,7 +11,7 @@ import pja.s20131.librarysystem.assertions.Assertions
 import pja.s20131.librarysystem.domain.resource.BookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
-import pja.s20131.librarysystem.preconditions.Preconditions
+import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest

@@ -18,8 +18,8 @@ class AuthorService(
         return authorRepository.get(authorId)
     }
 
-    fun addAuthor(addAuthorCommand: AddAuthorCommand): AuthorId {
-        val newAuthor = addAuthorCommand.toAuthor()
+    fun addAuthor(command: AddAuthorCommand): AuthorId {
+        val newAuthor = Author.from(command)
         authorRepository.insert(newAuthor)
         return newAuthor.authorId
     }
@@ -28,6 +28,4 @@ class AuthorService(
 data class AddAuthorCommand(
     val firstName: FirstName,
     val lastName: LastName,
-) {
-    fun toAuthor() = Author(AuthorId.generate(), firstName, lastName)
-}
+)

@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.preconditions
+package pja.s20131.librarysystem.resource
 
 import net.datafaker.Faker
 import org.springframework.stereotype.Component
@@ -18,8 +18,6 @@ import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.ebook.EbookDatabaseHelper
-import pja.s20131.librarysystem.resource.AuthorDatabaseHelper
-import pja.s20131.librarysystem.resource.SeriesDatabaseHelper
 import java.time.LocalDate
 import kotlin.random.Random
 

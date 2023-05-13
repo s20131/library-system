@@ -3,6 +3,7 @@ package pja.s20131.librarysystem.domain.resource.model
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.person.Person
+import pja.s20131.librarysystem.domain.resource.AddAuthorCommand
 import java.util.UUID
 
 data class Author(
@@ -15,6 +16,8 @@ data class Author(
 
     companion object {
         fun from(firstName: FirstName, lastName: LastName) = Author(AuthorId.generate(), firstName, lastName)
+
+        fun from(command: AddAuthorCommand) = Author(AuthorId.generate(), command.firstName, command.lastName)
     }
 }
 
