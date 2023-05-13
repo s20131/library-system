@@ -24,16 +24,9 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
 ) : AuthenticationProvider {
 
-    fun register(command: RegisterUserCommand): UserId {
-        validateUserData(command)
-        val user = User(
-            UserId.generate(),
-            command.firstName,
-            command.lastName,
-            command.email,
-            command.username,
-            Password(passwordEncoder.encode(command.password.value)),
-        )
+    fun register(dto: RegisterUserDto): UserId {
+        validateUserData(dto)
+        val user = User.from(dto).copy(password = Password(passwordEncoder.encode(dto.password.value)))
         userRepository.save(user)
         userRepository.saveSettings(user.userId, UserSettings.basic())
         return user.userId
@@ -56,15 +49,15 @@ class AuthService(
         return authentication == UsernamePasswordAuthenticationToken::class.java
     }
 
-    private fun validateUserData(command: RegisterUserCommand) {
-        if (userRepository.findBy(command.email) != null)
-            throw EmailAlreadyExistsException(command.email)
-        command.password.validate()
+    private fun validateUserData(dto: RegisterUserDto) {
+        if (userRepository.findBy(dto.email) != null)
+            throw EmailAlreadyExistsException(dto.email)
+        dto.password.validate()
     }
 
 }
 
-data class RegisterUserCommand(
+data class RegisterUserDto(
     val firstName: FirstName,
     val lastName: LastName,
     val email: Email,

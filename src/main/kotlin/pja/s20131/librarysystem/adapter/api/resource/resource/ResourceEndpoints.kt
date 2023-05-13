@@ -26,7 +26,7 @@ class ResourceEndpoints(
 
     @PostMapping(Paths.AUTHORS)
     fun addAuthor(@RequestBody addAuthorRequest: AddAuthorRequest): AuthorId {
-        return authorService.addAuthor(addAuthorRequest.toCommand())
+        return authorService.addAuthor(addAuthorRequest.toDto())
     }
 
     @GetMapping(Paths.SERIES)

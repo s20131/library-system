@@ -15,9 +15,9 @@ class AuthServiceTests @Autowired constructor(
 
     @Test
     fun `should save a user and add basic settings when registering a user`() {
-        val command = UserGen.registerUserCommand()
+        val dto = UserGen.registerUserDto()
 
-        val userId = authService.register(command)
+        val userId = authService.register(dto)
 
         assert.user.isSaved(userId)
     }

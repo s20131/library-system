@@ -52,17 +52,17 @@ class BookServiceTests @Autowired constructor(
     @Test
     fun `should correctly add a book`() {
         val (author) = assuming.author.exists().build()
-        val command = BookGen.addBookCommand(authorId = author.authorId)
+        val dto = BookGen.addBookDto(authorId = author.authorId)
 
-        val bookId = bookService.addBook(command)
+        val bookId = bookService.addBook(dto)
 
         assert.book.isSaved(bookId)
     }
 
     @Test
     fun `should throw an exception when adding a book with not existing author id`() {
-        val command = BookGen.addBookCommand()
+        val dto = BookGen.addBookDto()
 
-        assertThrows<AuthorNotFoundException> { bookService.addBook(command) }
+        assertThrows<AuthorNotFoundException> { bookService.addBook(dto) }
     }
 }

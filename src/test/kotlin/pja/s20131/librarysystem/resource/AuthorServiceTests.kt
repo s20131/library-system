@@ -27,9 +27,9 @@ class AuthorServiceTests @Autowired constructor(
 
     @Test
     fun `should correctly insert an author`() {
-        val command = ResourceGen.addAuthorCommand()
+        val dto = ResourceGen.addAuthorDto()
 
-        val authorId = authorService.addAuthor(command)
+        val authorId = authorService.addAuthor(dto)
 
         assert.author.isSaved(authorId)
     }

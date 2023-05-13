@@ -19,7 +19,7 @@ class AuthEndpoints(
     @RequestMapping("/register")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun register(@RequestBody request: RegisterUserRequest) {
-        authService.register(request.toCommand())
+        authService.register(request.toDto())
     }
 
     @PostMapping(consumes = ["application/json"], produces = ["application/json"])

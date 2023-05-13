@@ -38,9 +38,9 @@ class EbookService(
         return ebookRepository.get(ebookId)
     }
 
-    fun addEbook(command: AddEbookCommand): ResourceId {
-        checkIfAuthorExists(command.authorId)
-        val newEbook = Ebook.from(command)
+    fun addEbook(dto: AddEbookDto): ResourceId {
+        checkIfAuthorExists(dto.authorId)
+        val newEbook = Ebook.from(dto)
         ebookRepository.insert(newEbook)
         return newEbook.resourceId
     }
@@ -50,7 +50,7 @@ class EbookService(
     }
 }
 
-data class AddEbookCommand(
+data class AddEbookDto(
     val title: Title,
     val authorId: AuthorId,
     val releaseDate: ReleaseDate,

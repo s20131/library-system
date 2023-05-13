@@ -3,7 +3,7 @@ package pja.s20131.librarysystem.user
 import net.datafaker.Faker
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
-import pja.s20131.librarysystem.domain.user.RegisterUserCommand
+import pja.s20131.librarysystem.domain.user.RegisterUserDto
 import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
 import pja.s20131.librarysystem.domain.user.model.Username
@@ -32,11 +32,11 @@ object UserGen {
         kindleEmail: KindleEmail? = KindleEmail(faker.internet().emailAddress()),
     ) = UserSettings(sendEndOfRentalReminder, sendWhenAvailableReminder, kindleEmail)
 
-    fun registerUserCommand(
+    fun registerUserDto(
         firstName: FirstName = FirstName(faker.name().firstName()),
         lastName: LastName = LastName(faker.name().lastName()),
         email: Email = Email(faker.internet().emailAddress()),
         username: Username = Username(faker.name().username()),
         password: Password = Password(faker.internet().password()),
-    ) = RegisterUserCommand(firstName, lastName, email, username, password)
+    ) = RegisterUserDto(firstName, lastName, email, username, password)
 }

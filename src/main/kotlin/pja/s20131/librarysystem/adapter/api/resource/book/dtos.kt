@@ -9,7 +9,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
-import pja.s20131.librarysystem.domain.resource.AddBookCommand
+import pja.s20131.librarysystem.domain.resource.AddBookDto
 
 data class AddBookRequest(
     val title: Title,
@@ -20,7 +20,7 @@ data class AddBookRequest(
     val status: ResourceStatus,
     val isbn: ISBN,
 ) {
-    fun toCommand() = AddBookCommand(title, authorId, releaseDate, description, series, status, isbn)
+    fun toDto() = AddBookDto(title, authorId, releaseDate, description, series, status, isbn)
 }
 
 data class GetResourceWithAuthorBasicDataResponse(
