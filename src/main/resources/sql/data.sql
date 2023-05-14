@@ -65,5 +65,7 @@ BEGIN
     INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');
 
     INSERT INTO storage (user_id, resource_id, since) VALUES (user_id, book_id, now());
-    INSERT INTO storage (user_id, resource_id, since) VALUES (user_id, ebook_id, now() - INTERVAL '1 DAY');
+    INSERT INTO storage (user_id, resource_id, since) VALUES (user_id, ebook_id, now() - interval '1 day');
+
+    INSERT INTO rental VALUES (user_id, library_id1, book_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '14 days', 'ACTIVE', null);
 END; $$;

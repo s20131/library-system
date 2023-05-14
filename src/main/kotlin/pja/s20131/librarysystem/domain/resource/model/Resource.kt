@@ -1,5 +1,9 @@
 package pja.s20131.librarysystem.domain.resource.model
 
+import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.exception.BaseException
+import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
 
@@ -12,9 +16,17 @@ sealed class Resource {
     abstract val series: Series?
     abstract val status: ResourceStatus
 
-    fun isAvailable(): Boolean = status == ResourceStatus.AVAILABLE
-
     fun toBasicData(): ResourceBasicData = ResourceBasicData(resourceId, title)
+
+    fun borrow(userId: UserId, libraryId: LibraryId, instant: Instant) =
+        Rental(userId, resourceId, libraryId, RentalPeriod.startRental(instant), RentalStatus.ACTIVE, penalty = null)
+
+    fun reserveToBorrow(userId: UserId, libraryId: LibraryId, instant: Instant): Rental {
+        return when (this) {
+            is Book -> Rental(userId, resourceId, libraryId, RentalPeriod.startReservationToBorrow(instant), RentalStatus.RESERVED_TO_BORROW, penalty = null)
+            else -> throw CannotBeReservedToBorrowException(resourceId)
+        }
+    }
 }
 
 @JvmInline
@@ -51,3 +63,6 @@ data class ResourceBasicData(
     val id: ResourceId,
     val title: Title,
 )
+
+class CannotBeReservedToBorrowException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} is not of type ${ResourceType.BOOK} and cannot be reserved to borrow")
