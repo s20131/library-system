@@ -1,12 +1,18 @@
-CREATE TABLE series (
-    name TEXT  PRIMARY KEY
-);
-
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
 
 CREATE TYPE size_unit AS ENUM ('kB');
+
+CREATE TABLE rental_status (
+    name TEXT  PRIMARY KEY
+);
+
+INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('PAID_OFF');
+
+CREATE TABLE series (
+    name TEXT  PRIMARY KEY
+);
 
 CREATE TABLE library (
     id                        UUID  NOT NULL,
@@ -106,4 +112,31 @@ CREATE TABLE storage (
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id) REFERENCES resource
+);
+
+CREATE TABLE rental (
+    user_id          UUID  NOT NULL,
+    library_id       UUID  NOT NULL,
+    resource_id      UUID  NOT NULL,
+    start       TIMESTAMP  NOT NULL,
+    finish      TIMESTAMP  NOT NULL,
+    status           TEXT  NOT NULL,
+    penalty DECIMAL(10,2)          ,
+
+    PRIMARY KEY (user_id, library_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (library_id, resource_id) REFERENCES copy,
+    FOREIGN KEY (status) REFERENCES rental_status
+);
+
+CREATE TABLE reservation (
+    user_id     UUID  NOT NULL,
+    library_id  UUID  NOT NULL,
+    resource_id UUID  NOT NULL,
+    start  TIMESTAMP  NOT NULL,
+    finish TIMESTAMP  NOT NULL,
+
+    PRIMARY KEY (user_id, library_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (library_id, resource_id) REFERENCES copy
 );
