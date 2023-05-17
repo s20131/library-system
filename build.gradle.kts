@@ -18,7 +18,7 @@ repositories {
 val exposed = "0.41.1"
 val postgres = "42.6.0"
 val postgis = "2021.1.0"
-val jackson = "2.15.0"
+val jackson = "2.15.1"
 val faker = "1.9.0"
 val archunit = "1.0.1"
 val testcontainers = "1.18.1"
