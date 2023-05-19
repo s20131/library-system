@@ -1,15 +1,16 @@
 package pja.s20131.librarysystem.domain.resource.model
 
 import pja.s20131.librarysystem.domain.library.model.LibraryId
-import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.user.model.UserId
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
+import java.util.UUID
 
 data class Rental(
+    val rentalId: RentalId,
     val userId: UserId,
     val resourceId: ResourceId,
     val libraryId: LibraryId,
@@ -17,6 +18,13 @@ data class Rental(
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
 )
+
+@JvmInline
+value class RentalId(val value: UUID) {
+    companion object {
+        fun generate() = RentalId(UUID.randomUUID())
+    }
+}
 
 enum class RentalStatus {
     ACTIVE, RESERVED_TO_BORROW, PROLONGED, PAID_OFF, CANCELED

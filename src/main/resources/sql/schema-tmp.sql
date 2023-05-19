@@ -115,28 +115,30 @@ CREATE TABLE storage (
 );
 
 CREATE TABLE rental (
-    user_id          UUID  NOT NULL,
-    library_id       UUID  NOT NULL,
-    resource_id      UUID  NOT NULL,
-    start       TIMESTAMP  NOT NULL,
-    finish      TIMESTAMP  NOT NULL,
-    status           TEXT  NOT NULL,
-    penalty DECIMAL(10,2)          ,
+    id                    UUID  NOT NULL,
+    user_id               UUID  NOT NULL,
+    resource_id           UUID  NOT NULL,
+    library_id            UUID  NOT NULL,
+    start            TIMESTAMP  NOT NULL,
+    finish           TIMESTAMP  NOT NULL,
+    status                TEXT  NOT NULL,
+    penalty      DECIMAL(10,2)          ,
 
-    PRIMARY KEY (user_id, library_id, resource_id),
+    PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (library_id, resource_id) REFERENCES copy,
+    FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id),
     FOREIGN KEY (status) REFERENCES rental_status
 );
 
+--TODO is such PK (less strict than dependencies) ok?
 CREATE TABLE reservation (
     user_id     UUID  NOT NULL,
-    library_id  UUID  NOT NULL,
     resource_id UUID  NOT NULL,
+    library_id  UUID  NOT NULL,
     start  TIMESTAMP  NOT NULL,
     finish TIMESTAMP  NOT NULL,
 
-    PRIMARY KEY (user_id, library_id, resource_id),
+    PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (library_id, resource_id) REFERENCES copy
+    FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
 );

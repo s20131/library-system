@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
+import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.infrastructure.security.PrincipalConverter
 import java.security.Principal
@@ -20,9 +21,15 @@ class RentalEndpoints(
 ) {
 
     @GetMapping("/rentals")
-    fun getRentals(principal: Principal): List<GetRentalHistoryResponse> {
+    fun getUserRentals(principal: Principal): List<GetRentalHistoryResponse> {
         val userId = principalConverter.convert(principal)
-        return rentalService.getRentals(userId).toResponse()
+        return rentalService.getUserRentals(userId).toResponse()
+    }
+
+    @GetMapping("/rentals/{resourceId}")
+    fun getLatestRentalShortInfo(@PathVariable resourceId: ResourceId, principal: Principal): GetRentalShortInfoResponse {
+        val userId = principalConverter.convert(principal)
+        return rentalService.getLatestRentalShortInfo(resourceId, userId).toResponse()
     }
 
     @PostMapping("/libraries/{libraryId}/rentals/{resourceId}")
@@ -33,4 +40,7 @@ class RentalEndpoints(
     }
 }
 
-private fun List<RentalHistory>.toResponse() = map { GetRentalHistoryResponse(it.libraryId, it.resource, it.author, it.startDate, it.rentalStatus, it.resourceType) }
+private fun List<RentalHistory>.toResponse() =
+    map { GetRentalHistoryResponse(it.libraryId, it.resource, it.author, it.startDate, it.rentalStatus, it.resourceType) }
+
+private fun RentalShortInfo.toResponse() = GetRentalShortInfoResponse(rentalStatus, finish, library, penalty)
