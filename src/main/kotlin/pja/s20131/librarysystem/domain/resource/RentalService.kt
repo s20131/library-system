@@ -3,9 +3,12 @@ package pja.s20131.librarysystem.domain.resource
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.library.model.LibraryName
+import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
@@ -17,6 +20,8 @@ import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.exception.BaseException
 import java.time.Clock
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 @Service
 @Transactional
@@ -24,11 +29,24 @@ class RentalService(
     private val rentalRepository: RentalRepository,
     private val resourceRepository: ResourceRepository,
     private val copyRepository: CopyRepository,
+    private val libraryRepository: LibraryRepository,
     private val clock: Clock,
 ) {
 
-    fun getRentals(userId: UserId): List<RentalHistory> {
+    fun getUserRentals(userId: UserId): List<RentalHistory> {
         return rentalRepository.getAllBy(userId)
+    }
+
+    fun getLatestRentalShortInfo(resourceId: ResourceId, userId: UserId): RentalShortInfo {
+        val latestRental = rentalRepository.getLatest(resourceId, userId)
+        val library = libraryRepository.get(latestRental.libraryId)
+        return RentalShortInfo(
+            latestRental.rentalStatus,
+            //TODO via config prop
+            LocalDateTime.ofInstant(latestRental.rentalPeriod.finish, ZoneId.of("Europe/Warsaw")),
+            library.libraryName,
+            latestRental.penalty,
+        )
     }
 
     fun borrowResource(resourceId: ResourceId, libraryId: LibraryId, userId: UserId) {
@@ -51,6 +69,14 @@ data class RentalHistory(
     val startDate: StartDate,
     val rentalStatus: RentalStatus,
     val resourceType: ResourceType,
+)
+
+data class RentalShortInfo(
+    val rentalStatus: RentalStatus,
+    // TODO add type?
+    val finish: LocalDateTime,
+    val library: LibraryName,
+    val penalty: Penalty?,
 )
 
 class CannotBorrowResourceException(resourceId: ResourceId, libraryId: LibraryId) :

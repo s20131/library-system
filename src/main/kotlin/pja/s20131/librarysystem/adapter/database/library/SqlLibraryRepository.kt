@@ -2,6 +2,7 @@ package pja.s20131.librarysystem.adapter.database.library
 
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.point
@@ -16,12 +17,16 @@ import pja.s20131.librarysystem.domain.library.model.Postcode
 import pja.s20131.librarysystem.domain.library.model.StreetName
 import pja.s20131.librarysystem.domain.library.model.StreetNumber
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlLibraryRepository : LibraryRepository {
 
     override fun getAll(): List<Library> =
         LibraryTable.selectAll().map { it.toLibrary() }
+
+    override fun get(libraryId: LibraryId): Library =
+        LibraryTable.select { LibraryTable.id eq libraryId.value }.singleOrNull()?.toLibrary() ?: throw LibraryNotFoundException(libraryId)
 }
 
 object LibraryTable : UUIDTable("library") {
@@ -45,3 +50,5 @@ object LibraryTable : UUIDTable("library") {
             )
         )
 }
+
+class LibraryNotFoundException(libraryId: LibraryId) : BaseException("Library ${libraryId.value} was not found")

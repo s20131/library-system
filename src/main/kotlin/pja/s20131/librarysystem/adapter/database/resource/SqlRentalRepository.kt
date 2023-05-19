@@ -1,13 +1,16 @@
 package pja.s20131.librarysystem.adapter.database.resource
 
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.SortOrder
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
+import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRental
 import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRentalHistory
 import pja.s20131.librarysystem.adapter.database.user.UserTable
 import pja.s20131.librarysystem.domain.library.model.LibraryId
@@ -17,6 +20,7 @@ import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.Rental
+import pja.s20131.librarysystem.domain.resource.model.RentalId
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
@@ -25,6 +29,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlRentalRepository : RentalRepository {
@@ -43,8 +48,18 @@ class SqlRentalRepository : RentalRepository {
             }
     }
 
+    override fun getLatest(resourceId: ResourceId, userId: UserId): Rental {
+        // TODO sort desc?
+        return RentalTable.select {
+            RentalTable.resourceId eq resourceId.value and (RentalTable.userId eq userId.value)
+        }.orderBy(RentalTable.finish to SortOrder.DESC)
+            .firstOrNull()
+            ?.toRental() ?: throw RentalNotFoundException(resourceId, userId)
+    }
+
     override fun save(rental: Rental) {
         RentalTable.insert {
+            it[id] = rental.rentalId.value
             it[userId] = rental.userId.value
             it[libraryId] = rental.libraryId.value
             it[resourceId] = rental.resourceId.value
@@ -57,17 +72,17 @@ class SqlRentalRepository : RentalRepository {
 
 }
 
-object RentalTable : Table("rental") {
+object RentalTable : UUIDTable("rental") {
     val userId = reference("user_id", UserTable)
-    val libraryId = reference("library_id", CopyTable.libraryId)
     val resourceId = reference("resource_id", CopyTable.resourceId)
+    val libraryId = reference("library_id", CopyTable.libraryId)
     val start = timestamp("start")
     val finish = timestamp("finish")
     val status = enumerationByName("status", 255, RentalStatus::class)
     val penalty = decimal("penalty", 10, 2).nullable()
-    override val primaryKey = PrimaryKey(userId, libraryId, resourceId)
 
     fun ResultRow.toRental() = Rental(
+        RentalId(this[id].value),
         UserId(this[userId].value),
         ResourceId(this[resourceId].value),
         LibraryId(this[libraryId].value),
@@ -91,3 +106,6 @@ object RentalTable : Table("rental") {
         resourceType,
     )
 }
+
+class RentalNotFoundException(resourceId: ResourceId, userId: UserId) :
+    BaseException("Rental of resource ${resourceId.value} for user ${userId.value} was not found")

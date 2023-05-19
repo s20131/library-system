@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
+import pja.s20131.librarysystem.adapter.database.resource.RentalNotFoundException
 import pja.s20131.librarysystem.domain.library.model.InvalidPostcodePatternException
 import pja.s20131.librarysystem.domain.resource.model.NegativeSizeException
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
@@ -31,6 +32,7 @@ class ExceptionHandler {
             is AuthorNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.AUTHOR_NOT_FOUND)
             is BookNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.BOOK_NOT_FOUND)
             is EbookNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.EBOOK_NOT_FOUND)
+            is RentalNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.RENTAL_NOT_FOUND)
             is UserNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.USER_NOT_FOUND)
 
             is EmailAlreadyExistsException -> e.map(HttpStatus.CONFLICT, ErrorCode.EMAIL_ALREADY_EXISTS)
