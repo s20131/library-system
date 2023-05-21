@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.user.AuthService
 
 @SpringBootTest

@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.storage
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -6,28 +6,29 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.StorageService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
 import pja.s20131.librarysystem.Preconditions
+import pja.s20131.librarysystem.resource.ResourceGen
 import pja.s20131.librarysystem.user.UserGen
 
 @SpringBootTest
 class StorageServiceTests @Autowired constructor(
     private val storageService: StorageService,
-    private val assuming: Preconditions,
+    private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get user's storage`() {
-        val (author, books, ebooks) = assuming.author.exists()
+        val (author, books, ebooks) = given.author.exists()
             .withBook(series = ResourceGen.defaultSeries)
             .withEbook(series = ResourceGen.defaultSeries)
             .build()
-        val user = assuming.user.exists(
+        val user = given.user.exists(
             itemsInStorage = books.map { it.resourceId to clock.now() } + ebooks.map { it.resourceId to clock.now() }
         )
 
@@ -42,12 +43,12 @@ class StorageServiceTests @Autowired constructor(
     // TODO parametrized
     @Test
     fun `should get user's storage ordered by added time`() {
-        val (author, books, ebooks) = assuming.author.exists()
+        val (author, books, ebooks) = given.author.exists()
             .withBook(series = ResourceGen.defaultSeries)
             .withEbook(series = ResourceGen.defaultSeries)
             .withEbook()
             .build()
-        val user = assuming.user.exists(
+        val user = given.user.exists(
             itemsInStorage = listOf(ebooks[0].resourceId to clock.lastWeek(), books[0].resourceId to clock.now(), ebooks[1].resourceId to clock.yesterday())
         )
 
@@ -62,7 +63,7 @@ class StorageServiceTests @Autowired constructor(
 
     @Test
     fun `should get empty user's storage when nothing was added`() {
-        val user = assuming.user.exists()
+        val user = given.user.exists()
 
         val response = storageService.getUserStorage(user.userId)
 
@@ -78,8 +79,8 @@ class StorageServiceTests @Autowired constructor(
 
     @Test
     fun `should add item to user's storage`() {
-        val user = assuming.user.exists()
-        val (_, books) = assuming.author.exists().withBook().build()
+        val user = given.user.exists()
+        val (_, books) = given.author.exists().withBook().build()
 
         storageService.addToUserStorage(user.userId, books[0].resourceId)
 
@@ -88,8 +89,8 @@ class StorageServiceTests @Autowired constructor(
 
     @Test
     fun `should remove item from user's storage`() {
-        val book = assuming.author.exists().withBook().build().second[0]
-        val user = assuming.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant()))
+        val book = given.author.exists().withBook().build().second[0]
+        val user = given.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant()))
 
         storageService.removeFromUserStorage(user.userId, book.resourceId)
 

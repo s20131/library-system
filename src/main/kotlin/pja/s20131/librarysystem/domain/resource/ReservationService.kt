@@ -31,8 +31,8 @@ class ReservationService(
         return reservationRepository.getAllBy(userId)
     }
 
-    fun getReserVationShortInfo(resourceId: ResourceId, userId: UserId): ReservationShortInfo {
-        val reservation = reservationRepository.getActiveBy(resourceId, userId, clock.instant())
+    fun getReservationShortInfo(resourceId: ResourceId, userId: UserId): ReservationShortInfo {
+        val reservation = reservationRepository.getCurrentlyActiveBy(resourceId, userId, clock.instant())
         val library = libraryRepository.get(reservation.libraryId)
         return ReservationShortInfo(reservation.reservationPeriod.finishDate, library.libraryName)
     }

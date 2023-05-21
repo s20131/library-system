@@ -8,7 +8,7 @@ import java.time.Instant
 
 interface ReservationRepository {
     fun getAllBy(userId: UserId): List<ReservationHistory>
-    fun getActiveBy(resourceId: ResourceId, userId: UserId, now: Instant): Reservation
+    fun getCurrentlyActiveBy(resourceId: ResourceId, userId: UserId, now: Instant): Reservation
     fun upsert(reservation: Reservation)
     fun delete(resourceId: ResourceId, userId: UserId)
 }

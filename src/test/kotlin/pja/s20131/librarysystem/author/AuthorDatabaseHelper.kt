@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.author
 
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select

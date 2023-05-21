@@ -1,9 +1,8 @@
-package pja.s20131.librarysystem.assertions
+package pja.s20131.librarysystem.user
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.stereotype.Component
 import pja.s20131.librarysystem.domain.user.model.UserId
-import pja.s20131.librarysystem.user.UserDatabaseHelper
 
 @Component
 class UserAssertions(

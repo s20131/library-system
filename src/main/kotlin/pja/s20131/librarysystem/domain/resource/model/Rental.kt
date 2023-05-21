@@ -5,6 +5,7 @@ import pja.s20131.librarysystem.domain.user.model.UserId
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -38,6 +39,7 @@ data class RentalPeriod(
     val finish: Instant,
 ) {
     val startDate = StartDate(LocalDate.ofInstant(start, ZoneId.of("Europe/Warsaw")))
+    val finishTime = FinishTime(LocalDateTime.ofInstant(finish, ZoneId.of("Europe/Warsaw")))
 
     companion object {
         fun startRental(instant: Instant) = RentalPeriod(instant, instant.plus(14, ChronoUnit.DAYS))
@@ -48,3 +50,6 @@ data class RentalPeriod(
 
 @JvmInline
 value class StartDate(val value: LocalDate)
+
+@JvmInline
+value class FinishTime(val value: LocalDateTime)

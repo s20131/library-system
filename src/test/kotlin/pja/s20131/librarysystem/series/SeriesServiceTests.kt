@@ -1,11 +1,11 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.series
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.SeriesService
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.Preconditions
@@ -13,14 +13,14 @@ import pja.s20131.librarysystem.Preconditions
 @SpringBootTest
 class SeriesServiceTests @Autowired constructor(
     private val seriesService: SeriesService,
-    private val assuming: Preconditions,
+    private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get all series`() {
-        val series1 = assuming.series.exists()
-        val series2 = assuming.series.exists()
+        val series1 = given.series.exists()
+        val series2 = given.series.exists()
 
         val response = seriesService.getAllSeries()
 

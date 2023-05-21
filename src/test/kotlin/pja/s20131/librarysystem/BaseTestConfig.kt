@@ -11,6 +11,8 @@ import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
 import pja.s20131.librarysystem.adapter.database.resource.CopyTable
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable
+import pja.s20131.librarysystem.adapter.database.resource.RentalTable
+import pja.s20131.librarysystem.adapter.database.resource.ReservationTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
 import pja.s20131.librarysystem.adapter.database.resource.StorageTable
@@ -30,6 +32,8 @@ class BaseTestConfig {
     fun clear() {
         transaction {
             StorageTable.deleteAll()
+            RentalTable.deleteAll()
+            ReservationTable.deleteAll()
             CopyTable.deleteAll()
             BookTable.deleteAll()
             EbookTable.deleteAll()

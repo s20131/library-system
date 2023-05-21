@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.storage
 
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert

@@ -30,7 +30,7 @@ class ReservationEndpoints(
     @GetMapping("/reservations/{resourceId}")
     fun getReservationShortInfo(@PathVariable resourceId: ResourceId, principal: Principal): GetReservationShortInfoResponse {
         val userId = principalConverter.convert(principal)
-        return reservationService.getReserVationShortInfo(resourceId, userId).toResponse()
+        return reservationService.getReservationShortInfo(resourceId, userId).toResponse()
     }
 
     @PostMapping("/libraries/{libraryId}/reservations/{resourceId}")

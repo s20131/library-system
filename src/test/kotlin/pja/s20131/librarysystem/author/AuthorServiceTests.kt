@@ -1,24 +1,25 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.author
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.AuthorService
 import pja.s20131.librarysystem.Preconditions
+import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class AuthorServiceTests @Autowired constructor(
     private val authorService: AuthorService,
-    private val assuming: Preconditions,
+    private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should correctly retrieve an author`() {
-        val (author) = assuming.author.exists().build()
+        val (author) = given.author.exists().build()
 
         val retrievedAuthor = authorService.getAuthor(author.authorId)
 
