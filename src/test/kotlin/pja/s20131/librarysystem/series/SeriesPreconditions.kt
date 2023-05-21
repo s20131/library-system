@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.resource
+package pja.s20131.librarysystem.series
 
 import net.datafaker.Faker
 import org.springframework.stereotype.Component
@@ -10,8 +10,8 @@ class SeriesPreconditions(
 ) {
     private val faker = Faker()
 
-
-    fun exists(series: Series = Series(faker.familyGuy().location())): Series {
+    // random so tests don't fail if the same prop is picked
+    fun exists(series: Series = Series(faker.familyGuy().location() + Math.random())): Series {
         return series.also { seriesDatabaseHelper.insertSeries(series) }
     }
 

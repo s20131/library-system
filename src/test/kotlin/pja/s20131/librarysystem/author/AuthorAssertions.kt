@@ -1,9 +1,8 @@
-package pja.s20131.librarysystem.assertions
+package pja.s20131.librarysystem.author
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.stereotype.Component
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
-import pja.s20131.librarysystem.resource.AuthorDatabaseHelper
 
 @Component
 class AuthorAssertions(

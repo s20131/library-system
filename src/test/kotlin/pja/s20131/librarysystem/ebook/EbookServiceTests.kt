@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
@@ -17,13 +17,13 @@ import pja.s20131.librarysystem.resource.ResourceGen
 @SpringBootTest
 class EbookServiceTests @Autowired constructor(
     private val ebookService: EbookService,
-    private val assuming: Preconditions,
+    private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should get all ebooks`() {
-        val (author, _, ebooks) = assuming.author.exists().withEbook(series = ResourceGen.defaultSeries).withEbook().build()
+        val (author, _, ebooks) = given.author.exists().withEbook(series = ResourceGen.defaultSeries).withEbook().build()
 
         val response = ebookService.getAllEbooks()
 
@@ -35,7 +35,7 @@ class EbookServiceTests @Autowired constructor(
 
     @Test
     fun `should return an ebook`() {
-        val ebook = assuming.author.exists().withEbook().build().third[0]
+        val ebook = given.author.exists().withEbook().build().third[0]
 
         val response = ebookService.getEbook(ebook.resourceId)
 
@@ -52,8 +52,8 @@ class EbookServiceTests @Autowired constructor(
 
     @Test
     fun `should correctly add an ebook`() {
-        val (author) = assuming.author.exists().build()
-        val series = assuming.series.exists()
+        val (author) = given.author.exists().build()
+        val series = given.series.exists()
         val dto = EbookGen.addEbookDto(authorId = author.authorId, series = series)
 
         val ebookId = ebookService.addEbook(dto)

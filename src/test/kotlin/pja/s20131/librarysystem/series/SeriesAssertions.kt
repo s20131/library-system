@@ -1,9 +1,8 @@
-package pja.s20131.librarysystem.assertions
+package pja.s20131.librarysystem.series
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.stereotype.Component
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.resource.SeriesDatabaseHelper
 
 @Component
 class SeriesAssertions(

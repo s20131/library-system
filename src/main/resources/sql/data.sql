@@ -73,6 +73,6 @@ BEGIN
     INSERT INTO storage VALUES (user_id, book_id, now());
     INSERT INTO storage VALUES (user_id, ebook_id, now() - interval '1 day');
 
-    INSERT INTO rental VALUES (gen_random_uuid(), user_id, ebook_id, library_id_1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '14 days', 'ACTIVE', null);
+    INSERT INTO rental VALUES (gen_random_uuid(), user_id, ebook_id, library_id_1, CURRENT_TIMESTAMP - interval '2 days', CURRENT_TIMESTAMP + interval '12 days', 'ACTIVE', null);
     INSERT INTO rental VALUES (gen_random_uuid(), user_id, book_id, library_id_1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + interval '2 days', 'RESERVED_TO_BORROW', null);
 END; $$;

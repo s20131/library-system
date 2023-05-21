@@ -9,8 +9,7 @@ import pja.s20131.librarysystem.ebook.EbookGen.ebook
 class EbookDomainTests {
 
     @Test
-    fun `should return BAD_REQUEST when trying to insert ebook with size lower than 0`() {
+    fun `should return exception when trying to insert ebook with size lower than 0`() {
         assertThrows<NegativeSizeException> { ebook(size = Size(-.1)) }
     }
-
 }

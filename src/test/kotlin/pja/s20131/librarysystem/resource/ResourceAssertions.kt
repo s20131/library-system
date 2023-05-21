@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.assertions
+package pja.s20131.librarysystem.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.stereotype.Component
@@ -6,7 +6,7 @@ import pja.s20131.librarysystem.adapter.database.resource.StorageTable
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.model.UserId
-import pja.s20131.librarysystem.resource.StorageDatabaseHelper
+import pja.s20131.librarysystem.storage.StorageDatabaseHelper
 
 @Component
 class ResourceAssertions(

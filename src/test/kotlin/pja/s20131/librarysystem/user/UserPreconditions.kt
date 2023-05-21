@@ -10,7 +10,7 @@ import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.User
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.Username
-import pja.s20131.librarysystem.resource.StorageDatabaseHelper
+import pja.s20131.librarysystem.storage.StorageDatabaseHelper
 import java.time.Instant
 
 @Component

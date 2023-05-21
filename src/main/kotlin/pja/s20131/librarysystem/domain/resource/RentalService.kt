@@ -8,6 +8,7 @@ import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.FinishTime
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
@@ -20,8 +21,6 @@ import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.exception.BaseException
 import java.time.Clock
-import java.time.LocalDateTime
-import java.time.ZoneId
 
 @Service
 @Transactional
@@ -43,7 +42,7 @@ class RentalService(
         return RentalShortInfo(
             latestRental.rentalStatus,
             //TODO via config prop
-            LocalDateTime.ofInstant(latestRental.rentalPeriod.finish, ZoneId.of("Europe/Warsaw")),
+            latestRental.rentalPeriod.finishTime,
             library.libraryName,
             latestRental.penalty,
         )
@@ -73,8 +72,7 @@ data class RentalHistory(
 
 data class RentalShortInfo(
     val rentalStatus: RentalStatus,
-    // TODO add type?
-    val finish: LocalDateTime,
+    val finish: FinishTime,
     val library: LibraryName,
     val penalty: Penalty?,
 )

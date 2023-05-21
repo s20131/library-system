@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.assertions
+package pja.s20131.librarysystem.resource
 
 import org.assertj.core.api.Assertions.assertThat
 import org.springframework.stereotype.Component

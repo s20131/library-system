@@ -23,17 +23,22 @@ sealed class Resource {
 
     fun reserveToBorrow(userId: UserId, libraryId: LibraryId, instant: Instant): Rental {
         return when (this) {
-            is Book -> Rental(RentalId.generate(), userId, resourceId, libraryId, RentalPeriod.startReservationToBorrow(instant), RentalStatus.RESERVED_TO_BORROW, penalty = null)
+            is Book -> Rental(
+                RentalId.generate(),
+                userId,
+                resourceId,
+                libraryId,
+                RentalPeriod.startReservationToBorrow(instant),
+                RentalStatus.RESERVED_TO_BORROW,
+                penalty = null
+            )
+
             else -> throw CannotBeReservedToBorrowException(resourceId)
         }
     }
 
-    fun reserve(userId: UserId, libraryId: LibraryId, instant: Instant): Reservation {
-        return when (this) {
-            is Book -> Reservation(userId, resourceId, libraryId, ReservationPeriod.startReservation(instant))
-            else -> throw CannotBeReservedException(resourceId)
-        }
-    }
+    fun reserve(userId: UserId, libraryId: LibraryId, instant: Instant): Reservation =
+        Reservation(userId, resourceId, libraryId, ReservationPeriod.startReservation(instant))
 }
 
 @JvmInline
@@ -70,9 +75,6 @@ data class ResourceBasicData(
     val id: ResourceId,
     val title: Title,
 )
-
-class CannotBeReservedException(resourceId: ResourceId) :
-    BaseException("Resource ${resourceId.value} is not of type ${ResourceType.BOOK} and cannot be reserved")
 
 class CannotBeReservedToBorrowException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} is not of type ${ResourceType.BOOK} and cannot be reserved to borrow")

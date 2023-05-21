@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
-import pja.s20131.librarysystem.assertions.Assertions
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.BookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
@@ -17,13 +17,13 @@ import pja.s20131.librarysystem.resource.ResourceGen
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
     private val bookService: BookService,
-    private val assuming: Preconditions,
+    private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
     fun `should return all books`() {
-        val (author, books) = assuming.author.exists().withBook(series = ResourceGen.defaultSeries).withBook().build()
+        val (author, books) = given.author.exists().withBook(series = ResourceGen.defaultSeries).withBook().build()
 
         val response = bookService.getAllBooks()
 
@@ -35,7 +35,7 @@ class BookServiceTests @Autowired constructor(
 
     @Test
     fun `should return a book`() {
-        val book = assuming.author.exists().withBook().build().second[0]
+        val book = given.author.exists().withBook().build().second[0]
 
         val response = bookService.getBook(book.resourceId)
 
@@ -51,7 +51,7 @@ class BookServiceTests @Autowired constructor(
 
     @Test
     fun `should correctly add a book`() {
-        val (author) = assuming.author.exists().build()
+        val (author) = given.author.exists().build()
         val dto = BookGen.addBookDto(authorId = author.authorId)
 
         val bookId = bookService.addBook(dto)

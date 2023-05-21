@@ -35,6 +35,7 @@ class SqlReservationRepository : ReservationRepository {
     override fun getAllBy(userId: UserId): List<ReservationHistory> {
         return (ReservationTable innerJoin CopyTable innerJoin ResourceTable leftJoin BookTable leftJoin EbookTable innerJoin AuthorTable)
             .select { ReservationTable.userId eq userId.value }
+            .orderBy(ReservationTable.start)
             .map {
                 try {
                     it.toBook()
@@ -46,9 +47,9 @@ class SqlReservationRepository : ReservationRepository {
             }
     }
 
-    override fun getActiveBy(resourceId: ResourceId, userId: UserId, now: Instant): Reservation {
+    override fun getCurrentlyActiveBy(resourceId: ResourceId, userId: UserId, now: Instant): Reservation {
         return ReservationTable
-            .select { ReservationTable.resourceId eq resourceId.value and (ReservationTable.userId eq userId.value) and (ReservationTable.finish less now) }
+            .select { ReservationTable.resourceId eq resourceId.value and (ReservationTable.userId eq userId.value) and (ReservationTable.finish greater now) }
             .singleOrNull()
             ?.toReservation() ?: throw ReservationNotFoundException(resourceId, userId)
     }
