@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.library.model.LibraryId
@@ -37,6 +38,14 @@ class RentalEndpoints(
     fun borrowResource(@PathVariable libraryId: LibraryId, @PathVariable resourceId: ResourceId, principal: Principal) {
         val userId = principalConverter.convert(principal)
         rentalService.borrowResource(resourceId, libraryId, userId)
+    }
+
+    // TODO endpoint available for librarian only, with passed customer's code
+    @PutMapping("/rentals/{resourceId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun completeBorrowingBook(@PathVariable resourceId: ResourceId, principal: Principal) {
+        val userId = principalConverter.convert(principal)
+        rentalService.completeBookRental(resourceId, userId)
     }
 }
 

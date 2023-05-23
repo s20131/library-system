@@ -7,6 +7,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
@@ -29,7 +30,6 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
-import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlRentalRepository : RentalRepository {
@@ -48,13 +48,13 @@ class SqlRentalRepository : RentalRepository {
             }
     }
 
-    override fun getLatest(resourceId: ResourceId, userId: UserId): Rental {
+    override fun findLatest(resourceId: ResourceId, userId: UserId): Rental? {
         // TODO sort desc?
         return RentalTable.select {
             RentalTable.resourceId eq resourceId.value and (RentalTable.userId eq userId.value)
         }.orderBy(RentalTable.finish to SortOrder.DESC)
             .firstOrNull()
-            ?.toRental() ?: throw RentalNotFoundException(resourceId, userId)
+            ?.toRental()
     }
 
     override fun save(rental: Rental) {
@@ -70,6 +70,13 @@ class SqlRentalRepository : RentalRepository {
         }
     }
 
+    override fun update(rental: Rental) {
+        RentalTable.update({ RentalTable.id eq rental.rentalId.value }) {
+            it[start] = rental.rentalPeriod.start
+            it[finish] = rental.rentalPeriod.finish
+            it[status] = rental.rentalStatus
+        }
+    }
 }
 
 object RentalTable : UUIDTable("rental") {
@@ -106,6 +113,3 @@ object RentalTable : UUIDTable("rental") {
         resourceType,
     )
 }
-
-class RentalNotFoundException(resourceId: ResourceId, userId: UserId) :
-    BaseException("Rental of resource ${resourceId.value} for user ${userId.value} was not found")

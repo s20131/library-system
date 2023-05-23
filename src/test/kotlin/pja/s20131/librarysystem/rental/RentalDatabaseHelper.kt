@@ -36,9 +36,8 @@ class RentalDatabaseHelper {
         userId: UserId,
         resourceId: ResourceId,
         libraryId: LibraryId,
-        instant: Instant,
-        rentalPeriod: RentalPeriod = RentalPeriod.startRental(instant),
-        rentalStatus: RentalStatus = RentalStatus.ACTIVE,
+        rentalPeriod: RentalPeriod,
+        rentalStatus: RentalStatus,
         penalty: Penalty? = null,
     ): Rental {
         val rental = Rental(RentalId.generate(), userId, resourceId, libraryId, rentalPeriod, rentalStatus, penalty)

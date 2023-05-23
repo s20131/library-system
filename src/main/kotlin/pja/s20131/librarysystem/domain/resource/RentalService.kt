@@ -50,15 +50,29 @@ class RentalService(
 
     fun borrowResource(resourceId: ResourceId, libraryId: LibraryId, userId: UserId) {
         val available = copyRepository.getAvailability(resourceId, libraryId)
-        if (available.value == 0) throw CannotBorrowResourceException(resourceId, libraryId)
+        if (available.value == 0) {
+            throw InsufficientCopyAvailabilityException(resourceId, libraryId)
+        }
         val rental = when (val resource = resourceRepository.getResource(resourceId)) {
             is Book -> resource.reserveToBorrow(userId, libraryId, clock.instant())
             is Ebook -> resource.borrow(userId, libraryId, clock.instant())
         }
+        val latest = rentalRepository.findLatest(resourceId, userId)
+        latest?.validateIsNotOverlapped(rental)
         rentalRepository.save(rental)
         copyRepository.decreaseAvailability(resourceId, libraryId)
     }
 
+    fun completeBookRental(resourceId: ResourceId, userId: UserId) {
+        val resource = resourceRepository.getResource(resourceId)
+        if (resource !is Book) {
+            throw IncorrectResourceTypeException(resource.resourceId, ResourceType.BOOK)
+        }
+        val rental = rentalRepository.getLatest(resourceId, userId)
+        val updatedRental = rental.completeBookRental(clock.instant())
+        rental.validateIsOverlapped(updatedRental)
+        rentalRepository.update(updatedRental)
+    }
 }
 
 data class RentalHistory(
@@ -77,5 +91,8 @@ data class RentalShortInfo(
     val penalty: Penalty?,
 )
 
-class CannotBorrowResourceException(resourceId: ResourceId, libraryId: LibraryId) :
+class InsufficientCopyAvailabilityException(resourceId: ResourceId, libraryId: LibraryId) :
     BaseException("Resource ${resourceId.value} could not be borrowed from ${libraryId.value} for insufficient availability")
+
+class IncorrectResourceTypeException(resourceId: ResourceId, resourceType: ResourceType) :
+    BaseException("Resource ${resourceId.value} cannot be completed to be borrowed, because it's not of $resourceType type")

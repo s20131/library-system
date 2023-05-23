@@ -2,6 +2,7 @@ package pja.s20131.librarysystem.domain.resource.model
 
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.exception.BaseException
 import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
@@ -18,7 +19,24 @@ data class Rental(
     val rentalPeriod: RentalPeriod,
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
-)
+) {
+    private fun isRentalPeriodOverlapped(other: Rental) =
+        rentalPeriod.start.isBefore(other.rentalPeriod.finish) && other.rentalPeriod.start.isBefore(rentalPeriod.finish)
+
+    fun completeBookRental(instant: Instant) = copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
+
+    fun validateIsOverlapped(other: Rental) {
+        if (!isRentalPeriodOverlapped(other)) {
+            throw RentalPeriodNotOverlappingDatesException(resourceId)
+        }
+    }
+
+    fun validateIsNotOverlapped(other: Rental) {
+        if (isRentalPeriodOverlapped(other)) {
+            throw RentalPeriodOverlappingDatesException(resourceId)
+        }
+    }
+}
 
 @JvmInline
 value class RentalId(val value: UUID) {
@@ -53,3 +71,9 @@ value class StartDate(val value: LocalDate)
 
 @JvmInline
 value class FinishTime(val value: LocalDateTime)
+
+class RentalPeriodOverlappingDatesException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} cannot be borrowed as you already have an active rental of it")
+
+class RentalPeriodNotOverlappingDatesException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} cannot be completed to be borrowed as reservation ended")
