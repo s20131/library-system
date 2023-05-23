@@ -7,15 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.adapter.database.resource.RentalNotFoundException
-import pja.s20131.librarysystem.domain.resource.CannotBorrowResourceException
+import pja.s20131.librarysystem.domain.resource.IncorrectResourceTypeException
+import pja.s20131.librarysystem.domain.resource.InsufficientCopyAvailabilityException
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
+import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
+import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
+import pja.s20131.librarysystem.domain.resource.port.RentalNotFoundException
 
 @SpringBootTest
 class RentalServiceTests @Autowired constructor(
@@ -29,7 +32,7 @@ class RentalServiceTests @Autowired constructor(
         val user = given.user.exists()
         val (author, books) = given.author.exists().withBook().build()
         val library = given.library.exists().hasCopy(books[0].resourceId).build()
-        val rental = given.rental.exists(user.userId, books[0].resourceId, library.libraryId)
+        val rental = given.rental.exists(user.userId, books[0].resourceId, library.libraryId, RentalPeriod.startRental(clock.now()))
 
         val response = rentalService.getUserRentals(user.userId)
 
@@ -50,8 +53,8 @@ class RentalServiceTests @Autowired constructor(
         val user = given.user.exists()
         val (author, books, ebooks) = given.author.exists().withBook().withEbook().build()
         val library = given.library.exists().hasCopy(books[0].resourceId).hasCopy(ebooks[0].resourceId).build()
-        val rental1 = given.rental.exists(user.userId, books[0].resourceId, library.libraryId)
-        val rental2 = given.rental.exists(user.userId, ebooks[0].resourceId, library.libraryId, clock.yesterday())
+        val rental1 = given.rental.exists(user.userId, books[0].resourceId, library.libraryId, RentalPeriod.startRental(clock.now()))
+        val rental2 = given.rental.exists(user.userId, ebooks[0].resourceId, library.libraryId, RentalPeriod.startRental(clock.yesterday()))
 
         val response = rentalService.getUserRentals(user.userId)
 
@@ -80,9 +83,9 @@ class RentalServiceTests @Autowired constructor(
         val user = given.user.exists()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
-        given.rental.exists(user.userId, book.resourceId, library.libraryId, clock.lastWeek())
-        val expectedRental = given.rental.exists(user.userId, book.resourceId, library.libraryId)
-        given.rental.exists(user.userId, book.resourceId, library.libraryId, clock.yesterday())
+        given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+        val expectedRental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()))
+        given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.yesterday()))
 
         val response = rentalService.getLatestRentalShortInfo(book.resourceId, user.userId)
 
@@ -123,6 +126,17 @@ class RentalServiceTests @Autowired constructor(
     }
 
     @Test
+    fun `should throw exception when trying to borrow a resource with an active rental of this resource`() {
+        val user = given.user.exists()
+        val ebook = given.author.exists().withEbook().build().third[0]
+        val library1 = given.library.exists().hasCopy(ebook.resourceId).build()
+        val library2 = given.library.exists().hasCopy(ebook.resourceId).build()
+        given.rental.exists(user.userId, ebook.resourceId, library1.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+        assertThrows<RentalPeriodOverlappingDatesException> { rentalService.borrowResource(ebook.resourceId, library2.libraryId, user.userId) }
+    }
+
+    @Test
     fun `should reserve a book for user to pickup after borrowing one`() {
         val user = given.user.exists()
         val book = given.author.exists().withBook().build().second[0]
@@ -146,8 +160,58 @@ class RentalServiceTests @Autowired constructor(
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
 
-        assertThrows<CannotBorrowResourceException> {
+        assertThrows<InsufficientCopyAvailabilityException> {
             rentalService.borrowResource(book.resourceId, library.libraryId, user.userId)
         }
+    }
+
+    @Test
+    fun `should complete book rental`() {
+        val user = given.user.exists()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).build()
+        given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startReservationToBorrow(clock.yesterday()),
+            RentalStatus.RESERVED_TO_BORROW,
+        )
+
+        rentalService.completeBookRental(book.resourceId, user.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()), RentalStatus.ACTIVE, penalty = null)
+    }
+
+    @Test
+    fun `should throw exception when trying to complete rental of not book resource`() {
+        val user = given.user.exists()
+        val ebook = given.author.exists().withEbook().build().third[0]
+        val library = given.library.exists().hasCopy(ebook.resourceId).build()
+        given.rental.exists(
+            user.userId,
+            ebook.resourceId,
+            library.libraryId,
+            RentalPeriod.startReservationToBorrow(clock.yesterday()),
+            RentalStatus.RESERVED_TO_BORROW
+        )
+
+        assertThrows<IncorrectResourceTypeException> { rentalService.completeBookRental(ebook.resourceId, user.userId) }
+    }
+
+    @Test
+    fun `should throw exception when trying to complete rental after reservation expiration`() {
+        val user = given.user.exists()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).build()
+        given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startReservationToBorrow(clock.lastWeek()),
+            RentalStatus.RESERVED_TO_BORROW,
+        )
+
+        assertThrows<RentalPeriodNotOverlappingDatesException> { rentalService.completeBookRental(book.resourceId, user.userId) }
     }
 }

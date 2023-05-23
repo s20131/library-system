@@ -62,11 +62,9 @@ class SqlStorageRepository : StorageRepository {
     }
 
     override fun isInUserStorage(userId: UserId, resourceId: ResourceId): Boolean {
-        // TODO with database query
-        //val existsOp = exists(StorageTable.select { eqKey(userId, resourceId) })
         return StorageTable.select {
             eqKey(userId, resourceId)
-        }.any()
+        }.empty().not()
     }
 
     override fun add(userId: UserId, resourceId: ResourceId, since: Instant) {
