@@ -1,13 +1,20 @@
 package pja.s20131.librarysystem.adapter.database.resource
 
 import org.jetbrains.exposed.dao.id.UUIDTable
+import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.date
+import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
+import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
+import pja.s20131.librarysystem.adapter.database.resource.CoverTable.toCover
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.domain.resource.model.Resource
+import pja.s20131.librarysystem.domain.resource.model.ResourceCover
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
@@ -27,6 +34,21 @@ class SqlResourceRepository : ResourceRepository {
                     it?.toEbook()
                 }
             } ?: throw ResourceNotFoundException(resourceId)
+    }
+
+    override fun getCover(resourceId: ResourceId): ResourceCover {
+        return CoverTable.select {
+            CoverTable.id eq resourceId.value
+        }.singleOrNull()
+            ?.toCover() ?: throw CoverNotFoundException(resourceId)
+    }
+
+    override fun upsertCover(resourceId: ResourceId, resourceCover: ResourceCover) {
+        CoverTable.replace {
+            it[id] = resourceId.value
+            it[content] = ExposedBlob(resourceCover.content)
+            it[mediaType] = resourceCover.mediaType.toString()
+        }
     }
 }
 
@@ -49,4 +71,15 @@ object ResourceTable : UUIDTable("resource") {
     }
 }
 
+object CoverTable : Table("cover") {
+    val id = reference("id", ResourceTable)
+    val content = blob("content")
+    val mediaType = text("media_type")
+    override val primaryKey = PrimaryKey(id)
+
+    fun ResultRow.toCover() = ResourceCover(this[content].bytes, MediaType.valueOf(this[mediaType]))
+}
+
 class ResourceNotFoundException(resourceId: ResourceId) : BaseException("Resource ${resourceId.value} could not be found")
+
+class CoverNotFoundException(resourceId: ResourceId) : BaseException("Cover for resource ${resourceId.value} was not found")

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
+import pja.s20131.librarysystem.adapter.database.resource.CoverNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.library.model.InvalidPostcodePatternException
@@ -39,6 +40,7 @@ class ExceptionHandler {
 
             is AuthorNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.AUTHOR_NOT_FOUND)
             is BookNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.BOOK_NOT_FOUND)
+            is CoverNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.COVER_NOT_FOUND)
             is EbookNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.EBOOK_NOT_FOUND)
             is RentalNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.RENTAL_NOT_FOUND)
             is ReservationNotFoundException -> e.map(HttpStatus.NOT_FOUND, ErrorCode.RESERVATION_NOT_FOUND)

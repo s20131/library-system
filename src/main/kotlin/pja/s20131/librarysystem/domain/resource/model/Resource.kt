@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.domain.resource.model
 
+import org.springframework.http.MediaType
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.exception.BaseException
@@ -70,6 +71,9 @@ enum class ResourceStatus {
 enum class ResourceType {
     BOOK, EBOOK
 }
+
+@Suppress("ArrayInDataClass")
+data class ResourceCover(val content: ByteArray, val mediaType: MediaType)
 
 data class ResourceBasicData(
     val id: ResourceId,
