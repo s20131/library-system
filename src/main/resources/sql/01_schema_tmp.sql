@@ -2,7 +2,7 @@ CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
 
-CREATE TYPE size_unit AS ENUM ('kB');
+CREATE TYPE size_unit AS ENUM ('B', 'kB');
 
 CREATE TABLE rental_status (
     name TEXT  PRIMARY KEY
@@ -47,6 +47,15 @@ CREATE TABLE resource (
     PRIMARY KEY (id),
     FOREIGN KEY (author) REFERENCES author,
     FOREIGN KEY (series) REFERENCES series
+);
+
+CREATE TABLE cover (
+    id         UUID  NOT NULL,
+    content   BYTEA  NOT NULL,
+    media_type TEXT  NOT NULL,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (id) REFERENCES resource
 );
 
 CREATE TABLE book (
@@ -142,3 +151,5 @@ CREATE TABLE reservation (
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
 );
+
+CREATE MATERIALIZED VIEW books_view AS SELECT r.*, b.isbn FROM resource r INNER JOIN book b ON r.id = b.resource_id;
