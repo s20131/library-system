@@ -21,7 +21,7 @@ val postgis = "2021.1.0"
 val jackson = "2.15.1"
 val faker = "1.9.0"
 val archunit = "1.0.1"
-val testcontainers = "1.18.1"
+val testcontainers = "1.18.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
