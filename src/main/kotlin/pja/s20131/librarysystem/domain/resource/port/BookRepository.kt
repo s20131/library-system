@@ -7,4 +7,5 @@ interface BookRepository {
     fun getAll(): List<Book>
     fun get(bookId: ResourceId): Book
     fun save(book: Book)
+    fun search(tokens: List<String>): List<Book>
 }

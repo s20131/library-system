@@ -1,7 +1,8 @@
 package pja.s20131.librarysystem.adapter.api.resource.resource
 
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.IMAGE_JPEG_VALUE
+import org.springframework.http.MediaType.IMAGE_PNG_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -25,7 +26,7 @@ class ResourceEndpoints(
     private val seriesService: SeriesService,
 ) {
 
-    @GetMapping("/{resourceId}/cover", produces = [MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE, IMAGE_WEBP])
+    @GetMapping("/{resourceId}/cover", produces = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE, IMAGE_WEBP_VALUE])
     fun getCover(@PathVariable resourceId: ResourceId): ResponseEntity<ByteArray> {
         val cover = resourceService.getResourceCover(resourceId)
         return ResponseEntity.status(HttpStatus.OK).contentType(cover.mediaType).body(cover.content)
@@ -57,7 +58,7 @@ class ResourceEndpoints(
     }
 
     companion object {
-        const val IMAGE_WEBP = "image/webp"
+        const val IMAGE_WEBP_VALUE = "image/webp"
     }
 }
 

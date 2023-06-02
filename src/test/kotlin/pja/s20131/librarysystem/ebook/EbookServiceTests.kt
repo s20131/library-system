@@ -5,18 +5,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
-import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
+import pja.s20131.librarysystem.domain.resource.model.Description
+import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class EbookServiceTests @Autowired constructor(
     private val ebookService: EbookService,
+    private val ebookDatabaseHelper: EbookDatabaseHelper,
     private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
@@ -39,7 +42,7 @@ class EbookServiceTests @Autowired constructor(
 
         val response = ebookService.getEbook(ebook.resourceId)
 
-        // not a good practice, but content has a byte array inside, which is hard to compare
+        // probably (?) not a good practice, but content has a byte array inside, which is hard to compare
         assertThat(ebook.copy(content = response.content)).isEqualTo(response)
     }
 
@@ -66,5 +69,22 @@ class EbookServiceTests @Autowired constructor(
         val dto = EbookGen.addEbookDto()
 
         assertThrows<AuthorNotFoundException> { ebookService.addEbook(dto) }
+    }
+
+    @Test
+    fun `should find specific ebooks`() {
+        val (author, _, ebooks) = given.author.exists()
+            .withEbook(description = Description("fajny ebook"))
+            .withEbook(description = Description("wyborny ebook"))
+            .withEbook(description = Description("fantastyczny ebook"))
+            .build()
+        ebookDatabaseHelper.refreshSearchView()
+
+        val response = ebookService.search(SearchQuery("wyborny i fajny"))
+
+        assertThat(response).containsExactly(
+            ResourceWithAuthorBasicData(ebooks[0].toBasicData(), author.toBasicData()),
+            ResourceWithAuthorBasicData(ebooks[1].toBasicData(), author.toBasicData()),
+        )
     }
 }

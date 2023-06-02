@@ -75,6 +75,19 @@ enum class ResourceType {
 @Suppress("ArrayInDataClass")
 data class ResourceCover(val content: ByteArray, val mediaType: MediaType)
 
+@JvmInline
+value class SearchQuery(val value: String) {
+    fun tokenize(): List<String> {
+        return value.split(splitRegex)
+    }
+
+    companion object {
+        private val splitRegex = Regex( "[^a-zA-Z0-9]")
+
+        fun SearchQuery?.isNullOrEmpty(): Boolean = this == null || this.value.trim().isEmpty()
+    }
+}
+
 data class ResourceBasicData(
     val id: ResourceId,
     val title: Title,

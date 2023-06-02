@@ -10,7 +10,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.adapter.database.exposed.pgStDistance
+import pja.s20131.librarysystem.adapter.database.exposed.stDistance
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable.toLibrary
 import pja.s20131.librarysystem.domain.library.ResourceCopy
@@ -32,15 +32,15 @@ class SqlCopyRepository : CopyRepository {
                 ResourceCopy(
                     it.toLibrary(),
                     Available(it[CopyTable.available]),
-                    if (userLocation != null) Distance(it[pgStDistance(userLocation)]) else null,
+                    if (userLocation != null) Distance(it[LibraryTable.location stDistance userLocation]) else null,
                 )
             }
     }
 
     private fun Query.applyOrderBy(userLocation: Point?) = apply {
         if (userLocation != null) {
-            adjustSlice { slice(it.fields + pgStDistance(userLocation)) }
-                .orderBy(CopyTable.available eq 0 to SortOrder.ASC, pgStDistance(userLocation) to SortOrder.ASC)
+            adjustSlice { slice(it.fields + (LibraryTable.location stDistance userLocation)) }
+                .orderBy(CopyTable.available eq 0 to SortOrder.ASC, (LibraryTable.location stDistance userLocation) to SortOrder.ASC)
         } else {
             orderBy(CopyTable.available to SortOrder.DESC)
         }
