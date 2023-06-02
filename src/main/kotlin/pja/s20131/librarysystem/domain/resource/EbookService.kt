@@ -2,6 +2,7 @@ package pja.s20131.librarysystem.domain.resource
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData.Companion.withAuthors
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -10,6 +11,7 @@ import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
+import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
@@ -26,12 +28,7 @@ class EbookService(
     fun getAllEbooks(): List<ResourceWithAuthorBasicData> {
         val ebooks = ebookRepository.getAll()
         val authors = authorRepository.getAll()
-        return ebooks.map { ebook ->
-            ResourceWithAuthorBasicData(
-                ebook.toBasicData(),
-                authors.first { it.authorId == ebook.authorId }.toBasicData()
-            )
-        }
+        return ebooks.withAuthors(authors)
     }
 
     fun getEbook(ebookId: ResourceId): Ebook {
@@ -43,6 +40,13 @@ class EbookService(
         val newEbook = Ebook.from(dto)
         ebookRepository.insert(newEbook)
         return newEbook.resourceId
+    }
+
+    fun search(query: SearchQuery): List<ResourceWithAuthorBasicData> {
+        val tokens = query.tokenize()
+        val ebooks = ebookRepository.search(tokens)
+        val authors = authorRepository.getAll()
+        return ebooks.withAuthors(authors)
     }
 
     private fun checkIfAuthorExists(authorId: AuthorId) {

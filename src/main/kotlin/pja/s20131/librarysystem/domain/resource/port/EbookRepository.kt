@@ -7,4 +7,5 @@ interface EbookRepository {
     fun getAll(): List<Ebook>
     fun get(ebookId: ResourceId): Ebook
     fun insert(ebook: Ebook)
+    fun search(tokens: List<String>): List<Ebook>
 }

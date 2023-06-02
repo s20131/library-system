@@ -33,6 +33,8 @@ BEGIN
     RETURN NULL;
 END; $$;
 
+---
+
 -- DATABASE FEATURE - STORED PROCEDURE, CONDITIONALS
 CREATE PROCEDURE create_book(
   title text,
@@ -123,6 +125,8 @@ END; $$;
 CREATE TRIGGER refresh_books_search_view
 AFTER INSERT OR UPDATE OR DELETE ON book
 EXECUTE FUNCTION refresh_view('books_search_view');
+
+---
 
 CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook

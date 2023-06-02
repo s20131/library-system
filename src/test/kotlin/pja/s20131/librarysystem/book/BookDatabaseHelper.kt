@@ -2,6 +2,7 @@ package pja.s20131.librarysystem.book
 
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -42,4 +43,7 @@ class BookDatabaseHelper @Autowired constructor(
             .map { it.toBook() }
     }
 
+    fun refreshSearchView() {
+        TransactionManager.current().exec("REFRESH MATERIALIZED VIEW books_search_view;")
+    }
 }

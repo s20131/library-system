@@ -5,18 +5,21 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.BaseTestConfig
-import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.Assertions
+import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.Preconditions
+import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.domain.resource.BookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
+import pja.s20131.librarysystem.domain.resource.model.Description
+import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
-import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
     private val bookService: BookService,
+    private val bookDatabaseHelper: BookDatabaseHelper,
     private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
@@ -64,5 +67,21 @@ class BookServiceTests @Autowired constructor(
         val dto = BookGen.addBookDto()
 
         assertThrows<AuthorNotFoundException> { bookService.addBook(dto) }
+    }
+
+    @Test
+    fun `should find specific book`() {
+        val (author, books) = given.author.exists()
+            .withBook(description = Description("majestic book"))
+            .withBook(description = Description("some book"))
+            .withBook(description = Description("another book"))
+            .build()
+        bookDatabaseHelper.refreshSearchView()
+
+        val response = bookService.search(SearchQuery("majestic"))
+
+        assertThat(response).containsExactly(
+            ResourceWithAuthorBasicData(books[0].toBasicData(), author.toBasicData())
+        )
     }
 }
