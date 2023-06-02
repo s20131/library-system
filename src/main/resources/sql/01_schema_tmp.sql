@@ -1,3 +1,4 @@
+-- DATABASE FEATURE - ENUM
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
@@ -14,6 +15,7 @@ CREATE TABLE series (
     name TEXT  PRIMARY KEY
 );
 
+-- DATABASE FEATURE - POSTGIS, CHECK CONSTRAINT
 CREATE TABLE library (
     id                        UUID  NOT NULL,
     name                      TEXT  NOT NULL,
@@ -49,6 +51,7 @@ CREATE TABLE resource (
     FOREIGN KEY (series) REFERENCES series
 );
 
+-- DATABASE FEATURE - BLOB
 CREATE TABLE cover (
     id         UUID  NOT NULL,
     content   BYTEA  NOT NULL,
@@ -89,7 +92,6 @@ CREATE TABLE copy (
     FOREIGN KEY (resource_id) REFERENCES resource,
 
     CHECK (available >= 0)
-
 );
 
 CREATE TABLE "user" (
@@ -152,4 +154,23 @@ CREATE TABLE reservation (
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
 );
 
-CREATE MATERIALIZED VIEW books_view AS SELECT r.*, b.isbn FROM resource r INNER JOIN book b ON r.id = b.resource_id;
+---
+
+-- TODO polish
+-- DATABASE FEATURE - MATERIALIZED VIEW, FULL-TEXT SEARCH
+CREATE MATERIALIZED VIEW books_search_view AS SELECT r.*, b.isbn, to_tsvector(concat_ws(', ', r.title, r.description, r.series, b.isbn, a.first_name, a.last_name)) AS tokens
+FROM resource r
+INNER JOIN book b ON r.id = b.resource_id
+INNER JOIN author a on r.author = a.id;
+
+-- DATABASE FEATURE - INDEX
+CREATE UNIQUE INDEX books_search_view_idx ON books_search_view (id);
+
+---
+
+CREATE MATERIALIZED VIEW ebooks_search_view AS SELECT r.*, e.content, e.format, e.size, e.size_unit, to_tsvector(concat_ws(', ', r.title, r.description, r.series, e.format, a.first_name, a.last_name)) AS tokens
+FROM resource r
+INNER JOIN ebook e ON r.id = e.resource_id
+INNER JOIN author a on r.author = a.id;
+
+CREATE UNIQUE INDEX ebooks_search_view_idx ON ebooks_search_view (id);

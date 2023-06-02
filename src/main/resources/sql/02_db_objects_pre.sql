@@ -1,21 +1,39 @@
+-- DATABASE FEATURE - FUNCTION, PROCEDURAL LANGUAGE
 CREATE FUNCTION get_image_type(filename text)
 RETURNS text
 LANGUAGE plpgsql
+IMMUTABLE
 AS $$
 BEGIN
    RETURN concat('image/', substring(filename FROM '\w+$'));
 END; $$;
 
+---
 
 CREATE FUNCTION bytes_to_kB(bytes int)
 RETURNS DECIMAL
 LANGUAGE plpgsql
+IMMUTABLE
 AS $$
 BEGIN
     RETURN bytes / 1024;
 END; $$;
 
+---
 
+-- DATABASE FEATURE - DYNAMIC SQL
+CREATE FUNCTION refresh_view()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+    view_name TEXT := tg_argv[0];
+BEGIN
+    EXECUTE format('REFRESH MATERIALIZED VIEW CONCURRENTLY ' || view_name || ';');
+    RETURN NULL;
+END; $$;
+
+-- DATABASE FEATURE - STORED PROCEDURE, CONDITIONALS
 CREATE PROCEDURE create_book(
   title text,
   series text,
@@ -56,6 +74,7 @@ BEGIN
     END IF;
 END; $$;
 
+---
 
 CREATE PROCEDURE create_ebook(
     title text,
@@ -98,20 +117,13 @@ BEGIN
     END IF;
 END; $$;
 
+---
 
-CREATE UNIQUE INDEX books_view_idx ON books_view (id);
+-- DATABASE FEATURE - TRIGGER
+CREATE TRIGGER refresh_books_search_view
+AFTER INSERT OR UPDATE OR DELETE ON book
+EXECUTE FUNCTION refresh_view('books_search_view');
 
-
-CREATE FUNCTION refresh_books_view()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
-AS $$
-BEGIN
-    REFRESH MATERIALIZED VIEW CONCURRENTLY books_view;
-    RETURN null;
-END; $$;
-
-
-CREATE TRIGGER refresh_books_view
-    AFTER INSERT OR UPDATE OR DELETE ON book
-    EXECUTE FUNCTION refresh_books_view();
+CREATE TRIGGER refresh_ebooks_search_view
+AFTER INSERT OR UPDATE OR DELETE ON ebook
+EXECUTE FUNCTION refresh_view('ebooks_search_view');
