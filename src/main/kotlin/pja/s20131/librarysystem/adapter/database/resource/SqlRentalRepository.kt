@@ -2,10 +2,10 @@ package pja.s20131.librarysystem.adapter.database.resource
 
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
+import org.jetbrains.exposed.sql.max
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
@@ -38,6 +38,7 @@ class SqlRentalRepository : RentalRepository {
             .select { RentalTable.userId eq userId.value }
             .orderBy(RentalTable.finish)
             .map {
+                // TODO union? not necessary?
                 try {
                     it.toBook()
                     it.toRentalHistory(ResourceType.BOOK)
@@ -49,11 +50,12 @@ class SqlRentalRepository : RentalRepository {
     }
 
     override fun findLatest(resourceId: ResourceId, userId: UserId): Rental? {
-        // TODO sort desc?
         return RentalTable.select {
-            RentalTable.resourceId eq resourceId.value and (RentalTable.userId eq userId.value)
-        }.orderBy(RentalTable.finish to SortOrder.DESC)
-            .firstOrNull()
+            RentalTable.finish eqSubQuery
+                    RentalTable
+                        .slice(RentalTable.finish.max())
+                        .select { RentalTable.resourceId eq resourceId.value and (RentalTable.userId eq userId.value) }
+        }.singleOrNull()
             ?.toRental()
     }
 

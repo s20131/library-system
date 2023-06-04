@@ -9,7 +9,6 @@ import pja.s20131.librarysystem.adapter.database.resource.CoverNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.library.model.InvalidPostcodePatternException
-import pja.s20131.librarysystem.domain.resource.IncorrectResourceTypeException
 import pja.s20131.librarysystem.domain.resource.InsufficientCopyAvailabilityException
 import pja.s20131.librarysystem.domain.resource.model.NegativeSizeException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
@@ -29,7 +28,6 @@ class ExceptionHandler {
     @ExceptionHandler(Exception::class)
     fun exceptionMapper(e: Exception): ResponseEntity<ErrorResponse> {
         val errorMessage = when (e) {
-            is IncorrectResourceTypeException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.INCORECT_RESOURCE_TYPE)
             is InvalidPostcodePatternException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.INVALID_POSTCODE_PATTERN)
             is NegativeSizeException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.EBOOK_NEGATIVE_FILE_SIZE)
             is PasswordTooShortException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.PASSWORD_TOO_SHORT)

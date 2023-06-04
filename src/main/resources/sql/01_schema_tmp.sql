@@ -3,8 +3,6 @@ CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TYPE ebook_format AS ENUM ('PDF', 'MOBI', 'EPUB');
 
-CREATE TYPE size_unit AS ENUM ('B', 'kB');
-
 CREATE TABLE rental_status (
     name TEXT  PRIMARY KEY
 );
@@ -73,13 +71,9 @@ CREATE TABLE ebook (
     resource_id    UUID  NOT NULL,
     content       BYTEA  NOT NULL,
     format EBOOK_FORMAT  NOT NULL,
-    size  DECIMAL(5, 2)  NOT NULL,
-    size_unit SIZE_UNIT  NOT NULL,
 
     PRIMARY KEY (resource_id, format),
-    FOREIGN KEY (resource_id) REFERENCES resource,
-
-    CHECK (size > 0)
+    FOREIGN KEY (resource_id) REFERENCES resource
 );
 
 CREATE TABLE copy (
@@ -156,7 +150,7 @@ CREATE TABLE reservation (
 
 ---
 
--- TODO polish
+-- TODO polish?
 -- DATABASE FEATURE - MATERIALIZED VIEW, FULL-TEXT SEARCH
 CREATE MATERIALIZED VIEW books_search_view AS SELECT r.*, b.isbn, to_tsvector(concat_ws(', ', r.title, r.description, r.series, b.isbn, a.first_name, a.last_name)) AS tokens
 FROM resource r
@@ -168,7 +162,7 @@ CREATE UNIQUE INDEX books_search_view_idx ON books_search_view (id);
 
 ---
 
-CREATE MATERIALIZED VIEW ebooks_search_view AS SELECT r.*, e.content, e.format, e.size, e.size_unit, to_tsvector(concat_ws(', ', r.title, r.description, r.series, e.format, a.first_name, a.last_name)) AS tokens
+CREATE MATERIALIZED VIEW ebooks_search_view AS SELECT r.*, e.content, e.format, to_tsvector(concat_ws(', ', r.title, r.description, r.series, e.format, a.first_name, a.last_name)) AS tokens
 FROM resource r
 INNER JOIN ebook e ON r.id = e.resource_id
 INNER JOIN author a on r.author = a.id;

@@ -23,7 +23,6 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
-import pja.s20131.librarysystem.domain.resource.model.SizeUnit
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.EbookRepository
 import pja.s20131.librarysystem.exception.BaseException
@@ -51,9 +50,6 @@ class SqlEbookRepository : EbookRepository {
             it[id] = ebook.resourceId.value
             it[content] = ExposedBlob(ebook.content.value)
             it[format] = ebook.format
-            // TODO calculate
-            it[size] = ebook.size.value
-            it[sizeUnit] = SizeUnit.kB
         }
     }
 
@@ -69,8 +65,6 @@ object EbookTable : Table("ebook") {
     val id = reference("resource_id", ResourceTable)
     val content = blob("content")
     val format = enumerationByName<Format>("format", 255)
-    val size = double("size")
-    val sizeUnit = enumerationByName<SizeUnit>("size_unit", 255)
     override val primaryKey = PrimaryKey(id, format)
 
     fun ResultRow.toEbook() = Ebook(
@@ -83,7 +77,7 @@ object EbookTable : Table("ebook") {
         this[ResourceTable.status],
         Content(this[content].bytes),
         this[format],
-        Size(this[size]),
+        Size(this[content].bytes.size),
     )
 }
 
@@ -96,8 +90,6 @@ object EbookSearchView : UUIDTable("ebooks_search_view") {
     val status = enumerationByName<ResourceStatus>("status", 255)
     val content = blob("content")
     val format = enumerationByName<Format>("format", 255)
-    val size = double("size")
-    val sizeUnit = enumerationByName<SizeUnit>("size_unit", 255)
     val tokens = tsvector("tokens")
 
     fun ResultRow.toEbookView() = Ebook(
@@ -110,7 +102,7 @@ object EbookSearchView : UUIDTable("ebooks_search_view") {
         this[status],
         Content(this[content].bytes),
         this[format],
-        Size(this[size]),
+        Size(this[content].bytes.size),
     )
 }
 

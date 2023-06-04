@@ -31,7 +31,7 @@ data class Rental(
         }
     }
 
-    fun validateIsNotOverlapped(other: Rental) {
+    fun validateCanBeBorrowed(other: Rental) {
         if (isRentalPeriodOverlapped(other)) {
             throw RentalPeriodOverlappingDatesException(resourceId)
         }

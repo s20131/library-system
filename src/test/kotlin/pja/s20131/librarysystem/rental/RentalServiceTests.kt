@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.domain.resource.IncorrectResourceTypeException
+import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.domain.resource.InsufficientCopyAvailabilityException
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
@@ -196,7 +196,7 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW
         )
 
-        assertThrows<IncorrectResourceTypeException> { rentalService.completeBookRental(ebook.resourceId, user.userId) }
+        assertThrows<BookNotFoundException> { rentalService.completeBookRental(ebook.resourceId, user.userId) }
     }
 
     @Test

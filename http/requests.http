@@ -1,18 +1,17 @@
-###
-# @name Get libraries
-GET http://localhost:8080/libraries
+### Get libraries
+GET {{url}}/libraries
 
-###
-# @name Get books
-GET http://localhost:8080/books
+### Get books
+GET {{url}}/books
 
-###
-# @name Get ebooks
-GET http://localhost:8080/ebooks
+### Get books filtered
+GET {{url}}/books?search=sapkowski
 
-###
-# @name Register user
-POST http://localhost:8080/users
+### Get ebooks
+GET {{url}}/ebooks
+
+### Register user
+POST {{url}}/users
 Content-Type: application/json
 
 {
@@ -23,14 +22,11 @@ Content-Type: application/json
   "password": "{{$random.alphanumeric(8)}}"
 }
 
-###
-# @name Get user
-GET http://localhost:8080/users/{{userId}}
+### Get user
+GET {{url}}/users/{{userId}}
 
-###
-# @name Get user settings
-GET http://localhost:8080/users/{{userId}}/settings
+### Get user settings
+GET {{url}}/users/{{userId}}/settings
 
-###
-# @name Get user storage
-GET http://localhost:8080/storage
+### Get user storage
+GET {{url}}/storage

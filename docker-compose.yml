@@ -12,6 +12,7 @@ services:
       - '5432:5432'
     volumes:
       - ./src/main/resources/covers:/covers
+      - ./src/main/resources/ebooks:/ebooks
       - ./src/main/resources/sql/01_schema_tmp.sql:/docker-entrypoint-initdb.d/1-schema.sql
       - ./src/main/resources/sql/02_db_objects_pre.sql:/docker-entrypoint-initdb.d/2-db-objects.sql
       - ./src/main/resources/sql/03_data.sql:/docker-entrypoint-initdb.d/3-data.sql
