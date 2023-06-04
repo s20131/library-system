@@ -10,17 +10,6 @@ END; $$;
 
 ---
 
-CREATE FUNCTION bytes_to_kB(bytes int)
-RETURNS DECIMAL
-LANGUAGE plpgsql
-IMMUTABLE
-AS $$
-BEGIN
-    RETURN bytes / 1024;
-END; $$;
-
----
-
 -- DATABASE FEATURE - DYNAMIC SQL
 CREATE FUNCTION refresh_view()
     RETURNS TRIGGER
@@ -63,7 +52,9 @@ BEGIN
         RETURNING id INTO author_id;
     END IF;
 
-    INSERT INTO series VALUES (series) ON CONFLICT DO NOTHING;
+    IF series IS NOT NULL THEN
+        INSERT INTO series VALUES (series) ON CONFLICT DO NOTHING;
+    END IF;
 
     book_id := gen_random_uuid();
     INSERT INTO resource(id, title, author, release_date, description, series) VALUES (book_id, title, author_id, release_date, description, series);
@@ -87,7 +78,7 @@ CREATE PROCEDURE create_ebook(
     release_date date default CURRENT_DATE,
     description text default null,
     cover_filepath text default null,
-    content bytea default md5(random()::text)::bytea
+    content_filepath text default null
 )
 LANGUAGE plpgsql
 AS $$
@@ -95,6 +86,7 @@ DECLARE
     author_id uuid;
     cover bytea;
     cover_mediatype text;
+    content bytea;
 BEGIN
     SELECT id INTO author_id
     FROM author
@@ -106,11 +98,20 @@ BEGIN
         RETURNING id INTO author_id;
     END IF;
 
-    INSERT INTO series VALUES (series) ON CONFLICT DO NOTHING;
+    IF series IS NOT NULL THEN
+        INSERT INTO series VALUES (series) ON CONFLICT DO NOTHING;
+    END IF;
 
     ebook_id := gen_random_uuid();
     INSERT INTO resource(id, title, author, release_date, description, series) VALUES (ebook_id, title, author_id, release_date, description, series);
-    INSERT INTO ebook VALUES (ebook_id, content, 'EPUB', pg_column_size(content), 'kB');
+
+    IF content_filepath IS NULL THEN
+        content := md5(random()::text)::bytea;
+        INSERT INTO ebook VALUES (ebook_id, content, 'EPUB');
+    ELSE
+        content := pg_read_binary_file(content_filepath);
+        INSERT INTO ebook VALUES (ebook_id, content, 'EPUB');
+    END IF;
 
     IF cover_filepath IS NOT NULL THEN
         cover_mediatype := get_image_type(cover_filepath);

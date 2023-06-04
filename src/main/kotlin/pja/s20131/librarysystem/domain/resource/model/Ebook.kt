@@ -52,14 +52,10 @@ enum class Format {
 }
 
 @JvmInline
-value class Size(val value: Double) {
+value class Size(val value: Int) {
     init {
         if (value < 0) throw NegativeSizeException(value)
     }
 }
 
-enum class SizeUnit {
-    kB
-}
-
-class NegativeSizeException(value: Double) : BaseException("Size cannot be negative, but was $value")
+class NegativeSizeException(value: Int) : BaseException("Size cannot be negative, but was $value")

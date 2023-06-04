@@ -15,6 +15,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.StartDate
+import pja.s20131.librarysystem.domain.resource.port.BookRepository
 import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
 import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
@@ -27,6 +28,7 @@ import java.time.Clock
 class RentalService(
     private val rentalRepository: RentalRepository,
     private val resourceRepository: ResourceRepository,
+    private val bookRepository: BookRepository,
     private val copyRepository: CopyRepository,
     private val libraryRepository: LibraryRepository,
     private val clock: Clock,
@@ -53,22 +55,20 @@ class RentalService(
         if (available.value == 0) {
             throw InsufficientCopyAvailabilityException(resourceId, libraryId)
         }
+        // TODO pass in the request and validate?
         val rental = when (val resource = resourceRepository.getResource(resourceId)) {
             is Book -> resource.reserveToBorrow(userId, libraryId, clock.instant())
             is Ebook -> resource.borrow(userId, libraryId, clock.instant())
         }
         val latest = rentalRepository.findLatest(resourceId, userId)
-        latest?.validateIsNotOverlapped(rental)
+        latest?.validateCanBeBorrowed(rental)
         rentalRepository.save(rental)
         copyRepository.decreaseAvailability(resourceId, libraryId)
     }
 
     fun completeBookRental(resourceId: ResourceId, userId: UserId) {
-        val resource = resourceRepository.getResource(resourceId)
-        if (resource !is Book) {
-            throw IncorrectResourceTypeException(resource.resourceId, ResourceType.BOOK)
-        }
-        val rental = rentalRepository.getLatest(resourceId, userId)
+        val book = bookRepository.get(resourceId)
+        val rental = rentalRepository.getLatest(book.resourceId, userId)
         val updatedRental = rental.completeBookRental(clock.instant())
         rental.validateIsOverlapped(updatedRental)
         rentalRepository.update(updatedRental)
@@ -93,6 +93,3 @@ data class RentalShortInfo(
 
 class InsufficientCopyAvailabilityException(resourceId: ResourceId, libraryId: LibraryId) :
     BaseException("Resource ${resourceId.value} could not be borrowed from ${libraryId.value} for insufficient availability")
-
-class IncorrectResourceTypeException(resourceId: ResourceId, resourceType: ResourceType) :
-    BaseException("Resource ${resourceId.value} cannot be completed to be borrowed, because it's not of $resourceType type")

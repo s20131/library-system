@@ -1,4 +1,4 @@
--- DATAABSE FEATURE - TRANSACTION, FOR-LOOP
+-- DATABASE FEATURE - TRANSACTION, FOR-LOOP
 DO $$
     DECLARE library_id_1 uuid;
     DECLARE library_id_2 uuid;
@@ -8,6 +8,7 @@ DO $$
     DECLARE book_loop_id uuid;
     DECLARE ebook_id_1 uuid;
     DECLARE ebook_id_2 uuid;
+    DECLARE ebook_id_3 uuid;
     DECLARE user_id uuid;
 BEGIN
     library_id_1 := gen_random_uuid();
@@ -23,6 +24,7 @@ BEGIN
     CALL create_book('Gra o tron', 'Pieśń Lodu i Ognia', 'George R. R.', 'Martin', book_id_2, '1996-08-01', 'Powieść z gatunku fantasy, pierwszy tom sagi Pieśń lodu i ognia George’a R.R. Martina. Pierwsze wydanie w języku angielskim miało premierę 1 sierpnia 1996 roku[1]. Polski przekład ukazał się w roku 1998 nakładem wydawnictwa Zysk i S-ka. Akcja książki toczy się w fikcyjnym świecie na kontynentach Westeros i Essos, gdzie pory roku mogą trwać wiele lat. Na podstawie powieści powstał serial Gra o tron realizowany przez telewizję HBO, a także gra fabularna, gra planszowa oraz gry komputerowe.', '/covers/gra-o-tron.webp');
     CALL create_ebook('Pani Jeziora', 'Wiedźmin', 'Andrzej', 'Sapkowski', ebook_id_1, '1999-03-15', 'Powieść z gatunku fantasy, napisana przez Andrzeja Sapkowskiego, wydana w 1999. Jest ostatnią z pięciu części sagi o wiedźminie.', '/covers/pani-jeziora.jpeg');
     CALL create_ebook('Gra o tron', 'Pieśń Lodu i Ognia', 'George R. R.', 'Martin', ebook_id_2, '1996-08-01', 'Powieść z gatunku fantasy, pierwszy tom sagi Pieśń lodu i ognia George’a R.R. Martina. Pierwsze wydanie w języku angielskim miało premierę 1 sierpnia 1996 roku[1]. Polski przekład ukazał się w roku 1998 nakładem wydawnictwa Zysk i S-ka. Akcja książki toczy się w fikcyjnym świecie na kontynentach Westeros i Essos, gdzie pory roku mogą trwać wiele lat. Na podstawie powieści powstał serial Gra o tron realizowany przez telewizję HBO, a także gra fabularna, gra planszowa oraz gry komputerowe.', '/covers/gra-o-tron.webp');
+    CALL create_ebook('Boska Komedia', null, 'Dante', 'Alighieri', ebook_id_3, '1321-01-01', E'Boska Komedia to dzieło życia włoskiego poety Dante Alighieriego, którym chciał zapewnić nieśmiertelność, oddać hołd swojej zmarłej ukochanej Beatrycze oraz ostrzec lud średniowieczny przed konsekwencjami grzesznego życia. Poemat tryptyk — składający się z trzech ksiąg — Piekła, Czyśćca i Raju, po których wędruje alter ego autora, oprowadzane przez Wergiliusza, św. Bernarda z Clairvaux oraz ukochaną Beatrycze. Alighieri nie tylko jako bohater, ale i jako narrator krytykuje zaświaty, będące alegorią życia doczesnego. W całym utworze wyraźnie widać fascynację cyframi, zwłaszcza 3, będącą symbolem Trójcy Świętej. Księga pierwsza, Piekło, charakteryzuje się drastycznymi opisami wydarzeń i właśnie dzięki niej mówi się o dantejskich scenach.', '/covers/boska-komedia.jpeg', '/ebooks/boska-komedia.epub');
 
     FOR i in 1..5 LOOP
         CALL create_book(title => 'Book ' || i, series => 'Series X', author_first_name => 'John', author_last_name => 'Doe', book_id => book_loop_id);
