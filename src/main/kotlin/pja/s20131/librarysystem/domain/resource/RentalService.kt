@@ -61,7 +61,7 @@ class RentalService(
             is Ebook -> resource.borrow(userId, libraryId, clock.instant())
         }
         val latest = rentalRepository.findLatest(resourceId, userId)
-        latest?.validateCanBeBorrowed(rental)
+        rental.validateCanBeBorrowed(latest)
         rentalRepository.save(rental)
         copyRepository.decreaseAvailability(resourceId, libraryId)
     }
@@ -70,7 +70,7 @@ class RentalService(
         val book = bookRepository.get(resourceId)
         val rental = rentalRepository.getLatest(book.resourceId, userId)
         val updatedRental = rental.completeBookRental(clock.instant())
-        rental.validateIsOverlapped(updatedRental)
+        rental.validateIsOverlapped(updatedRental.rentalPeriod)
         rentalRepository.update(updatedRental)
     }
 }

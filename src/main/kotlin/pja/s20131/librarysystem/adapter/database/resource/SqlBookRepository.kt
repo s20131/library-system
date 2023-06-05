@@ -3,12 +3,10 @@ package pja.s20131.librarysystem.adapter.database.resource
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
-import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.TsQuery
 import pja.s20131.librarysystem.adapter.database.exposed.tsvector
@@ -34,6 +32,7 @@ class SqlBookRepository : BookRepository {
         BookTable
             .innerJoin(ResourceTable)
             .selectAll()
+            .orderBy(ResourceTable.title)
             .map { it.toBook() }
 
     override fun get(bookId: ResourceId): Book =
@@ -55,9 +54,10 @@ class SqlBookRepository : BookRepository {
 
     override fun search(tokens: List<String>): List<Book> {
         val joinedTokens = tokens.joinToString(" | ")
-        return BookSearchView.select {
-            TsQuery(BookSearchView.tokens, joinedTokens) eq true
-        }.map { it.toBookView() }
+        return BookSearchView
+            .select { TsQuery(BookSearchView.tokens, joinedTokens) eq true }
+            .orderBy(BookSearchView.title)
+            .map { it.toBookView() }
     }
 }
 

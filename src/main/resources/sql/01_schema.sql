@@ -1,27 +1,30 @@
-DROP OWNED BY test;
+-- DATABASE FEATURE - ENUM
+CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
+CREATE TYPE ebook_format AS ENUM ('PDF', 'EPUB');
+
+CREATE TABLE rental_status (
+    name TEXT  PRIMARY KEY
+);
+
+INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('PAID_OFF'), ('CANCELED');
+
+CREATE TABLE series (
+    name TEXT  PRIMARY KEY
+);
+
+-- DATABASE FEATURE - POSTGIS, CHECK CONSTRAINT
 CREATE TABLE library (
-    id            UUID  NOT NULL,
-    name          TEXT  NOT NULL,
-    street_name   TEXT  NOT NULL,
-    street_number TEXT  NOT NULL,
-    postcode      TEXT  NOT NULL,
-    city          TEXT  NOT NULL,
- -- location     POINT  NOT NULL,
+    id                        UUID  NOT NULL,
+    name                      TEXT  NOT NULL,
+    street_name               TEXT  NOT NULL,
+    street_number             TEXT  NOT NULL,
+    postcode                  TEXT  NOT NULL,
+    city                      TEXT  NOT NULL,
+    location GEOMETRY(Point, 4326)  NOT NULL,
 
     PRIMARY KEY (id),
     CHECK (postcode ~ '^\d{2}-\d{3}$')
-);
-
-CREATE TABLE "user" (
-    id         UUID  NOT NULL,
-    first_name TEXT  NOT NULL,
-    last_name  TEXT  NOT NULL,
-    email      TEXT  NOT NULL,
-    login      TEXT  NOT NULL,
-    password   TEXT  NOT NULL,
-
-    PRIMARY KEY (id)
 );
 
 CREATE TABLE author (
@@ -31,14 +34,6 @@ CREATE TABLE author (
 
     PRIMARY KEY (id)
 );
-
-CREATE TABLE series (
-    id TEXT  NOT NULL,
-
-    PRIMARY KEY (id)
-);
-
-CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
 CREATE TABLE resource (
     id                UUID  NOT NULL,
@@ -54,58 +49,7 @@ CREATE TABLE resource (
     FOREIGN KEY (series) REFERENCES series
 );
 
-CREATE TABLE book (
-    resource_id UUID  NOT NULL,
-    isbn        TEXT  NOT NULL,
-
-    PRIMARY KEY (resource_id),
-    FOREIGN KEY (resource_id) REFERENCES resource
-);
-
-CREATE TYPE content_type AS ENUM ('PDF', 'MOBI', 'EPUB');
-
-CREATE TYPE size_unit AS ENUM ('kB', 'MB');
-
-CREATE TABLE ebook (
-    resource_id          UUID  NOT NULL,
-    format               TEXT  NOT NULL,
-    content             BYTEA  NOT NULL,
-    content_type CONTENT_TYPE  NOT NULL,
-    size              NUMERIC  NOT NULL,
-    size_unit       SIZE_UNIT  NOT NULL,
-
-    PRIMARY KEY (resource_id, format),
-    FOREIGN KEY (resource_id) REFERENCES resource
-);
-
-CREATE TABLE category (
-    name TEXT  NOT NULL,
-
-    PRIMARY KEY (name)
-);
-
-INSERT INTO category VALUES ('adventure'), ('fantasy'), ('crime'), ('romance');
-
-CREATE TABLE resource_categories (
-    resource_id UUID  NOT NULL,
-    category    TEXT  NOT NULL,
-
-    PRIMARY KEY (resource_id, category),
-    FOREIGN KEY (resource_id) REFERENCES resource,
-    FOREIGN KEY (category) REFERENCES category
-);
-
-CREATE TABLE copy (
-    id          UUID  NOT NULL,
-    available    INT  NOT NULL,
-    library_id  UUID  NOT NULL,
-    resource_id UUID  NOT NULL,
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (library_id) REFERENCES library,
-    FOREIGN KEY (resource_id) REFERENCES resource
-);
-
+-- DATABASE FEATURE - BLOB
 CREATE TABLE cover (
     id         UUID  NOT NULL,
     content   BYTEA  NOT NULL,
@@ -115,78 +59,44 @@ CREATE TABLE cover (
     FOREIGN KEY (id) REFERENCES resource
 );
 
-CREATE TYPE operation AS ENUM ('CREATE', 'UPDATE', 'DELETE');
+CREATE TABLE book (
+    resource_id UUID  NOT NULL,
+    isbn        TEXT  NOT NULL,
 
-CREATE TABLE e_book_audit (
-    id            UUID  NOT NULL,
-    e_book_id     UUID  NOT NULL,
-    e_book_format TEXT  NOT NULL,
-    who            INT  NOT NULL,
-    what     OPERATION  NOT NULL,
-    at       TIMESTAMP  NOT NULL,
-    data         JSONB  NOT NULL,
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (e_book_id, e_book_format) REFERENCES e_book (resource_id, format)
+    PRIMARY KEY (resource_id),
+    FOREIGN KEY (resource_id) REFERENCES resource
 );
 
-CREATE TABLE favourite_libraries (
-    user_id    UUID  NOT NULL,
-    library_id UUID  NOT NULL,
+CREATE TABLE ebook (
+    resource_id    UUID  NOT NULL,
+    content       BYTEA  NOT NULL,
+    format EBOOK_FORMAT  NOT NULL,
 
-    PRIMARY KEY (user_id, library_id),
-    FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (library_id) REFERENCES library
+    PRIMARY KEY (resource_id, format),
+    FOREIGN KEY (resource_id) REFERENCES resource
 );
 
-CREATE TABLE librarian (
-    user_id    UUID  NOT NULL,
-    library_id UUID  NOT NULL,
+CREATE TABLE copy (
+    library_id  UUID  NOT NULL,
+    resource_id UUID  NOT NULL,
+    available    INT  NOT NULL,
 
-    PRIMARY KEY (user_id, library_id),
-    FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (library_id) REFERENCES library
+    PRIMARY KEY (library_id, resource_id),
+    FOREIGN KEY (library_id) REFERENCES library,
+    FOREIGN KEY (resource_id) REFERENCES resource,
+
+    CHECK (available >= 0)
 );
 
-CREATE SEQUENCE library_card_seq MINVALUE 1000000000;
+CREATE TABLE "user" (
+    id         UUID  NOT NULL,
+    first_name TEXT  NOT NULL,
+    last_name  TEXT  NOT NULL,
+    email      TEXT  NOT NULL,
+    username   TEXT  NOT NULL,
+    password   TEXT  NOT NULL,
 
-CREATE TABLE library_card (
-    number     BIGINT  NOT NULL DEFAULT nextval('library_card_seq'),
-    qr_code     BYTEA  NOT NULL,
-    expiration   DATE  NOT NULL,
-    is_active BOOLEAN  NOT NULL,
-    user_id      UUID  NOT NULL,
-
-    PRIMARY KEY (number),
-    FOREIGN KEY (user_id) REFERENCES "user"
-);
-
-CREATE TYPE rent_status AS ENUM ('WAITING');
-
-CREATE TABLE rental (
-    id                INT  NOT NULL,
-    user_id          UUID  NOT NULL,
-    copy_id          UUID  NOT NULL,
-    start       TIMESTAMP  NOT NULL,
-    finish      TIMESTAMP  NOT NULL,
-    status    RENT_STATUS  NOT NULL,
-    penalty DECIMAL(10,2)          ,
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (copy_id) REFERENCES copy
-);
-
-CREATE TABLE reservation (
-    id           INT  NOT NULL,
-    user_id     UUID  NOT NULL,
-    copy_id     UUID  NOT NULL,
-    start  TIMESTAMP  NOT NULL,
-    finish TIMESTAMP  NOT NULL,
-
-    PRIMARY KEY (id),
-    FOREIGN KEY (user_id) REFERENCES "user",
-    FOREIGN KEY (copy_id) REFERENCES copy
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE user_settings (
@@ -208,3 +118,58 @@ CREATE TABLE storage (
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id) REFERENCES resource
 );
+
+CREATE TABLE rental (
+    id                    UUID  NOT NULL,
+    user_id               UUID  NOT NULL,
+    resource_id           UUID  NOT NULL,
+    library_id            UUID  NOT NULL,
+    start            TIMESTAMP  NOT NULL,
+    finish           TIMESTAMP  NOT NULL,
+    status                TEXT  NOT NULL,
+    penalty      DECIMAL(10,2)          ,
+
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id),
+    FOREIGN KEY (status) REFERENCES rental_status
+);
+
+--TODO is such PK (less strict than dependencies) ok?
+CREATE TABLE reservation (
+    user_id     UUID  NOT NULL,
+    resource_id UUID  NOT NULL,
+    library_id  UUID  NOT NULL,
+    start  TIMESTAMP  NOT NULL,
+    finish TIMESTAMP  NOT NULL,
+
+    PRIMARY KEY (user_id, resource_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
+);
+
+---
+
+-- TODO polish dictionary?
+-- DATABASE FEATURE - MATERIALIZED VIEW, FULL-TEXT SEARCH
+CREATE MATERIALIZED VIEW books_search_view AS SELECT r.*, b.isbn, to_tsvector(concat_ws(', ', r.title, r.description, r.series, b.isbn, a.first_name, a.last_name)) AS tokens
+FROM resource r
+INNER JOIN book b ON r.id = b.resource_id
+INNER JOIN author a on r.author = a.id;
+
+-- DATABASE FEATURE - INDEX
+CREATE UNIQUE INDEX books_search_view_idx ON books_search_view (id);
+
+---
+
+CREATE MATERIALIZED VIEW ebooks_search_view AS SELECT r.*, e.content, e.format, to_tsvector(concat_ws(', ', r.title, r.description, r.series, e.format, a.first_name, a.last_name)) AS tokens
+FROM resource r
+INNER JOIN ebook e ON r.id = e.resource_id
+INNER JOIN author a on r.author = a.id;
+
+CREATE UNIQUE INDEX ebooks_search_view_idx ON ebooks_search_view (id);
+
+---
+
+-- TODO privileges + schema
+CREATE USER spring_app;

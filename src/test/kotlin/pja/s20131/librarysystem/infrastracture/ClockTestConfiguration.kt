@@ -46,6 +46,10 @@ class TestClock : Clock() {
         return instant().minus(7, ChronoUnit.DAYS)
     }
 
+    fun monthAgo(): Instant {
+        return instant().minus(30, ChronoUnit.DAYS)
+    }
+
     fun inDays(daysToAdd: Long): Instant {
         return instant().plus(daysToAdd, ChronoUnit.DAYS)
     }

@@ -30,10 +30,11 @@ class BookServiceTests @Autowired constructor(
 
         val response = bookService.getAllBooks()
 
-        assertThat(response).containsExactly(
+        val expected = listOf(
             ResourceWithAuthorBasicData(books[0].toBasicData(), author.toBasicData()),
             ResourceWithAuthorBasicData(books[1].toBasicData(), author.toBasicData()),
-        )
+        ).sortedBy { it.resource.title.value }
+        assertThat(response).isEqualTo(expected)
     }
 
     @Test

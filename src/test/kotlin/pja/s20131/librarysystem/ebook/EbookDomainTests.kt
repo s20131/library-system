@@ -10,6 +10,6 @@ class EbookDomainTests {
 
     @Test
     fun `should return exception when trying to insert ebook with size lower than 0`() {
-        assertThrows<NegativeSizeException> { ebook(size = Size(-.1)) }
+        assertThrows<NegativeSizeException> { ebook(size = Size(-1)) }
     }
 }

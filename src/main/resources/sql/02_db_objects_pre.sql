@@ -1,19 +1,30 @@
 -- DATABASE FEATURE - FUNCTION, PROCEDURAL LANGUAGE
+CREATE FUNCTION get_file_extension(filename text)
+RETURNS text
+LANGUAGE plpgsql
+IMMUTABLE
+AS $$
+BEGIN
+    RETURN substring(filename FROM '\w+$');
+END; $$;
+
+---
+
 CREATE FUNCTION get_image_type(filename text)
 RETURNS text
 LANGUAGE plpgsql
 IMMUTABLE
 AS $$
 BEGIN
-   RETURN concat('image/', substring(filename FROM '\w+$'));
+    RETURN concat('image/', get_file_extension(filename));
 END; $$;
 
 ---
 
 -- DATABASE FEATURE - DYNAMIC SQL
 CREATE FUNCTION refresh_view()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
+RETURNS trigger
+LANGUAGE plpgsql
 AS $$
 DECLARE
     view_name TEXT := tg_argv[0];
@@ -24,16 +35,34 @@ END; $$;
 
 ---
 
+CREATE FUNCTION generate_binary(length int)
+RETURNS bytea
+LANGUAGE sql
+AS $$
+    SELECT repeat(md5(random()::text), length)::bytea;
+$$;
+
+---
+
+CREATE FUNCTION generate_between(min int, max int)
+RETURNS int
+LANGUAGE sql
+AS $$
+    SELECT (random() * (max - min + 1) + min)::int;
+$$;
+
+---
+
 -- DATABASE FEATURE - STORED PROCEDURE, CONDITIONALS
 CREATE PROCEDURE create_book(
-  title text,
-  series text,
-  author_first_name text,
-  author_last_name text,
-  out book_id uuid,
-  release_date date default CURRENT_DATE,
-  description text default null,
-  cover_filepath text default null
+    title text,
+    series text,
+    author_first_name text,
+    author_last_name text,
+    out book_id uuid,
+    release_date date default CURRENT_DATE,
+    description text default null,
+    cover_filepath text default null
 )
 LANGUAGE plpgsql
 AS $$
@@ -106,11 +135,11 @@ BEGIN
     INSERT INTO resource(id, title, author, release_date, description, series) VALUES (ebook_id, title, author_id, release_date, description, series);
 
     IF content_filepath IS NULL THEN
-        content := md5(random()::text)::bytea;
-        INSERT INTO ebook VALUES (ebook_id, content, 'EPUB');
+        content := generate_binary(generate_between(1000, 10000));
+        INSERT INTO ebook VALUES (ebook_id, content, 'PDF');
     ELSE
         content := pg_read_binary_file(content_filepath);
-        INSERT INTO ebook VALUES (ebook_id, content, 'EPUB');
+        INSERT INTO ebook VALUES (ebook_id, content, upper(get_file_extension(content_filepath))::ebook_format);
     END IF;
 
     IF cover_filepath IS NOT NULL THEN
