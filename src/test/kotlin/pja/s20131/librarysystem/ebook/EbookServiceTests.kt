@@ -12,6 +12,9 @@ import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Description
+import pja.s20131.librarysystem.domain.resource.model.RentalCannotBeDownloadedException
+import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
+import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.resource.ResourceGen
@@ -30,10 +33,11 @@ class EbookServiceTests @Autowired constructor(
 
         val response = ebookService.getAllEbooks()
 
-        assertThat(response).containsExactly(
+        val expected = listOf(
             ResourceWithAuthorBasicData(ebooks[0].toBasicData(), author.toBasicData()),
             ResourceWithAuthorBasicData(ebooks[1].toBasicData(), author.toBasicData()),
-        )
+        ).sortedBy { it.resource.title.value }
+        assertThat(response).isEqualTo(expected)
     }
 
     @Test
@@ -42,7 +46,7 @@ class EbookServiceTests @Autowired constructor(
 
         val response = ebookService.getEbook(ebook.resourceId)
 
-        // probably (?) not a good practice, but content has a byte array inside, which is hard to compare
+        assertThat(ebook.content.bytes).isEqualTo(response.content.bytes)
         assertThat(ebook.copy(content = response.content)).isEqualTo(response)
     }
 
@@ -82,9 +86,33 @@ class EbookServiceTests @Autowired constructor(
 
         val response = ebookService.search(SearchQuery("wyborny i fajny"))
 
-        assertThat(response).containsExactly(
+        val expected = listOf(
             ResourceWithAuthorBasicData(ebooks[0].toBasicData(), author.toBasicData()),
             ResourceWithAuthorBasicData(ebooks[1].toBasicData(), author.toBasicData()),
-        )
+        ).sortedBy { it.resource.title.value }
+        assertThat(response).isEqualTo(expected)
+    }
+
+    @Test
+    fun `should get ebook content`() {
+        val ebook = given.author.exists().withEbook().build().third[0]
+        val user = given.user.exists()
+        val library = given.library.exists().hasCopy(ebook.resourceId).build()
+        given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()))
+
+        val response = ebookService.getEbookContent(ebook.resourceId, user.userId)
+
+        assertThat(response.bytes).isEqualTo(ebook.content.bytes)
+        assertThat(response.format).isEqualTo(ebook.content.format)
+    }
+
+    @Test
+    fun `should throw an error when trying to download ebook and having inactive rental`() {
+        val ebook = given.author.exists().withEbook().build().third[0]
+        val user = given.user.exists()
+        val library = given.library.exists().hasCopy(ebook.resourceId).build()
+        given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.CANCELED)
+
+        assertThrows<RentalCannotBeDownloadedException> { ebookService.getEbookContent(ebook.resourceId, user.userId) }
     }
 }

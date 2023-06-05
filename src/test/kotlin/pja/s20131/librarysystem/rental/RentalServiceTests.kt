@@ -13,6 +13,7 @@ import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.RentalNotPaidOffException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
@@ -163,6 +164,16 @@ class RentalServiceTests @Autowired constructor(
         assertThrows<InsufficientCopyAvailabilityException> {
             rentalService.borrowResource(book.resourceId, library.libraryId, user.userId)
         }
+    }
+
+    @Test
+    fun `should throw an error when trying to borrow a prolonged resource without paying it off before`() {
+        val user = given.user.exists()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).build()
+        given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()), RentalStatus.PROLONGED)
+
+        assertThrows<RentalNotPaidOffException> { rentalService.borrowResource(book.resourceId, library.libraryId, user.userId) }
     }
 
     @Test

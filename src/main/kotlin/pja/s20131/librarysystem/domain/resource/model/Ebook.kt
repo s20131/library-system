@@ -11,8 +11,8 @@ data class Ebook(
     override val description: Description?,
     override val series: Series?,
     override val status: ResourceStatus,
-    val content: Content,
-    val format: Format,
+    // TODO could be stored separately - many formats to choose
+    val content: EbookContent,
     val size: Size,
 ) : Resource() {
 
@@ -24,10 +24,9 @@ data class Ebook(
             description: Description?,
             series: Series?,
             status: ResourceStatus,
-            content: Content,
-            format: Format,
+            content: EbookContent,
             size: Size,
-        ) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, format, size)
+        ) = Ebook(ResourceId.generate(), title, authorId, releaseDate, description, series, status, content, size)
 
         fun from(dto: AddEbookDto) = Ebook(
             ResourceId.generate(),
@@ -37,18 +36,17 @@ data class Ebook(
             dto.description,
             dto.series,
             dto.status,
-            dto.content,
-            dto.format,
+            EbookContent(dto.content, dto.format),
             dto.size
         )
     }
 }
 
-@JvmInline
-value class Content(val value: ByteArray)
+@Suppress("ArrayInDataClass")
+data class EbookContent(val bytes: ByteArray, val format: Format)
 
 enum class Format {
-    PDF, MOBI, EPUB
+    PDF, EPUB
 }
 
 @JvmInline

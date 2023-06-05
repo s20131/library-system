@@ -9,6 +9,7 @@ DO $$
     DECLARE ebook_id_1 uuid;
     DECLARE ebook_id_2 uuid;
     DECLARE ebook_id_3 uuid;
+    DECLARE ebook_id_4 uuid;
     DECLARE user_id uuid;
 BEGIN
     library_id_1 := gen_random_uuid();
@@ -25,6 +26,7 @@ BEGIN
     CALL create_ebook('Pani Jeziora', 'Wiedźmin', 'Andrzej', 'Sapkowski', ebook_id_1, '1999-03-15', 'Powieść z gatunku fantasy, napisana przez Andrzeja Sapkowskiego, wydana w 1999. Jest ostatnią z pięciu części sagi o wiedźminie.', '/covers/pani-jeziora.jpeg');
     CALL create_ebook('Gra o tron', 'Pieśń Lodu i Ognia', 'George R. R.', 'Martin', ebook_id_2, '1996-08-01', 'Powieść z gatunku fantasy, pierwszy tom sagi Pieśń lodu i ognia George’a R.R. Martina. Pierwsze wydanie w języku angielskim miało premierę 1 sierpnia 1996 roku[1]. Polski przekład ukazał się w roku 1998 nakładem wydawnictwa Zysk i S-ka. Akcja książki toczy się w fikcyjnym świecie na kontynentach Westeros i Essos, gdzie pory roku mogą trwać wiele lat. Na podstawie powieści powstał serial Gra o tron realizowany przez telewizję HBO, a także gra fabularna, gra planszowa oraz gry komputerowe.', '/covers/gra-o-tron.webp');
     CALL create_ebook('Boska Komedia', null, 'Dante', 'Alighieri', ebook_id_3, '1321-01-01', E'Boska Komedia to dzieło życia włoskiego poety Dante Alighieriego, którym chciał zapewnić nieśmiertelność, oddać hołd swojej zmarłej ukochanej Beatrycze oraz ostrzec lud średniowieczny przed konsekwencjami grzesznego życia. Poemat tryptyk — składający się z trzech ksiąg — Piekła, Czyśćca i Raju, po których wędruje alter ego autora, oprowadzane przez Wergiliusza, św. Bernarda z Clairvaux oraz ukochaną Beatrycze. Alighieri nie tylko jako bohater, ale i jako narrator krytykuje zaświaty, będące alegorią życia doczesnego. W całym utworze wyraźnie widać fascynację cyframi, zwłaszcza 3, będącą symbolem Trójcy Świętej. Księga pierwsza, Piekło, charakteryzuje się drastycznymi opisami wydarzeń i właśnie dzięki niej mówi się o dantejskich scenach.', '/covers/boska-komedia.jpeg', '/ebooks/boska-komedia.epub');
+    CALL create_ebook('Wesele', null, 'Stanisław', 'Wyspiański', ebook_id_4, '1901-03-16', 'Wystawiony po raz pierwszy na krakowskiej scenie w 1901 r. dramat Stanisława Wyspiańskiego Wesele wywołał spore poruszenie, niemal skandal. Głównym powodem był fakt wprowadzenia na scenę autentycznych, rozpoznawalnych w środowisku postaci pod ich własnymi imionami oraz odwołanie do rzeczywistego wydarzenia, mianowicie wesela poety Lucjana Rydla z chłopką Jadwigą Mikołajczykówną, które miało miejsce zaledwie rok wcześniej. Jednakże w tekście dramatu znaleźć można więcej spraw niepokojących niż tylko pożywka do plotek towarzyskich. Wyspiański wybrał szczególne wesele, będące triumfem młodopolskiej chłopomanii i świętowaniem uroczystego zaślubienia elity społecznej z wsią w osobach państwa młodych. Potraktował to wesele jako okazję do konfrontacji różnych klas, grup społecznych, obyczajów i systemów wartości; okazuje się dzięki temu, co łączy księdza z arendarzem Żydem, a co dzieli, mimo pozorów zbratania, gospodarza weselnej chałupy, zanurzonego w inteligenckim świecie wyobrażeń, z jego chłopskimi sąsiadami. W trakcie zabawy, może wskutek spożycia znacznej ilości mocnych trunków, pojawiają się ni to duchy, ni to symboliczne uosobienia lęków i marzeń poszczególnych postaci. W efekcie uzyskany zostaje obraz przedstawiający słabość mitów narodowych, jednostronnych i niemających mocy jednoczącej; naród, który nie jest zdolny do walki o własne państwo; marazm społeczeństwa i uwiąd warstw tradycyjnie uznawanych za predestynowane do przywództwa.', '/covers/wesele.jpg', '/ebooks/wesele.pdf');
 
     FOR i in 1..5 LOOP
         CALL create_book(title => 'Book ' || i, series => 'Series X', author_first_name => 'John', author_last_name => 'Doe', book_id => book_loop_id);
@@ -42,6 +44,8 @@ BEGIN
     INSERT INTO copy VALUES (library_id_3, book_id_1, 0);
     INSERT INTO copy VALUES (library_id_2, book_id_2, 4);
     INSERT INTO copy VALUES (library_id_3, book_id_2, 5);
+    INSERT INTO copy VALUES (library_id_1, ebook_id_3, 2);
+    INSERT INTO copy VALUES (library_id_2, ebook_id_4, 1);
 
     INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', '$2a$12$ca76zYFD.OyRZYIwEmnlxO2FMBipevX0dB/r.ga2eZ21lgCWNsTj6'); --abc123!#
     INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');

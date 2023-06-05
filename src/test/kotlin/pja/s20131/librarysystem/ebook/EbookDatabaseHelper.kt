@@ -13,7 +13,6 @@ import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.model.SizeUnit
 import pja.s20131.librarysystem.resource.ResourceDatabaseHelper
 
 @Component
@@ -25,10 +24,8 @@ class EbookDatabaseHelper @Autowired constructor(
         resourceDatabaseHelper.insertResource(ebook)
         EbookTable.insert {
             it[id] = ebook.resourceId.value
-            it[content] = ExposedBlob(ebook.content.value)
-            it[format] = ebook.format
-            it[size] = ebook.size.value
-            it[sizeUnit] = SizeUnit.kB
+            it[content] = ExposedBlob(ebook.content.bytes)
+            it[format] = ebook.content.format
         }
     }
 

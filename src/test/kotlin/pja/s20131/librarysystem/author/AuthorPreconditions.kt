@@ -7,9 +7,9 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.model.Author
 import pja.s20131.librarysystem.domain.resource.model.Book
-import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.EbookContent
 import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
@@ -62,11 +62,10 @@ class AuthorPreconditions(
         description: Description? = Description(faker.familyGuy().quote()),
         series: Series? = null,
         status: ResourceStatus = ResourceStatus.AVAILABLE,
-        content: Content = Content(Random.nextBytes(10)),
-        format: Format = Format.MOBI,
-        size: Size = Size(faker.number().randomDouble(2, 0, 800)),
+        content: EbookContent = EbookContent(Random.nextBytes(10), Format.PDF),
+        size: Size = Size(faker.number().randomDigit()),
     ): AuthorPreconditions {
-        val ebook = Ebook.from(title, author.authorId, releaseDate, description, series, status, content, format, size)
+        val ebook = Ebook.from(title, author.authorId, releaseDate, description, series, status, content, size)
         seriesDatabaseHelper.insertSeries(series)
         ebookDatabaseHelper.insertEbook(ebook)
         return this

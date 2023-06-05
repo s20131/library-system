@@ -20,20 +20,31 @@ data class Rental(
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
 ) {
-    private fun isRentalPeriodOverlapped(other: Rental) =
-        rentalPeriod.start.isBefore(other.rentalPeriod.finish) && other.rentalPeriod.start.isBefore(rentalPeriod.finish)
+    private fun isRentalPeriodOverlapped(other: RentalPeriod): Boolean =
+        rentalPeriod.start.isBefore(other.finish) && other.start.isBefore(rentalPeriod.finish)
 
-    fun completeBookRental(instant: Instant) = copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
+    fun completeBookRental(instant: Instant): Rental =
+        copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
 
-    fun validateIsOverlapped(other: Rental) {
+    fun validateIsOverlapped(other: RentalPeriod) {
         if (!isRentalPeriodOverlapped(other)) {
             throw RentalPeriodNotOverlappingDatesException(resourceId)
         }
     }
 
-    fun validateCanBeBorrowed(other: Rental) {
-        if (isRentalPeriodOverlapped(other)) {
+    fun validateCanBeBorrowed(previous: Rental?) {
+        if (previous != null && isRentalPeriodOverlapped(previous.rentalPeriod)) {
             throw RentalPeriodOverlappingDatesException(resourceId)
+        }
+        // TODO check if there is ANY not paid-off rental
+        if (previous != null && previous.rentalStatus === RentalStatus.PROLONGED) {
+            throw RentalNotPaidOffException(resourceId)
+        }
+    }
+
+    fun validateCanBeDownloaded() {
+        if (rentalStatus !== RentalStatus.ACTIVE) {
+            throw RentalCannotBeDownloadedException(resourceId)
         }
     }
 }
@@ -77,3 +88,9 @@ class RentalPeriodOverlappingDatesException(resourceId: ResourceId) :
 
 class RentalPeriodNotOverlappingDatesException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be completed to be borrowed as reservation ended")
+
+class RentalNotPaidOffException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} cannot be borrowed as you haven't paid off the last rental of this resource")
+
+class RentalCannotBeDownloadedException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rent")

@@ -14,9 +14,9 @@ import pja.s20131.librarysystem.adapter.database.exposed.tsvector
 import pja.s20131.librarysystem.adapter.database.resource.EbookSearchView.toEbookView
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
-import pja.s20131.librarysystem.domain.resource.model.Content
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.Ebook
+import pja.s20131.librarysystem.domain.resource.model.EbookContent
 import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
@@ -33,6 +33,7 @@ class SqlEbookRepository : EbookRepository {
         EbookTable
             .innerJoin(ResourceTable)
             .selectAll()
+            .orderBy(ResourceTable.title)
             .map { it.toEbook() }
 
     override fun get(ebookId: ResourceId): Ebook =
@@ -42,22 +43,32 @@ class SqlEbookRepository : EbookRepository {
             .singleOrNull()
             ?.toEbook() ?: throw EbookNotFoundException(ebookId)
 
+    override fun getContent(ebookId: ResourceId): EbookContent =
+        EbookTable
+            .innerJoin(ResourceTable)
+            .slice(EbookTable.content, EbookTable.format)
+            .select { EbookTable.id eq ebookId.value }
+            .singleOrNull()
+            ?.let { EbookContent(it[EbookTable.content].bytes, it[EbookTable.format]) } ?: throw EbookNotFoundException(ebookId)
+
     override fun insert(ebook: Ebook) {
         ResourceTable.insert {
             it.from(ebook)
         }
         EbookTable.insert {
             it[id] = ebook.resourceId.value
-            it[content] = ExposedBlob(ebook.content.value)
-            it[format] = ebook.format
+            it[content] = ExposedBlob(ebook.content.bytes)
+            it[format] = ebook.content.format
         }
     }
 
     override fun search(tokens: List<String>): List<Ebook> {
         val joinedTokens = tokens.joinToString(" | ")
-        return EbookSearchView.select {
-            TsQuery(EbookSearchView.tokens, joinedTokens) eq true
-        }.map { it.toEbookView() }
+        return EbookSearchView
+            .select { TsQuery(EbookSearchView.tokens, joinedTokens) eq true }
+            // TODO by rank
+            .orderBy(EbookSearchView.title)
+            .map { it.toEbookView() }
     }
 }
 
@@ -75,8 +86,8 @@ object EbookTable : Table("ebook") {
         this[ResourceTable.description]?.let { Description(it) },
         this[ResourceTable.series]?.let { Series(it) },
         this[ResourceTable.status],
-        Content(this[content].bytes),
-        this[format],
+        // TODO don't read if not necessary?
+        EbookContent(this[content].bytes, this[format]),
         Size(this[content].bytes.size),
     )
 }
@@ -100,8 +111,7 @@ object EbookSearchView : UUIDTable("ebooks_search_view") {
         this[description]?.let { Description(it) },
         this[series]?.let { Series(it) },
         this[status],
-        Content(this[content].bytes),
-        this[format],
+        EbookContent(this[content].bytes, this[format]),
         Size(this[content].bytes.size),
     )
 }
