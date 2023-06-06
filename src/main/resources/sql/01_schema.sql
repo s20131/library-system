@@ -109,6 +109,20 @@ CREATE TABLE user_settings (
     FOREIGN KEY (user_id) REFERENCES "user"
 );
 
+-- DATABASE FEATURE - SEQUENCE
+CREATE SEQUENCE library_card_seq MINVALUE 1000000000;
+
+CREATE TABLE library_card (
+    number     BIGINT  NOT NULL DEFAULT nextval('library_card_seq'),
+    user_id      UUID  NOT NULL,
+  --qr_code     BYTEA  NOT NULL,
+    expiration   DATE  NOT NULL,
+    is_active BOOLEAN  NOT NULL,
+
+    PRIMARY KEY (number),
+    FOREIGN KEY (user_id) REFERENCES "user"
+);
+
 CREATE TABLE librarian (
     user_id    UUID  NOT NULL,
     library_id UUID  NOT NULL,
