@@ -12,42 +12,44 @@ import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.ReservationService
 import pja.s20131.librarysystem.domain.resource.ReservationShortInfo
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.infrastructure.security.PrincipalConverter
-import java.security.Principal
+import pja.s20131.librarysystem.domain.user.AuthService
 
 @RestController
 class ReservationEndpoints(
     private val reservationService: ReservationService,
-    private val principalConverter: PrincipalConverter,
+    private val authService: AuthService,
 ) {
 
     @GetMapping("/reservations")
-    fun getUserReservations(principal: Principal): List<GetReservationHistoryResponse> {
-        val userId = principalConverter.convert(principal)
-        return reservationService.getUserReservations(userId).toResponse()
+    fun getUserReservations(): List<GetReservationHistoryResponse> {
+        return authService.withUserContext {
+            reservationService.getUserReservations(it)
+        }.toResponse()
     }
 
     @GetMapping("/reservations/{resourceId}")
-    fun getReservationShortInfo(@PathVariable resourceId: ResourceId, principal: Principal): GetReservationShortInfoResponse {
-        val userId = principalConverter.convert(principal)
-        return reservationService.getReservationShortInfo(resourceId, userId).toResponse()
+    fun getReservationShortInfo(@PathVariable resourceId: ResourceId): GetReservationShortInfoResponse {
+        return authService.withUserContext {
+            reservationService.getReservationShortInfo(resourceId, it)
+        }.toResponse()
     }
 
     @PostMapping("/libraries/{libraryId}/reservations/{resourceId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun reserveResource(@PathVariable resourceId: ResourceId, @PathVariable libraryId: LibraryId, principal: Principal) {
-        val userId = principalConverter.convert(principal)
-        reservationService.reserveResource(resourceId, libraryId, userId)
+    fun reserveResource(@PathVariable resourceId: ResourceId, @PathVariable libraryId: LibraryId) {
+        return authService.withUserContext {
+            reservationService.reserveResource(resourceId, libraryId, it)
+        }
     }
 
     @DeleteMapping("/reservations/{resourceId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteReservation(@PathVariable resourceId: ResourceId, principal: Principal) {
-        val userId = principalConverter.convert(principal)
-        reservationService.deleteReservation(resourceId, userId)
+    fun deleteReservation(@PathVariable resourceId: ResourceId) {
+        return authService.withUserContext {
+            reservationService.deleteReservation(resourceId, it)
+        }
     }
 }
 
 private fun List<ReservationHistory>.toResponse() = map { GetReservationHistoryResponse(it.libraryId, it.resource, it.author, it.finishDate, it.resourceType) }
-
 private fun ReservationShortInfo.toResponse() = GetReservationShortInfoResponse(finish, library)

@@ -4,8 +4,8 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.person.Person
 import pja.s20131.librarysystem.domain.user.RegisterUserDto
-import java.util.UUID
 import pja.s20131.librarysystem.exception.BaseException
+import java.util.UUID
 
 data class User(
     val userId: UserId,
@@ -54,7 +54,11 @@ value class Password(val value: String) {
 }
 
 enum class UserRole {
-    LIBRARIAN
+    LIBRARIAN;
+
+    override fun toString(): String {
+        return "ROLE_${super.toString()}"
+    }
 }
 
 class PasswordTooShortException : BaseException("Password is too short")
