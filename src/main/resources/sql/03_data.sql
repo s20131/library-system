@@ -11,11 +11,13 @@ DO $$
     DECLARE ebook_id_3 uuid;
     DECLARE ebook_id_4 uuid;
     DECLARE user_id uuid;
+    DECLARE librarian_id uuid;
 BEGIN
     library_id_1 := gen_random_uuid();
     library_id_2 := gen_random_uuid();
     library_id_3 := gen_random_uuid();
     user_id := uuid('45d859ad-d03d-4a3b-ba59-31ae20a99992');
+    librarian_id := uuid('59a2a4de-8864-41ec-a30d-6333472e066d');
 
     INSERT INTO library VALUES (library_id_1, 'Biblioteka Publiczna w Dzielnicy Wesoła - Filia Nr 1', 'Jana Pawła II', '25', '05-077', 'Warszawa', st_flipcoordinates(st_point(52.21644380014136, 21.23889248476246)));
     INSERT INTO library VALUES (library_id_2, 'Biblioteka Dzielnicowa Warszawa Wesoła', '1 Praskiego Pułku', '31', '05-075', 'Warszawa', st_flipcoordinates(st_point(52.24838074876337, 21.22411093615883)));
@@ -48,10 +50,14 @@ BEGIN
     INSERT INTO copy VALUES (library_id_2, ebook_id_4, 1);
 
     INSERT INTO "user" VALUES (user_id, 'Jane', 'Doe', 'jane.doe@gmail.com', 'janedoe', '$2a$12$ca76zYFD.OyRZYIwEmnlxO2FMBipevX0dB/r.ga2eZ21lgCWNsTj6'); --abc123!#
+    INSERT INTO "user" VALUES (librarian_id, 'Michael', 'Scott', 'michael.scott@gmail.com', 'michaels', '$2a$12$ca76zYFD.OyRZYIwEmnlxO2FMBipevX0dB/r.ga2eZ21lgCWNsTj6'); --abc123!#
+
     INSERT INTO user_settings VALUES (user_id, true, false, 'kindle123@kindle.com');
 
     INSERT INTO storage VALUES (user_id, book_id_1, now());
     INSERT INTO storage VALUES (user_id, ebook_id_1, now() - interval '1 day');
+
+    INSERT INTO librarian VALUES (librarian_id, library_id_1);
 
     INSERT INTO rental VALUES (gen_random_uuid(), user_id, ebook_id_1, library_id_1, CURRENT_TIMESTAMP - interval '2 days', CURRENT_TIMESTAMP + interval '12 days', 'ACTIVE', null);
     INSERT INTO rental VALUES (gen_random_uuid(), user_id, book_id_1, library_id_1, CURRENT_TIMESTAMP - interval '1 days', CURRENT_TIMESTAMP + interval '1 days', 'RESERVED_TO_BORROW', null);

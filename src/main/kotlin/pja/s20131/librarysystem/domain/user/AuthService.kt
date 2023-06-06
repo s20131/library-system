@@ -40,9 +40,11 @@ class AuthService(
         if (user == null || !passwordEncoder.matches(password.toString(), user.password.value)) {
             throw BadCredentialsException()
         }
-        return UsernamePasswordAuthenticationToken(
-            user.userId.value, password, listOf()
-        )
+        return if (userRepository.isLibrarian(user.userId)) {
+            UsernamePasswordAuthenticationToken(user.userId.value, password, listOf(SimpleGrantedAuthority("ROLE_${UserRole.LIBRARIAN}")))
+        } else {
+            UsernamePasswordAuthenticationToken(user.userId.value, password, listOf())
+        }
     }
 
     override fun supports(authentication: Class<*>): Boolean {

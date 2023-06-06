@@ -109,6 +109,15 @@ CREATE TABLE user_settings (
     FOREIGN KEY (user_id) REFERENCES "user"
 );
 
+CREATE TABLE librarian (
+    user_id    UUID  NOT NULL,
+    library_id UUID  NOT NULL,
+
+    PRIMARY KEY (user_id, library_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (library_id) REFERENCES library
+);
+
 CREATE TABLE storage (
     user_id     UUID  NOT NULL,
     resource_id UUID  NOT NULL,

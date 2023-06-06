@@ -53,4 +53,8 @@ value class Password(val value: String) {
     }
 }
 
+enum class UserRole {
+    LIBRARIAN
+}
+
 class PasswordTooShortException : BaseException("Password is too short")
