@@ -23,11 +23,6 @@ data class AddBookRequest(
     fun toDto() = AddBookDto(title, authorId, releaseDate, description, series, status, isbn)
 }
 
-data class GetResourceWithAuthorBasicDataResponse(
-    val resource: ResourceBasicData,
-    val author: AuthorBasicData
-)
-
 data class GetBookResponse(
     val title: Title,
     val authorId: AuthorId,

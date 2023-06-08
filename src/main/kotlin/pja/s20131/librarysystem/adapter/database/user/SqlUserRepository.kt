@@ -3,11 +3,9 @@ package pja.s20131.librarysystem.adapter.database.user
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Repository
-import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable.toUserSettings
 import pja.s20131.librarysystem.adapter.database.user.UserTable.toUser
 import pja.s20131.librarysystem.domain.person.FirstName
@@ -75,12 +73,6 @@ class SqlUserRepository : UserRepository {
             it[kindleEmail] = userSettings.kindleEmail?.value
         }
     }
-
-    override fun isLibrarian(userId: UserId): Boolean {
-        return (LibrarianTable innerJoin UserTable)
-            .select { LibrarianTable.userId eq userId.value }
-            .empty().not()
-    }
 }
 
 object UserTable : UUIDTable("\"user\"") {
@@ -112,10 +104,4 @@ object UserSettingsTable : IdTable<UUID>("user_settings") {
         SendWhenAvailableReminder(this[sendWhenAvailableReminder]),
         this[kindleEmail]?.let { KindleEmail(it) },
     )
-}
-
-object LibrarianTable : Table("librarian") {
-    val userId = reference("user_id", UserTable)
-    val libraryId = reference("library_id", LibraryTable)
-    override val primaryKey = PrimaryKey(userId, libraryId)
 }

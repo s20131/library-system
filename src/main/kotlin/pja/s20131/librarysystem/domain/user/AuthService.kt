@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import pja.s20131.librarysystem.domain.library.port.LibrarianRepository
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.user.model.Email
@@ -17,16 +18,18 @@ import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.model.UserRole
 import pja.s20131.librarysystem.domain.user.model.UserSettings
 import pja.s20131.librarysystem.domain.user.model.Username
+import pja.s20131.librarysystem.domain.user.port.LibraryCardRepository
 import pja.s20131.librarysystem.domain.user.port.UserRepository
 import pja.s20131.librarysystem.exception.BaseException
-import pja.s20131.librarysystem.infrastructure.security.PrincipalConverter
+import java.util.UUID
 
 @Service
 @Transactional
 class AuthService(
     private val userRepository: UserRepository,
+    private val librarianRepository: LibrarianRepository,
+    private val libraryCardRepository: LibraryCardRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val principalConverter: PrincipalConverter,
 ) : AuthenticationProvider {
 
     //TODO should be extracted as custom provider?
@@ -37,11 +40,11 @@ class AuthService(
         if (user == null || !passwordEncoder.matches(password.toString(), user.password.value)) {
             throw BadCredentialsException()
         }
-        return if (userRepository.isLibrarian(user.userId)) {
-            UsernamePasswordAuthenticationToken(user.userId.value, password, listOf(SimpleGrantedAuthority(UserRole.LIBRARIAN.toString())))
-        } else {
-            UsernamePasswordAuthenticationToken(user.userId.value, password, emptyList())
+        val roles = mutableListOf<SimpleGrantedAuthority>()
+        if (librarianRepository.isLibrarian(user.userId)) {
+            roles.add(SimpleGrantedAuthority(UserRole.LIBRARIAN.toString()))
         }
+        return UsernamePasswordAuthenticationToken(user.userId.value, password, roles)
     }
 
     override fun supports(authentication: Class<*>): Boolean {
@@ -53,13 +56,14 @@ class AuthService(
         val user = User.from(dto).securePassword()
         userRepository.save(user)
         userRepository.saveSettings(user.userId, UserSettings.basic())
+        // TODO pass domain object containing all data
+        libraryCardRepository.save(user.userId)
         return user.userId
     }
 
-    // TODO inline?
-    fun <T> withUserContext(body: (UserId) -> T): T {
+    final inline fun <T> withUserContext(body: (UserId) -> T): T {
         val userAuth = SecurityContextHolder.getContext().authentication
-        val userId = principalConverter.convert(userAuth)
+        val userId = UserId(UUID.fromString(userAuth.name))
         return body.invoke(userId)
     }
 

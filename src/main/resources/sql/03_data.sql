@@ -59,9 +59,12 @@ BEGIN
 
     INSERT INTO library_card (user_id, expiration, is_active) VALUES
     (user_id, CURRENT_TIMESTAMP + interval '365 days', true),
+    (librarian_id, CURRENT_TIMESTAMP + interval '3 days', false),
     (librarian_id, CURRENT_TIMESTAMP + interval '365 days', true);
 
-    INSERT INTO librarian VALUES (librarian_id, library_id_1);
+    INSERT INTO librarian VALUES (librarian_id, library_id_1, true),
+                                 (librarian_id, library_id_2, false),
+                                 (librarian_id, library_id_3, false);
 
     INSERT INTO storage VALUES (user_id, book_id_1, now()),
                                (user_id, ebook_id_1, now() - interval '1 day');

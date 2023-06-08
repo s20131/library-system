@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.library.model.LibraryName
+import pja.s20131.librarysystem.domain.library.port.LibrarianRepository
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Book
@@ -19,7 +20,9 @@ import pja.s20131.librarysystem.domain.resource.port.BookRepository
 import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
 import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.domain.user.port.LibraryCardRepository
 import pja.s20131.librarysystem.exception.BaseException
 import java.time.Clock
 
@@ -31,6 +34,8 @@ class RentalService(
     private val bookRepository: BookRepository,
     private val copyRepository: CopyRepository,
     private val libraryRepository: LibraryRepository,
+    private val libraryCardRepository: LibraryCardRepository,
+    private val librarianRepository: LibrarianRepository,
     private val clock: Clock,
 ) {
 
@@ -66,9 +71,19 @@ class RentalService(
         copyRepository.decreaseAvailability(resourceId, libraryId)
     }
 
-    fun completeBookRental(resourceId: ResourceId, userId: UserId) {
+    fun getCustomerAwaitingBooks(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData> {
+        libraryCardRepository.getActive(cardNumber)
+        return rentalRepository.getAllAwaitingBy(libraryId, cardNumber)
+    }
+
+    fun completeBookRental(resourceId: ResourceId, cardNumber: CardNumber, librarianId: UserId) {
         val book = bookRepository.get(resourceId)
-        val rental = rentalRepository.getLatest(book.resourceId, userId)
+        val libraryCard = libraryCardRepository.getActive(cardNumber)
+            .also { it.checkIfActive() }
+        val rental = rentalRepository.getLatest(book.resourceId, libraryCard.userId)
+        if (!librarianRepository.isLibrarian(librarianId, rental.libraryId)) {
+            throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
+        }
         val updatedRental = rental.completeBookRental(clock.instant())
         rental.validateIsOverlapped(updatedRental.rentalPeriod)
         rentalRepository.update(updatedRental)
@@ -93,3 +108,6 @@ data class RentalShortInfo(
 
 class InsufficientCopyAvailabilityException(resourceId: ResourceId, libraryId: LibraryId) :
     BaseException("Resource ${resourceId.value} could not be borrowed from ${libraryId.value} for insufficient availability")
+
+class UserNotPermittedToAccessLibraryException(librarianId: UserId, libraryId: LibraryId) :
+    BaseException("Librarian ${librarianId.value} doesn't work at library ${libraryId.value}")

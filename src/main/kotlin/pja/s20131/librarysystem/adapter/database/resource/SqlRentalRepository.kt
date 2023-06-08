@@ -3,6 +3,7 @@ package pja.s20131.librarysystem.adapter.database.resource
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.max
@@ -13,6 +14,8 @@ import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRental
 import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRentalHistory
+import pja.s20131.librarysystem.adapter.database.resource.ResourceTable.toResourceBasicData
+import pja.s20131.librarysystem.adapter.database.user.LibraryCardTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.person.FirstName
@@ -29,6 +32,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Repository
@@ -47,6 +51,20 @@ class SqlRentalRepository : RentalRepository {
                     it.toRentalHistory(ResourceType.EBOOK)
                 }
             }
+    }
+
+    override fun getAllAwaitingBy(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData> {
+        return RentalTable
+            .innerJoin(UserTable)
+            .innerJoin(LibraryCardTable)
+            .innerJoin(CopyTable)
+            .innerJoin(ResourceTable)
+            .select {
+                RentalTable.status eq RentalStatus.RESERVED_TO_BORROW and
+                        (LibraryCardTable.id eq cardNumber.value) and
+                        (CopyTable.libraryId eq libraryId.value)
+            }
+            .map { it.toResourceBasicData() }
     }
 
     override fun findLatest(resourceId: ResourceId, userId: UserId): Rental? {

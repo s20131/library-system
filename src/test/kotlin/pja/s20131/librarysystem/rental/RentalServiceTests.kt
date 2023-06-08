@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
@@ -20,12 +21,16 @@ import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDat
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.port.RentalNotFoundException
+import pja.s20131.librarysystem.user.LibraryCardDatabaseHelper
+import pja.s20131.librarysystem.user.LibraryCardGen
 
 @SpringBootTest
 class RentalServiceTests @Autowired constructor(
     private val rentalService: RentalService,
+    // TODO preconditions
+    private val libraryCardDatabaseHelper: LibraryCardDatabaseHelper,
     private val given: Preconditions,
-    private val assert: pja.s20131.librarysystem.Assertions,
+    private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
@@ -179,8 +184,11 @@ class RentalServiceTests @Autowired constructor(
     @Test
     fun `should complete book rental`() {
         val user = given.user.exists()
+        val librarian = given.user.exists()
+        val libraryCard = LibraryCardGen.card(user.userId)
+        libraryCardDatabaseHelper.insertCard(libraryCard)
         val book = given.author.exists().withBook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId).build()
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
         given.rental.exists(
             user.userId,
             book.resourceId,
@@ -189,7 +197,7 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW,
         )
 
-        rentalService.completeBookRental(book.resourceId, user.userId)
+        rentalService.completeBookRental(book.resourceId, libraryCard.cardNumber, librarian.userId)
 
         assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()), RentalStatus.ACTIVE, penalty = null)
     }
@@ -197,6 +205,9 @@ class RentalServiceTests @Autowired constructor(
     @Test
     fun `should throw exception when trying to complete rental of not book resource`() {
         val user = given.user.exists()
+        val librarian = given.user.exists()
+        val libraryCard = LibraryCardGen.card(user.userId)
+        libraryCardDatabaseHelper.insertCard(libraryCard)
         val ebook = given.author.exists().withEbook().build().third[0]
         val library = given.library.exists().hasCopy(ebook.resourceId).build()
         given.rental.exists(
@@ -207,14 +218,17 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW
         )
 
-        assertThrows<BookNotFoundException> { rentalService.completeBookRental(ebook.resourceId, user.userId) }
+        assertThrows<BookNotFoundException> { rentalService.completeBookRental(ebook.resourceId, libraryCard.cardNumber, librarian.userId) }
     }
 
     @Test
     fun `should throw exception when trying to complete rental after reservation expiration`() {
         val user = given.user.exists()
+        val librarian = given.user.exists()
+        val libraryCard = LibraryCardGen.card(user.userId)
+        libraryCardDatabaseHelper.insertCard(libraryCard)
         val book = given.author.exists().withBook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId).build()
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
         given.rental.exists(
             user.userId,
             book.resourceId,
@@ -223,6 +237,6 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW,
         )
 
-        assertThrows<RentalPeriodNotOverlappingDatesException> { rentalService.completeBookRental(book.resourceId, user.userId) }
+        assertThrows<RentalPeriodNotOverlappingDatesException> { rentalService.completeBookRental(book.resourceId, libraryCard.cardNumber, librarian.userId) }
     }
 }

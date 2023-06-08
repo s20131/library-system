@@ -24,9 +24,10 @@ class AuthEndpoints(
 
     @PostMapping(consumes = ["application/json"], produces = ["application/json"])
     @RequestMapping("/login")
-    fun login(@RequestBody request: AuthenticateUserRequest) {
+    fun login(@RequestBody request: AuthenticateUserRequest): GetUserAuthoritiesResponse {
         val credentials = request.toCredentials()
         val authentication = UsernamePasswordAuthenticationToken(credentials.username.value, credentials.password.value)
-        authService.authenticate(authentication)
+        val token = authService.authenticate(authentication)
+        return GetUserAuthoritiesResponse(token.authorities.map { it.authority })
     }
 }

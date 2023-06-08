@@ -14,10 +14,12 @@ import pja.s20131.librarysystem.domain.library.model.StreetName
 import pja.s20131.librarysystem.domain.library.model.StreetNumber
 import pja.s20131.librarysystem.domain.resource.model.Available
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
+import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Component
 class LibraryPreconditions(
     private val libraryDatabaseHelper: LibraryDatabaseHelper,
+    private val librarianDatabaseHelper: LibrarianDatabaseHelper,
     private val copyDatabaseHelper: CopyDatabaseHelper,
 ) {
     private val faker = Faker()
@@ -39,6 +41,11 @@ class LibraryPreconditions(
 
         fun hasCopy(resourceId: ResourceId, available: Available = Available(2)): Builder {
             copyDatabaseHelper.insertCopy(library.libraryId, resourceId, available)
+            return this
+        }
+
+        fun hasLibrarian(userId: UserId, isSelected: Boolean = true): Builder {
+            librarianDatabaseHelper.insertLibrarian(userId, library.libraryId, isSelected)
             return this
         }
 

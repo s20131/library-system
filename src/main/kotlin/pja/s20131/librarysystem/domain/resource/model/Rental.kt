@@ -24,7 +24,11 @@ data class Rental(
         rentalPeriod.start.isBefore(other.finish) && other.start.isBefore(rentalPeriod.finish)
 
     fun completeBookRental(instant: Instant): Rental =
-        copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
+        if (rentalStatus === RentalStatus.RESERVED_TO_BORROW) {
+            copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
+        } else {
+            throw ReservationNotFoundException(resourceId, userId)
+        }
 
     fun validateIsOverlapped(other: RentalPeriod) {
         if (!isRentalPeriodOverlapped(other)) {
@@ -94,3 +98,7 @@ class RentalNotPaidOffException(resourceId: ResourceId) :
 
 class RentalCannotBeDownloadedException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rent")
+
+class ReservationNotFoundException(resourceId: ResourceId, userId: UserId) :
+    BaseException("Reservation of resource ${resourceId.value} for user ${userId.value} was not found")
+

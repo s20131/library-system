@@ -9,6 +9,8 @@ import pja.s20131.librarysystem.domain.resource.model.Available
 
 data class GetLibraryResponse(val libraryId: LibraryId, val libraryName: LibraryName, val address: Address)
 
+data class GetLibrarianLibrariesResponse(val libraryId: LibraryId, val libraryName: LibraryName, val isSelected: Boolean)
+
 data class GetResourceCopyResponse(
     val libraryId: LibraryId,
     val libraryName: LibraryName,

@@ -17,6 +17,7 @@ import pja.s20131.librarysystem.domain.library.model.Postcode
 import pja.s20131.librarysystem.domain.library.model.StreetName
 import pja.s20131.librarysystem.domain.library.model.StreetNumber
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
+import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
@@ -24,6 +25,13 @@ class SqlLibraryRepository : LibraryRepository {
 
     override fun getAll(): List<Library> =
         LibraryTable.selectAll().map { it.toLibrary() }
+
+    override fun getAll(librarianId: UserId): List<Pair<Library, Boolean>> {
+        return LibraryTable
+            .innerJoin(LibrarianTable)
+            .select { LibrarianTable.userId eq librarianId.value }
+            .map { it.toLibrary() to it[LibrarianTable.isSelected] }
+    }
 
     override fun get(libraryId: LibraryId): Library =
         LibraryTable.select { LibraryTable.id eq libraryId.value }.singleOrNull()?.toLibrary() ?: throw LibraryNotFoundException(libraryId)
@@ -52,3 +60,5 @@ object LibraryTable : UUIDTable("library") {
 }
 
 class LibraryNotFoundException(libraryId: LibraryId) : BaseException("Library ${libraryId.value} was not found")
+
+class UserHasNotSelectedLibraryException(librarianId: UserId) : BaseException("Librarian ${librarianId.value} has not selected library")

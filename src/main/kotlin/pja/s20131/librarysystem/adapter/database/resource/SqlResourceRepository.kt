@@ -14,9 +14,11 @@ import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.CoverTable.toCover
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.domain.resource.model.Resource
+import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceCover
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
+import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
 import pja.s20131.librarysystem.exception.BaseException
 
@@ -69,6 +71,11 @@ object ResourceTable : UUIDTable("resource") {
         this[series] = resource.series?.value
         this[status] = resource.status
     }
+
+    fun ResultRow.toResourceBasicData() = ResourceBasicData(
+        ResourceId(this[id].value),
+        Title(this[title]),
+    )
 }
 
 object CoverTable : Table("cover") {

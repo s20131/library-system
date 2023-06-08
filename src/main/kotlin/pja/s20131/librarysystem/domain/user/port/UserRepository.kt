@@ -15,7 +15,6 @@ interface UserRepository {
     fun findBy(username: Username): User?
     fun save(user: User)
     fun saveSettings(userId: UserId, userSettings: UserSettings)
-    fun isLibrarian(userId: UserId): Boolean
 }
 
 class UserNotFoundException(id: UserId) : BaseException("User with id=${id.value} not found")
