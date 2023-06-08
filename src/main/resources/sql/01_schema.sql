@@ -97,6 +97,8 @@ CREATE TABLE "user" (
     username   TEXT  NOT NULL,
     password   TEXT  NOT NULL,
 
+    UNIQUE (email),
+    UNIQUE (username),
     PRIMARY KEY (id)
 );
 
@@ -173,6 +175,7 @@ CREATE TABLE reservation (
     start  TIMESTAMP  NOT NULL,
     finish TIMESTAMP  NOT NULL,
 
+    -- TODO more than 1 reservation?!
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)

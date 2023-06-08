@@ -1,5 +1,7 @@
 package pja.s20131.librarysystem.domain.user
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -31,6 +33,7 @@ class AuthService(
     private val libraryCardRepository: LibraryCardRepository,
     private val passwordEncoder: PasswordEncoder,
 ) : AuthenticationProvider {
+    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     //TODO should be extracted as custom provider?
     override fun authenticate(authentication: Authentication): Authentication {
@@ -58,7 +61,9 @@ class AuthService(
         userRepository.saveSettings(user.userId, UserSettings.basic())
         // TODO pass domain object containing all data
         libraryCardRepository.save(user.userId)
-        return user.userId
+        return user.userId.also {
+            logger.info("New user ${user.username.value} has just registered")
+        }
     }
 
     final inline fun <T> withUserContext(body: (UserId) -> T): T {

@@ -2,8 +2,9 @@ package pja.s20131.librarysystem.domain.resource.model
 
 import org.springframework.http.MediaType
 import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.resource.CannotReserveResourceException
+import pja.s20131.librarysystem.domain.resource.InsufficientCopyAvailabilityException
 import pja.s20131.librarysystem.domain.user.model.UserId
-import pja.s20131.librarysystem.exception.BaseException
 import java.time.Instant
 import java.time.LocalDate
 import java.util.UUID
@@ -34,7 +35,7 @@ sealed class Resource {
                 penalty = null
             )
 
-            else -> throw CannotBeReservedToBorrowException(resourceId)
+            else -> throw CannotReserveResourceException(resourceId)
         }
     }
 
@@ -62,7 +63,17 @@ value class Description(val value: String)
 value class Series(val value: String)
 
 @JvmInline
-value class Available(val value: Int)
+value class Available(val value: Int) {
+    fun checkIsEnoughCopies(activeReservations: Int, resourceId: ResourceId, isReservedByCustomer: Boolean) {
+        // TODO order of reservations? some limitations?
+        if (value > 0 && isReservedByCustomer) {
+            return
+        }
+        if (value - activeReservations <= 0) {
+            throw InsufficientCopyAvailabilityException(resourceId)
+        }
+    }
+}
 
 enum class ResourceStatus {
     AVAILABLE, WITHDRAWN
@@ -82,9 +93,9 @@ value class SearchQuery(val value: String) {
     }
 
     companion object {
-        private val splitRegex = Regex( "[^a-zA-Z0-9]")
+        private val splitRegex = Regex("[^a-zA-Z0-9]")
 
-        fun SearchQuery?.isNullOrEmpty(): Boolean = this == null || this.value.trim().isEmpty()
+        fun SearchQuery?.isNullOrEmpty(): Boolean = this == null || value.trim().isEmpty()
     }
 }
 
@@ -92,6 +103,3 @@ data class ResourceBasicData(
     val id: ResourceId,
     val title: Title,
 )
-
-class CannotBeReservedToBorrowException(resourceId: ResourceId) :
-    BaseException("Resource ${resourceId.value} is not of type ${ResourceType.BOOK} and cannot be reserved to borrow")

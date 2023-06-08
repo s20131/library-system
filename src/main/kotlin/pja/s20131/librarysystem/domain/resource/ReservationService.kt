@@ -63,5 +63,11 @@ data class ReservationShortInfo(
     val library: LibraryName,
 )
 
-class CannotReserveResourceException(resourceId: ResourceId, libraryId: LibraryId) :
-    BaseException("Resource ${resourceId.value} cannot be reserved in ${libraryId.value} as it can be borrowed")
+class CannotReserveResourceException : BaseException {
+    constructor(
+        resourceId: ResourceId,
+        libraryId: LibraryId,
+    ) : super("Resource ${resourceId.value} cannot be reserved in ${libraryId.value} as it can be borrowed")
+
+    constructor(resourceId: ResourceId) : super("Resource ${resourceId.value} is not of type ${ResourceType.BOOK} and cannot be reserved to borrow")
+}

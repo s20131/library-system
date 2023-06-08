@@ -4,17 +4,25 @@ import org.jetbrains.exposed.sql.insert
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import pja.s20131.librarysystem.adapter.database.user.LibraryCardTable
-import pja.s20131.librarysystem.domain.user.model.LibraryCard
+import pja.s20131.librarysystem.domain.user.model.CardNumber
+import pja.s20131.librarysystem.domain.user.model.Expiration
+import pja.s20131.librarysystem.domain.user.model.IsActive
+import pja.s20131.librarysystem.domain.user.model.UserId
 
 @Component
 @Transactional
 class LibraryCardDatabaseHelper {
-    fun insertCard(libraryCard: LibraryCard) {
+    fun insertCard(
+        cardNumber: CardNumber,
+        userId: UserId,
+        expiration: Expiration,
+        isActive: IsActive
+    ) {
         LibraryCardTable.insert {
-            it[id] = libraryCard.cardNumber.value
-            it[userId] = libraryCard.userId.value
-            it[expiration] = libraryCard.expiration.value
-            it[isActive] = libraryCard.isActive.value
+            it[id] = cardNumber.value
+            it[LibraryCardTable.userId] = userId.value
+            it[LibraryCardTable.expiration] = expiration.value
+            it[LibraryCardTable.isActive] = isActive.value
         }
     }
 }

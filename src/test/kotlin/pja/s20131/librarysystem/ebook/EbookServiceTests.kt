@@ -96,7 +96,7 @@ class EbookServiceTests @Autowired constructor(
     @Test
     fun `should get ebook content`() {
         val ebook = given.author.exists().withEbook().build().third[0]
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val library = given.library.exists().hasCopy(ebook.resourceId).build()
         given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()))
 
@@ -109,7 +109,7 @@ class EbookServiceTests @Autowired constructor(
     @Test
     fun `should throw an error when trying to download ebook and having inactive rental`() {
         val ebook = given.author.exists().withEbook().build().third[0]
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val library = given.library.exists().hasCopy(ebook.resourceId).build()
         given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.CANCELED)
 

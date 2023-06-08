@@ -19,7 +19,7 @@ class UserServiceTests @Autowired constructor(
 
     @Test
     fun `should get the user`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
 
         val response = userService.getUser(user.userId)
 
@@ -35,7 +35,7 @@ class UserServiceTests @Autowired constructor(
 
     @Test
     fun `should get basic user settings after adding a new user`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
 
         val response = userService.getUserSettings(user.userId)
 

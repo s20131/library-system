@@ -1,6 +1,7 @@
 package pja.s20131.librarysystem.adapter.database.resource
 
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
@@ -69,6 +70,28 @@ class SqlReservationRepository : ReservationRepository {
             ReservationTable.resourceId eq resourceId.value and (ReservationTable.userId eq userId.value)
         }
     }
+
+    override fun isCurrentlyReserved(resourceId: ResourceId, libraryId: LibraryId, userId: UserId, now: Instant): Boolean {
+        return ReservationTable
+            .select {
+                ReservationTable.resourceId eq resourceId.value and
+                        (ReservationTable.userId eq userId.value) and
+                        (ReservationTable.libraryId eq libraryId.value) and
+                        betweenStartAndFinish(now)
+            }.empty().not()
+    }
+
+    override fun countCurrentlyReservedPerLibrary(resourceId: ResourceId, libraryId: LibraryId, now: Instant): Long {
+        return ReservationTable
+            .select {
+                ReservationTable.resourceId eq resourceId.value and
+                        (ReservationTable.libraryId eq libraryId.value) and
+                        betweenStartAndFinish(now)
+            }.count()
+    }
+
+    private fun SqlExpressionBuilder.betweenStartAndFinish(now: Instant) =
+        (ReservationTable.start lessEq now) and (ReservationTable.finish greaterEq now)
 }
 
 object ReservationTable : Table("reservation") {
