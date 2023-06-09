@@ -10,6 +10,7 @@ import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable.toUserSe
 import pja.s20131.librarysystem.adapter.database.user.UserTable.toUser
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.Email
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
 import pja.s20131.librarysystem.domain.user.model.Password
@@ -25,6 +26,13 @@ import java.util.UUID
 
 @Repository
 class SqlUserRepository : UserRepository {
+    override fun getBy(cardNumber: CardNumber): User {
+        return UserTable
+            .innerJoin(LibraryCardTable)
+            .select { LibraryCardTable.id eq cardNumber.value }
+            .singleOrNull()
+            ?.toUser() ?: throw UserNotFoundException(cardNumber)
+    }
 
     override fun getSettingsBy(userId: UserId): UserSettings {
         return UserSettingsTable

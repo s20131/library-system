@@ -2,6 +2,8 @@ package pja.s20131.librarysystem.domain.user
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import pja.s20131.librarysystem.domain.library.port.LibrarianRepository
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.LibraryCard
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserId
@@ -18,6 +20,10 @@ class UserService(
 
     fun getUser(userId: UserId): UserBasicData {
         return userRepository.getBy(userId).toBasicData()
+    }
+
+    fun getUser(cardNumber: CardNumber): UserBasicData {
+        return userRepository.getBy(cardNumber).toBasicData()
     }
 
     fun getUserSettings(userId: UserId): UserSettings {

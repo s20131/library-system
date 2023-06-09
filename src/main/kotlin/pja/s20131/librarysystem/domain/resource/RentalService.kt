@@ -10,6 +10,7 @@ import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Book
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.FinishTime
+import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
@@ -78,6 +79,15 @@ class RentalService(
         copyRepository.decreaseAvailability(resourceId, libraryId)
     }
 
+    fun borrowResourceForCustomer(libraryId: LibraryId, isbn: ISBN, cardNumber: CardNumber, librarianId: UserId) {
+        val libraryCard = libraryCardRepository.getActive(cardNumber)
+        if (!librarianRepository.isLibrarianOf(librarianId, libraryId)) {
+            throw UserNotPermittedToAccessLibraryException(librarianId, libraryId)
+        }
+        val book = bookRepository.get(isbn)
+        borrowResource(book.resourceId, libraryId, libraryCard.userId)
+    }
+
     fun getCustomerAwaitingBooks(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData> {
         libraryCardRepository.getActive(cardNumber)
         return rentalRepository.getAllAwaitingBy(libraryId, cardNumber)
@@ -87,7 +97,7 @@ class RentalService(
         val book = bookRepository.get(resourceId)
         val libraryCard = libraryCardRepository.getActive(cardNumber)
         val rental = rentalRepository.getLatest(book.resourceId, libraryCard.userId)
-        if (!librarianRepository.isLibrarian(librarianId, rental.libraryId)) {
+        if (!librarianRepository.isLibrarianOf(librarianId, rental.libraryId)) {
             throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
         }
         val updatedRental = rental.completeBookRental(clock.instant())

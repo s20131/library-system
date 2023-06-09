@@ -8,5 +8,5 @@ interface LibrarianRepository {
     fun getSelectedLibrary(librarianId: UserId): Library
     fun updateSelectedLibrary(libraryId: LibraryId, librarianId: UserId, isSelected: Boolean)
     fun isLibrarian(userId: UserId): Boolean
-    fun isLibrarian(userId: UserId, libraryId: LibraryId): Boolean
+    fun isLibrarianOf(userId: UserId, libraryId: LibraryId): Boolean
 }

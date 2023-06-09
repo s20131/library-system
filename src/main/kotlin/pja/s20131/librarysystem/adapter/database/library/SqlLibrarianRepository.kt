@@ -37,7 +37,7 @@ class SqlLibrarianRepository : LibrarianRepository {
             .empty().not()
     }
 
-    override fun isLibrarian(userId: UserId, libraryId: LibraryId): Boolean {
+    override fun isLibrarianOf(userId: UserId, libraryId: LibraryId): Boolean {
         return (LibrarianTable innerJoin UserTable innerJoin LibraryTable)
             .select { LibrarianTable.userId eq userId.value and (LibrarianTable.libraryId eq libraryId.value) }
             .empty().not()

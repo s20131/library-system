@@ -14,6 +14,7 @@ import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
+import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.AuthService
@@ -47,11 +48,13 @@ class RentalEndpoints(
         }
     }
 
-    @PostMapping("/libraries/{libraryId}/librarian/rentals/{resourceId}")
+    @PostMapping("/libraries/{libraryId}/librarian/rentals/{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured("ROLE_LIBRARIAN")
-    fun borrowResourceForCustomer(@PathVariable libraryId: LibraryId, @PathVariable resourceId: ResourceId, @RequestParam cardNumber: CardNumber) {
-        TODO()
+    fun borrowResourceForCustomer(@PathVariable libraryId: LibraryId, @PathVariable isbn: ISBN, @RequestParam cardNumber: CardNumber) {
+        authService.withUserContext {
+            rentalService.borrowResourceForCustomer(libraryId, isbn, cardNumber, it)
+        }
     }
 
     @GetMapping("/libraries/{libraryId}/librarian/rentals")

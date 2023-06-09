@@ -1,9 +1,12 @@
 package pja.s20131.librarysystem.adapter.api.user
 
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.domain.user.AuthService
 import pja.s20131.librarysystem.domain.user.UserService
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.LibraryCard
 import pja.s20131.librarysystem.domain.user.model.UserBasicData
 import pja.s20131.librarysystem.domain.user.model.UserSettings
@@ -32,6 +35,12 @@ class UserEndpoints(
         return authService.withUserContext {
             userService.getUserLibraryCard(it)
         }.toResponse()
+    }
+
+    @GetMapping("/card/{cardNumber}")
+    @Secured("ROLE_LIBRARIAN")
+    fun getUserDataByLibraryCard(@PathVariable cardNumber: CardNumber): GetUserResponse {
+        return userService.getUser(cardNumber).toResponse()
     }
 }
 
