@@ -1,7 +1,7 @@
 package pja.s20131.librarysystem.storage
 
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.select
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -15,11 +15,11 @@ import java.time.Instant
 @Transactional
 class StorageDatabaseHelper {
 
-    fun insertToStorage(userId: UserId, resourceId: ResourceId, since: Instant = Instant.now()) {
-        StorageTable.insert {
-            it[this.userId] = userId.value
-            it[this.resourceId] = resourceId.value
-            it[this.since] = since
+    fun batchInsertToStorage(userId: UserId, resources: List<Pair<ResourceId, Instant>>) {
+        StorageTable.batchInsert(resources) { resourceIdToSince ->
+            this[StorageTable.userId] = userId.value
+            this[StorageTable.resourceId] = resourceIdToSince.first.value
+            this[StorageTable.since] = resourceIdToSince.second
         }
     }
 

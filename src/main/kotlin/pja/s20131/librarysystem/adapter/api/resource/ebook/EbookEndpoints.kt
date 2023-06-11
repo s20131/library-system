@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import pja.s20131.librarysystem.adapter.api.resource.book.GetResourceWithAuthorBasicDataResponse
+import pja.s20131.librarysystem.adapter.api.resource.resource.GetResourceWithAuthorBasicDataResponse
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Ebook
@@ -20,14 +20,13 @@ import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery.Companion.isNullOrEmpty
-import pja.s20131.librarysystem.infrastructure.security.PrincipalConverter
-import java.security.Principal
+import pja.s20131.librarysystem.domain.user.AuthService
 
 @RestController
 @RequestMapping("/ebooks")
 class EbookEndpoints(
     val ebookService: EbookService,
-    val principalConverter: PrincipalConverter,
+    val authService: AuthService,
 ) {
 
     @GetMapping
@@ -47,9 +46,10 @@ class EbookEndpoints(
     }
 
     @GetMapping("/{ebookId}/content", produces = [APPLICATION_EPUB_VALUE, APPLICATION_PDF_VALUE])
-    fun getEbookContent(@PathVariable ebookId: ResourceId, principal: Principal): ResponseEntity<ByteArray> {
-        val userId = principalConverter.convert(principal)
-        val content = ebookService.getEbookContent(ebookId, userId)
+    fun getEbookContent(@PathVariable ebookId: ResourceId): ResponseEntity<ByteArray> {
+        val content = authService.withUserContext {
+            ebookService.getEbookContent(ebookId, it)
+        }
         val contentType = when (content.format) {
             Format.EPUB -> APPLICATION_EPUB_VALUE
             Format.PDF -> APPLICATION_PDF_VALUE

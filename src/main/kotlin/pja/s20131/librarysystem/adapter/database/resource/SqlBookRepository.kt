@@ -42,6 +42,13 @@ class SqlBookRepository : BookRepository {
             .singleOrNull()
             ?.toBook() ?: throw BookNotFoundException(bookId)
 
+    override fun get(isbn: ISBN): Book =
+        BookTable
+            .innerJoin(ResourceTable)
+            .select { BookTable.isbn eq isbn.value }
+            .singleOrNull()
+            ?.toBook() ?: throw BookNotFoundException(isbn)
+
     override fun save(book: Book) {
         ResourceTable.insert {
             it.from(book)
@@ -100,4 +107,7 @@ object BookSearchView : UUIDTable("books_search_view") {
     )
 }
 
-class BookNotFoundException(bookId: ResourceId) : BaseException("Book with id=${bookId.value} doesn't exist")
+class BookNotFoundException : BaseException {
+    constructor(bookId: ResourceId) : super("Book with id ${bookId.value} doesn't exist")
+    constructor(isbn: ISBN) : super("Book with isbn ${isbn.value} doesn't exist")
+}

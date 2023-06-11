@@ -63,6 +63,7 @@ CREATE TABLE book (
     resource_id UUID  NOT NULL,
     isbn        TEXT  NOT NULL,
 
+    UNIQUE (isbn),
     PRIMARY KEY (resource_id),
     FOREIGN KEY (resource_id) REFERENCES resource
 );
@@ -96,6 +97,8 @@ CREATE TABLE "user" (
     username   TEXT  NOT NULL,
     password   TEXT  NOT NULL,
 
+    UNIQUE (email),
+    UNIQUE (username),
     PRIMARY KEY (id)
 );
 
@@ -108,6 +111,35 @@ CREATE TABLE user_settings (
     PRIMARY KEY (user_id),
     FOREIGN KEY (user_id) REFERENCES "user"
 );
+
+-- DATABASE FEATURE - SEQUENCE
+CREATE SEQUENCE library_card_seq MINVALUE 1000;
+
+CREATE TABLE library_card (
+    number     BIGINT  NOT NULL DEFAULT nextval('library_card_seq'),
+    user_id      UUID  NOT NULL,
+  --qr_code     BYTEA  NOT NULL,
+    expiration   DATE  NOT NULL,
+    is_active BOOLEAN  NOT NULL,
+
+    PRIMARY KEY (number),
+    FOREIGN KEY (user_id) REFERENCES "user"
+);
+
+-- DATABASE FEATURE - CONDITIONAL UNIQUE CONSTRAINT
+CREATE UNIQUE INDEX active_card_unique_idx ON library_card (user_id, is_active) WHERE is_active = true;
+
+CREATE TABLE librarian (
+    user_id     UUID  NOT NULL,
+    library_id  UUID  NOT NULL,
+    is_selected BOOL  NOT NULL,
+
+    PRIMARY KEY (user_id, library_id),
+    FOREIGN KEY (user_id) REFERENCES "user",
+    FOREIGN KEY (library_id) REFERENCES library
+);
+
+CREATE UNIQUE INDEX selected_library_unique_idx ON librarian (user_id, is_selected) WHERE is_selected = true;
 
 CREATE TABLE storage (
     user_id     UUID  NOT NULL,
@@ -143,6 +175,7 @@ CREATE TABLE reservation (
     start  TIMESTAMP  NOT NULL,
     finish TIMESTAMP  NOT NULL,
 
+    -- TODO more than 1 reservation?!
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)

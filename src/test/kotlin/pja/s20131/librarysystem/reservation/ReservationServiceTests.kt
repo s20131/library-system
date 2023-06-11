@@ -8,12 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.CannotReserveResourceException
 import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.ReservationService
 import pja.s20131.librarysystem.domain.resource.ReservationShortInfo
 import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 
 @SpringBootTest
@@ -25,7 +25,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should get user reservations`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val (author, books) = given.author.exists().withBook().build()
         val library = given.library.exists().hasCopy(books[0].resourceId).build()
         val reservation = given.reservation.exists(user.userId, books[0].resourceId, library.libraryId)
@@ -39,7 +39,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should get user reservations ordered by start of a reservation`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val (author, books, ebooks) = given.author.exists().withBook().withEbook().build()
         val library = given.library.exists().hasCopy(books[0].resourceId).hasCopy(ebooks[0].resourceId).build()
         val reservation1 = given.reservation.exists(user.userId, books[0].resourceId, library.libraryId)
@@ -55,7 +55,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should get short info about a reservation`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
         val reservation = given.reservation.exists(user.userId, book.resourceId, library.libraryId)
@@ -67,7 +67,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should throw exception when getting short info about not existing reservation`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
 
         assertThrows<ReservationNotFoundException> { reservationService.getReservationShortInfo(book.resourceId, user.userId) }
@@ -75,7 +75,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should reserve a resource`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
 
@@ -86,7 +86,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should throw exception when trying to reserve a resource when more than 0 copies are available`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
 
@@ -97,7 +97,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should keep only the latest reservation of a resource`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
 
@@ -111,7 +111,7 @@ class ReservationServiceTests @Autowired constructor(
 
     @Test
     fun `should delete a reservation`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
         given.reservation.exists(user.userId, book.resourceId, library.libraryId)

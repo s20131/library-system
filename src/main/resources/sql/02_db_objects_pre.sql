@@ -161,3 +161,5 @@ EXECUTE FUNCTION refresh_view('books_search_view');
 CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook
 EXECUTE FUNCTION refresh_view('ebooks_search_view');
+
+-- TODO trigger to check ebook/book mutual id constraint

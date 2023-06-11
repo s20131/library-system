@@ -36,6 +36,12 @@ class BookService(
         return bookRepository.get(bookId)
     }
 
+    fun getBook(isbn: ISBN): ResourceWithAuthorBasicData {
+        val book = bookRepository.get(isbn)
+        val author = authorRepository.get(book.authorId)
+        return ResourceWithAuthorBasicData(book.toBasicData(), author.toBasicData())
+    }
+
     fun addBook(dto: AddBookDto): ResourceId {
         checkIfAuthorExists(dto.authorId)
         val newBook = Book.from(dto)

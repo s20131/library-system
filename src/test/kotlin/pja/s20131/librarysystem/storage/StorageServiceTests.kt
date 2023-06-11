@@ -30,7 +30,7 @@ class StorageServiceTests @Autowired constructor(
             .build()
         val user = given.user.exists(
             itemsInStorage = books.map { it.resourceId to clock.now() } + ebooks.map { it.resourceId to clock.now() }
-        )
+        ).build()
 
         val response = storageService.getUserStorage(user.userId)
 
@@ -50,7 +50,7 @@ class StorageServiceTests @Autowired constructor(
             .build()
         val user = given.user.exists(
             itemsInStorage = listOf(ebooks[0].resourceId to clock.lastWeek(), books[0].resourceId to clock.now(), ebooks[1].resourceId to clock.yesterday())
-        )
+        ).build()
 
         val response = storageService.getUserStorage(user.userId)
 
@@ -63,7 +63,7 @@ class StorageServiceTests @Autowired constructor(
 
     @Test
     fun `should get empty user's storage when nothing was added`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
 
         val response = storageService.getUserStorage(user.userId)
 
@@ -79,7 +79,7 @@ class StorageServiceTests @Autowired constructor(
 
     @Test
     fun `should add item to user's storage`() {
-        val user = given.user.exists()
+        val user = given.user.exists().build()
         val (_, books) = given.author.exists().withBook().build()
 
         storageService.addToUserStorage(user.userId, books[0].resourceId)
@@ -90,7 +90,7 @@ class StorageServiceTests @Autowired constructor(
     @Test
     fun `should remove item from user's storage`() {
         val book = given.author.exists().withBook().build().second[0]
-        val user = given.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant()))
+        val user = given.user.exists(itemsInStorage = listOf(book.resourceId to clock.instant())).build()
 
         storageService.removeFromUserStorage(user.userId, book.resourceId)
 

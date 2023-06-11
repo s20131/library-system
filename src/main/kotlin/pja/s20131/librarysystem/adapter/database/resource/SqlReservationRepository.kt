@@ -1,6 +1,7 @@
 package pja.s20131.librarysystem.adapter.database.resource
 
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SqlExpressionBuilder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
@@ -20,6 +21,7 @@ import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Reservation
+import pja.s20131.librarysystem.domain.resource.model.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.model.ReservationPeriod
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
@@ -27,7 +29,6 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.ReservationRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
-import pja.s20131.librarysystem.exception.BaseException
 import java.time.Instant
 
 @Repository
@@ -69,6 +70,28 @@ class SqlReservationRepository : ReservationRepository {
             ReservationTable.resourceId eq resourceId.value and (ReservationTable.userId eq userId.value)
         }
     }
+
+    override fun isCurrentlyReserved(resourceId: ResourceId, libraryId: LibraryId, userId: UserId, now: Instant): Boolean {
+        return ReservationTable
+            .select {
+                ReservationTable.resourceId eq resourceId.value and
+                        (ReservationTable.userId eq userId.value) and
+                        (ReservationTable.libraryId eq libraryId.value) and
+                        betweenStartAndFinish(now)
+            }.empty().not()
+    }
+
+    override fun countCurrentlyReservedPerLibrary(resourceId: ResourceId, libraryId: LibraryId, now: Instant): Long {
+        return ReservationTable
+            .select {
+                ReservationTable.resourceId eq resourceId.value and
+                        (ReservationTable.libraryId eq libraryId.value) and
+                        betweenStartAndFinish(now)
+            }.count()
+    }
+
+    private fun SqlExpressionBuilder.betweenStartAndFinish(now: Instant) =
+        (ReservationTable.start lessEq now) and (ReservationTable.finish greaterEq now)
 }
 
 object ReservationTable : Table("reservation") {
@@ -100,6 +123,3 @@ object ReservationTable : Table("reservation") {
         resourceType,
     )
 }
-
-class ReservationNotFoundException(resourceId: ResourceId, userId: UserId) :
-    BaseException("Reservation of resource ${resourceId.value} for user ${userId.value} was not found")

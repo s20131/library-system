@@ -6,8 +6,20 @@ import pja.s20131.librarysystem.domain.resource.AddAuthorDto
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
+import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
+import pja.s20131.librarysystem.domain.resource.model.Title
 import java.time.Instant
+
+data class GetResourceWithAuthorBasicDataResponse(
+    val resource: ResourceBasicData,
+    val author: AuthorBasicData
+)
+
+data class GetResourceBasicDataResponse(
+    val id: ResourceId,
+    val title: Title
+)
 
 data class AddAuthorRequest(
     val firstName: FirstName,

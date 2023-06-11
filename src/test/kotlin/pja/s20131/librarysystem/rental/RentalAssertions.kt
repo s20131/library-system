@@ -29,4 +29,14 @@ class RentalAssertions(
         assertThat(expectedRental.rentalStatus).isEqualTo(rentalStatus)
         assertThat(expectedRental.penalty).isEqualTo(penalty)
     }
+
+    fun isSaved(
+        userId: UserId,
+        resourceId: ResourceId,
+        libraryId: LibraryId,
+    ) {
+        val expectedRental = rentalDatabaseHelper.findBy(resourceId, userId, libraryId)
+
+        requireNotNull(expectedRental)
+    }
 }

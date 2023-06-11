@@ -3,14 +3,16 @@ package pja.s20131.librarysystem.adapter.api.user
 import com.fasterxml.jackson.annotation.JsonCreator
 import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
+import pja.s20131.librarysystem.domain.user.Credentials
+import pja.s20131.librarysystem.domain.user.RegisterUserDto
+import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.Email
+import pja.s20131.librarysystem.domain.user.model.Expiration
 import pja.s20131.librarysystem.domain.user.model.KindleEmail
-import pja.s20131.librarysystem.domain.user.model.Username
 import pja.s20131.librarysystem.domain.user.model.Password
 import pja.s20131.librarysystem.domain.user.model.SendEndOfRentalReminder
 import pja.s20131.librarysystem.domain.user.model.SendWhenAvailableReminder
-import pja.s20131.librarysystem.domain.user.Credentials
-import pja.s20131.librarysystem.domain.user.RegisterUserDto
+import pja.s20131.librarysystem.domain.user.model.Username
 
 data class RegisterUserRequest(
     val firstName: FirstName,
@@ -34,8 +36,8 @@ data class AuthenticateUserRequest(
     val password: Password,
 ) {
     fun toCredentials(): Credentials = Credentials(username, password)
-    
-    companion object{
+
+    companion object {
         @JvmStatic
         @JsonCreator
         fun creator(username: String, password: String) =
@@ -53,4 +55,13 @@ data class GetUserSettingsResponse(
     val sendEndOfRentalReminder: SendEndOfRentalReminder,
     val sendWhenAvailableReminder: SendWhenAvailableReminder,
     val kindleEmail: KindleEmail?,
+)
+
+data class GetUserLibraryCardResponse(
+    val cardNumber: CardNumber,
+    val expiration: Expiration,
+)
+
+data class GetUserAuthoritiesResponse(
+    val userRoles: List<String>
 )

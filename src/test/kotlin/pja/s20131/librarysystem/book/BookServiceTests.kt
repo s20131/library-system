@@ -54,6 +54,15 @@ class BookServiceTests @Autowired constructor(
     }
 
     @Test
+    fun `should get a book short info by isbn`() {
+        val (author, books) = given.author.exists().withBook().build()
+
+        val response = bookService.getBook(books[0].isbn)
+
+        assertThat(response).isEqualTo(ResourceWithAuthorBasicData(books[0].toBasicData(), author.toBasicData()))
+    }
+
+    @Test
     fun `should correctly add a book`() {
         val (author) = given.author.exists().build()
         val dto = BookGen.addBookDto(authorId = author.authorId)

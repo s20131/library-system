@@ -11,9 +11,11 @@ class UserAssertions(
     fun isSaved(userId: UserId) {
         val user = userDatabaseHelper.findBy(userId)
         val settings = userDatabaseHelper.findSettingsBy(userId)
+        val libraryCard = userDatabaseHelper.findActiveLibraryCardBy(userId)
 
         assertThat(user).isNotNull
         assertThat(user!!.userId).isEqualTo(userId)
         assertThat(settings).isNotNull
+        assertThat(libraryCard).isNotNull
     }
 }

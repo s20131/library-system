@@ -21,6 +21,7 @@ data class ReservationPeriod(
     val finishDate = FinishDate(LocalDate.ofInstant(finish, ZoneId.of("Europe/Warsaw")))
 
     companion object {
+        // TODO amount of days?
         fun startReservation(instant: Instant) = ReservationPeriod(instant, instant.plus(30, ChronoUnit.DAYS))
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
+import pja.s20131.librarysystem.adapter.database.library.LibrarianTable
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
 import pja.s20131.librarysystem.adapter.database.resource.BookTable
@@ -16,6 +17,7 @@ import pja.s20131.librarysystem.adapter.database.resource.ReservationTable
 import pja.s20131.librarysystem.adapter.database.resource.ResourceTable
 import pja.s20131.librarysystem.adapter.database.resource.SeriesTable
 import pja.s20131.librarysystem.adapter.database.resource.StorageTable
+import pja.s20131.librarysystem.adapter.database.user.LibraryCardTable
 import pja.s20131.librarysystem.adapter.database.user.UserSettingsTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
 import pja.s20131.librarysystem.infrastracture.ClockTestConfiguration
@@ -40,7 +42,9 @@ class BaseTestConfig {
             ResourceTable.deleteAll()
             AuthorTable.deleteAll()
             SeriesTable.deleteAll()
+            LibrarianTable.deleteAll()
             LibraryTable.deleteAll()
+            LibraryCardTable.deleteAll()
             UserSettingsTable.deleteAll()
             UserTable.deleteAll()
         }
