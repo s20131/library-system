@@ -7,7 +7,7 @@ CREATE TABLE rental_status (
     name TEXT  PRIMARY KEY
 );
 
-INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('PAID_OFF'), ('CANCELED');
+INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('CANCELED'), ('FINISHED');
 
 CREATE TABLE series (
     name TEXT  PRIMARY KEY
@@ -175,7 +175,7 @@ CREATE TABLE reservation (
     start  TIMESTAMP  NOT NULL,
     finish TIMESTAMP  NOT NULL,
 
-    -- TODO more than 1 reservation?!
+    -- TODO is such PK enough? the data would be only upserted
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)

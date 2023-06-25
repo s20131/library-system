@@ -25,3 +25,9 @@ data class GetRentalShortInfoResponse(
     val library: LibraryName,
     val penalty: Penalty?,
 )
+
+data class GetRentalPenaltyInfoResponse(
+    val finish: FinishTime,
+    val status: RentalStatus,
+    val penalty: Penalty?,
+)

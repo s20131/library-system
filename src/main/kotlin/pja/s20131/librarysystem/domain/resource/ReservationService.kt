@@ -42,6 +42,7 @@ class ReservationService(
         if (available.value != 0) throw CannotReserveResourceException(resourceId, libraryId)
         val resource = resourceRepository.getResource(resourceId)
         val reservation = resource.reserve(userId, libraryId, clock.instant())
+        // TODO upsert only if reservation already finished?
         reservationRepository.upsert(reservation)
     }
 

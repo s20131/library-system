@@ -19,7 +19,6 @@ class StorageService(
     private val userRepository: UserRepository,
     private val clock: Clock,
 ) {
-
     fun getUserStorage(userId: UserId): List<StoredResource> {
         val user = userRepository.getBy(userId)
         return storageRepository.getAllBy(user.userId)
@@ -39,7 +38,6 @@ class StorageService(
         val user = userRepository.getBy(userId)
         storageRepository.remove(user.userId, resourceId)
     }
-
 }
 
 data class StoredResource(

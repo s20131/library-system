@@ -5,6 +5,7 @@ import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.minus
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
@@ -52,6 +53,14 @@ class SqlCopyRepository : CopyRepository {
             .select { CopyTable.resourceId eq resourceId.value and (CopyTable.libraryId eq libraryId.value) }
             .singleOrNull()
             ?.let { Available(it[CopyTable.available]) } ?: throw CopyNotFoundException(resourceId, libraryId)
+    }
+
+    override fun increaseAvailability(resourceId: ResourceId, libraryId: LibraryId) {
+        CopyTable.update({
+            CopyTable.resourceId eq resourceId.value and (CopyTable.libraryId eq libraryId.value)
+        }) {
+            it[available] = available + 1
+        }
     }
 
     override fun decreaseAvailability(resourceId: ResourceId, libraryId: LibraryId) {
