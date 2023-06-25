@@ -15,6 +15,7 @@ import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.model.ISBN
+import pja.s20131.librarysystem.domain.resource.model.Rental
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.AuthService
@@ -65,12 +66,34 @@ class RentalEndpoints(
         }.toResponse()
     }
 
+    // TODO /libraries/{libraryId}/librarian and validate libraryId
     @PutMapping("/rentals/{resourceId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured("ROLE_LIBRARIAN")
     fun completeBorrowingBook(@PathVariable resourceId: ResourceId, @RequestParam cardNumber: CardNumber) {
         authService.withUserContext {
             rentalService.completeBookRental(resourceId, cardNumber, it)
+        }
+    }
+
+    @GetMapping("/libraries/{libraryId}/librarian/rentals/{isbn}/return")
+    @Secured("ROLE_LIBRARIAN")
+    fun checkBeforeReturningBook(
+        @PathVariable libraryId: LibraryId,
+        @PathVariable isbn: ISBN,
+        @RequestParam cardNumber: CardNumber
+    ): GetRentalPenaltyInfoResponse {
+        return authService.withUserContext {
+            rentalService.checkBeforeReturningBook(libraryId, isbn, cardNumber, it)
+        }.toResponse()
+    }
+
+    @PutMapping("/libraries/{libraryId}/librarian/rentals/{isbn}/return")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Secured("ROLE_LIBRARIAN")
+    fun returnBook(@PathVariable libraryId: LibraryId, @PathVariable isbn: ISBN, @RequestParam cardNumber: CardNumber) {
+        authService.withUserContext {
+            rentalService.returnBook(libraryId, isbn, cardNumber, it)
         }
     }
 }
@@ -82,3 +105,5 @@ private fun RentalShortInfo.toResponse() = GetRentalShortInfoResponse(rentalStat
 
 @JvmName("toResourceResponse")
 private fun List<ResourceBasicData>.toResponse() = map { GetResourceBasicDataResponse(it.id, it.title) }
+
+private fun Rental.toResponse() = GetRentalPenaltyInfoResponse(rentalPeriod.finishTime, rentalStatus, penalty)

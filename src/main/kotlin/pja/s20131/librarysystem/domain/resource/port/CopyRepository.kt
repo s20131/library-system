@@ -9,5 +9,6 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 interface CopyRepository {
     fun getAllBy(resourceId: ResourceId, userLocation: Point?): List<ResourceCopy>
     fun getAvailability(resourceId: ResourceId, libraryId: LibraryId): Available
+    fun increaseAvailability(resourceId: ResourceId, libraryId: LibraryId)
     fun decreaseAvailability(resourceId: ResourceId, libraryId: LibraryId)
 }

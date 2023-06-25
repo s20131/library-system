@@ -1,6 +1,8 @@
 package pja.s20131.librarysystem.domain.resource.model
 
 import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.library.model.LibraryName
+import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.exception.BaseException
 import java.math.BigDecimal
@@ -20,9 +22,6 @@ data class Rental(
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
 ) {
-    private fun isRentalPeriodOverlapped(other: RentalPeriod): Boolean =
-        rentalPeriod.start.isBefore(other.finish) && other.start.isBefore(rentalPeriod.finish)
-
     fun completeBookRental(instant: Instant): Rental =
         if (rentalStatus === RentalStatus.RESERVED_TO_BORROW) {
             copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
@@ -30,14 +29,9 @@ data class Rental(
             throw ReservationNotFoundException(resourceId, userId)
         }
 
-    fun validateIsOverlapped(other: RentalPeriod) {
-        if (!isRentalPeriodOverlapped(other)) {
-            throw RentalPeriodNotOverlappingDatesException(resourceId)
-        }
-    }
-
+    // TODO bug: borrow a book -> return -> borrow again
     fun validateCanBeBorrowed(previous: Rental?) {
-        if (previous != null && isRentalPeriodOverlapped(previous.rentalPeriod)) {
+        if (previous != null && rentalPeriod.isOverlapped(previous.rentalPeriod)) {
             throw RentalPeriodOverlappingDatesException(resourceId)
         }
         // TODO check if there is ANY not paid-off rental
@@ -51,6 +45,19 @@ data class Rental(
             throw RentalCannotBeDownloadedException(resourceId)
         }
     }
+
+    fun validateIsActive(now: Instant) {
+        if (rentalStatus !in RentalStatus.activeStatuses) {
+            throw RentalNotActiveException(rentalId)
+        }
+        rentalPeriod.validateIsNotOver(now)
+    }
+
+    fun finish(): Rental {
+        return copy(rentalStatus = RentalStatus.FINISHED)
+    }
+
+    fun toShortInfo(libraryName: LibraryName) = RentalShortInfo(rentalStatus, rentalPeriod.finishTime, libraryName, penalty)
 }
 
 @JvmInline
@@ -61,7 +68,11 @@ value class RentalId(val value: UUID) {
 }
 
 enum class RentalStatus {
-    ACTIVE, RESERVED_TO_BORROW, PROLONGED, PAID_OFF, CANCELED
+    ACTIVE, RESERVED_TO_BORROW, PROLONGED, CANCELED, FINISHED;
+
+    companion object {
+        val activeStatuses = listOf(ACTIVE, PROLONGED, RESERVED_TO_BORROW)
+    }
 }
 
 @JvmInline
@@ -73,6 +84,22 @@ data class RentalPeriod(
 ) {
     val startDate = StartDate(LocalDate.ofInstant(start, ZoneId.of("Europe/Warsaw")))
     val finishTime = FinishTime(LocalDateTime.ofInstant(finish, ZoneId.of("Europe/Warsaw")))
+
+    fun isOverlapped(other: RentalPeriod): Boolean =
+        start.isBefore(other.finish) && other.start.isBefore(finish)
+
+    fun validateIsOverlapped(other: RentalPeriod, resourceId: ResourceId) {
+        if (!isOverlapped(other)) {
+            throw RentalPeriodNotOverlappingDatesException(resourceId)
+        }
+    }
+
+    fun validateIsNotOver(now: Instant) {
+        if (finish.isBefore(now)) {
+            // TODO better message?
+            throw RentalPeriodIsOverException(finishTime)
+        }
+    }
 
     companion object {
         fun startRental(instant: Instant) = RentalPeriod(instant, instant.plus(14, ChronoUnit.DAYS))
@@ -93,6 +120,10 @@ class RentalPeriodOverlappingDatesException(resourceId: ResourceId) :
 class RentalPeriodNotOverlappingDatesException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be completed to be borrowed as reservation ended")
 
+class RentalPeriodIsOverException(finishTime: FinishTime) : BaseException("Rental period was over at $finishTime")
+
+class RentalNotActiveException(rentalId: RentalId) : BaseException("Rental $rentalId is not active")
+
 class RentalNotPaidOffException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be borrowed as you haven't paid off the last rental of this resource")
 
@@ -101,4 +132,3 @@ class RentalCannotBeDownloadedException(resourceId: ResourceId) :
 
 class ReservationNotFoundException(resourceId: ResourceId, userId: UserId) :
     BaseException("Reservation of resource ${resourceId.value} for user ${userId.value} was not found")
-

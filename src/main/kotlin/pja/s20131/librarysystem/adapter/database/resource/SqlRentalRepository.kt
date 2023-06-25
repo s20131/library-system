@@ -3,7 +3,6 @@ package pja.s20131.librarysystem.adapter.database.resource
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.innerJoin
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.timestamp
 import org.jetbrains.exposed.sql.max

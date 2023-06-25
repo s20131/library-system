@@ -12,6 +12,7 @@ import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.FinishTime
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
+import pja.s20131.librarysystem.domain.resource.model.Rental
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
@@ -31,6 +32,7 @@ import java.time.Clock
 @Service
 @Transactional
 class RentalService(
+    // TODO simplify dependencies?
     private val rentalRepository: RentalRepository,
     private val resourceRepository: ResourceRepository,
     private val bookRepository: BookRepository,
@@ -49,13 +51,8 @@ class RentalService(
     fun getLatestRentalShortInfo(resourceId: ResourceId, userId: UserId): RentalShortInfo {
         val latestRental = rentalRepository.getLatest(resourceId, userId)
         val library = libraryRepository.get(latestRental.libraryId)
-        return RentalShortInfo(
-            latestRental.rentalStatus,
-            //TODO via config prop
-            latestRental.rentalPeriod.finishTime,
-            library.libraryName,
-            latestRental.penalty,
-        )
+        //TODO finish time zone, dates via config props
+        return latestRental.toShortInfo(library.libraryName)
     }
 
     fun borrowResource(resourceId: ResourceId, libraryId: LibraryId, userId: UserId) {
@@ -101,8 +98,28 @@ class RentalService(
             throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
         }
         val updatedRental = rental.completeBookRental(clock.instant())
-        rental.validateIsOverlapped(updatedRental.rentalPeriod)
+        rental.rentalPeriod.validateIsOverlapped(updatedRental.rentalPeriod, resourceId)
         rentalRepository.update(updatedRental)
+    }
+
+    fun checkBeforeReturningBook(libraryId: LibraryId, isbn: ISBN, cardNumber: CardNumber, librarianId: UserId): Rental {
+        val book = bookRepository.get(isbn)
+        val libraryCard = libraryCardRepository.getActive(cardNumber)
+        val rental = rentalRepository.getLatest(book.resourceId, libraryCard.userId)
+        rental.validateIsActive(clock.instant())
+        if (libraryId != rental.libraryId) {
+            throw LibraryNotMatchingException(libraryId, rental.libraryId)
+        }
+        if (!librarianRepository.isLibrarianOf(librarianId, rental.libraryId)) {
+            throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
+        }
+        return rental
+    }
+
+    fun returnBook(libraryId: LibraryId, isbn: ISBN, cardNumber: CardNumber, librarianId: UserId) {
+        val rental = checkBeforeReturningBook(libraryId, isbn, cardNumber, librarianId)
+        copyRepository.increaseAvailability(rental.resourceId, libraryId)
+        rentalRepository.update(rental.finish())
     }
 }
 
@@ -133,3 +150,6 @@ class InsufficientCopyAvailabilityException : BaseException {
 
 class UserNotPermittedToAccessLibraryException(librarianId: UserId, libraryId: LibraryId) :
     BaseException("Librarian ${librarianId.value} doesn't work at library ${libraryId.value}")
+
+class LibraryNotMatchingException(libraryId: LibraryId, otherLibraryId: LibraryId) :
+    BaseException("Current library $libraryId does not match rental library $otherLibraryId")

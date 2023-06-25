@@ -11,7 +11,6 @@ import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
 class ResourceService(
     private val resourceRepository: ResourceRepository,
 ) {
-
     fun getResourceCover(resourceId: ResourceId): ResourceCover {
         return resourceRepository.getCover(resourceId)
     }

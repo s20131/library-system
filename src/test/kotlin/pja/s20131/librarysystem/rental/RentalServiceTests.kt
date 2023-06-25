@@ -1,6 +1,7 @@
 package pja.s20131.librarysystem.rental
 
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,14 +11,18 @@ import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.adapter.database.user.LibraryCardDoesNotExistException
+import pja.s20131.librarysystem.book.BookGen
 import pja.s20131.librarysystem.domain.resource.InsufficientCopyAvailabilityException
+import pja.s20131.librarysystem.domain.resource.LibraryNotMatchingException
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.UserNotPermittedToAccessLibraryException
 import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.RentalNotActiveException
 import pja.s20131.librarysystem.domain.resource.model.RentalNotPaidOffException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
+import pja.s20131.librarysystem.domain.resource.model.RentalPeriodIsOverException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
@@ -406,6 +411,275 @@ class RentalServiceTests @Autowired constructor(
         )
 
         assertThrows<UserNotPermittedToAccessLibraryException> { rentalService.completeBookRental(book.resourceId, cardNumber, librarian.userId) }
+    }
+
+    @Nested
+    inner class CheckBeforeReturningBook {
+        @Test
+        fun `should return a rental`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            val response = rentalService.checkBeforeReturningBook(library.libraryId, book.isbn, cardNumber, librarian.userId)
+
+            assertThat(response).isEqualTo(rental)
+        }
+
+        @Test
+        fun `should validate if book exists`() {
+            given.user.exists().hasCard(cardNumber).build()
+            val book = BookGen.book()
+            val librarian = given.user.exists().build()
+            val library = given.library.exists().hasLibrarian(librarian.userId).build()
+
+            assertThrows<BookNotFoundException> { rentalService.checkBeforeReturningBook(library.libraryId, book.isbn, cardNumber, librarian.userId) }
+        }
+
+        @Test
+        fun `should validate if user's card is active`() {
+            val user = given.user.exists().hasCard(cardNumber, isActive = IsActive(false)).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<LibraryCardDoesNotExistException> {
+                rentalService.checkBeforeReturningBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental exists`() {
+            given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+
+            assertThrows<RentalNotFoundException> {
+                rentalService.checkBeforeReturningBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental is in correct status`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.FINISHED)
+
+            assertThrows<RentalNotActiveException> {
+                rentalService.checkBeforeReturningBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental finish date has not ended`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
+
+            assertThrows<RentalPeriodIsOverException> {
+                rentalService.checkBeforeReturningBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if library matches the rental's library`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library1 = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            val library2 = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId, isSelected = false).build()
+            given.rental.exists(user.userId, book.resourceId, library2.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<LibraryNotMatchingException> {
+                rentalService.checkBeforeReturningBook(
+                    library1.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if librarian works at the given library`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<UserNotPermittedToAccessLibraryException> {
+                rentalService.checkBeforeReturningBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+    }
+
+    @Nested
+    inner class ReturnBook {
+        @Test
+        fun `should successfully return a book and increase availability`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            rentalService.returnBook(library.libraryId, book.isbn, cardNumber, librarian.userId)
+
+            assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.FINISHED, penalty = null)
+            assert.library.hasCopies(3, library.libraryId, book.resourceId)
+        }
+
+        @Test
+        fun `should validate if book exists`() {
+            given.user.exists().hasCard(cardNumber).build()
+            val book = BookGen.book()
+            val librarian = given.user.exists().build()
+            val library = given.library.exists().hasLibrarian(librarian.userId).build()
+
+            assertThrows<BookNotFoundException> { rentalService.returnBook(library.libraryId, book.isbn, cardNumber, librarian.userId) }
+        }
+
+        @Test
+        fun `should validate if user's card is active`() {
+            val user = given.user.exists().hasCard(cardNumber, isActive = IsActive(false)).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<LibraryCardDoesNotExistException> {
+                rentalService.returnBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental exists`() {
+            given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+
+            assertThrows<RentalNotFoundException> {
+                rentalService.returnBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental is in correct status`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.FINISHED)
+
+            assertThrows<RentalNotActiveException> {
+                rentalService.returnBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if rental finish date has not ended`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
+
+            assertThrows<RentalPeriodIsOverException> {
+                rentalService.returnBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if library matches the rental's library`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library1 = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+            val library2 = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId, isSelected = false).build()
+            given.rental.exists(user.userId, book.resourceId, library2.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<LibraryNotMatchingException> {
+                rentalService.returnBook(
+                    library1.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
+
+        @Test
+        fun `should validate if librarian works at the given library`() {
+            val user = given.user.exists().hasCard(cardNumber).build()
+            val librarian = given.user.exists().build()
+            val book = given.author.exists().withBook().build().second[0]
+            val library = given.library.exists().hasCopy(book.resourceId).build()
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
+
+            assertThrows<UserNotPermittedToAccessLibraryException> {
+                rentalService.returnBook(
+                    library.libraryId,
+                    book.isbn,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
+        }
     }
 
     companion object {

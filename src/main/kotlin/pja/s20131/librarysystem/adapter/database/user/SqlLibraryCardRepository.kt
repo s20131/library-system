@@ -33,6 +33,7 @@ class SqlLibraryCardRepository : LibraryCardRepository {
             .innerJoin(UserTable)
             .select { LibraryCardTable.id eq number.value and (LibraryCardTable.isActive eq true) }
             .singleOrNull()
+            // TODO or is not active exception?
             ?.toLibraryCard() ?: throw LibraryCardDoesNotExistException(number)
     }
 
