@@ -181,6 +181,12 @@ CREATE TABLE reservation (
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
 );
 
+CREATE TABLE config (
+    penalty_rate DECIMAL NOT NULL
+);
+
+INSERT INTO config (penalty_rate) VALUES (2.50);
+
 ---
 
 -- TODO polish dictionary?
