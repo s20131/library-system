@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 class PenaltyService {
 
     // TODO via config
-    @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Warsaw")
+    @Scheduled(cron = "\${cron.update-penalties}", zone = "Europe/Warsaw")
     fun updatePenaltiesForResourceOverdue() {
         transaction {
             TransactionManager.current().exec("CALL update_penalties()")
