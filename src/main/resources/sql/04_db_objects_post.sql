@@ -2,7 +2,7 @@ CREATE FUNCTION get_penalty()
 RETURNS decimal
 LANGUAGE sql
 AS $$
-    SELECT penalty_rate FROM config;
+    SELECT (settings -> 'penalty_rate')::decimal FROM config;
 $$;
 
 CREATE PROCEDURE update_penalties()
