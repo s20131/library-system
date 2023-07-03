@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION get_penalty()
     RETURNS decimal
     LANGUAGE sql
 AS '
-    SELECT penalty_rate FROM config;
+    SELECT (settings -> ''penalty_rate'')::decimal FROM config;
 ';
 
 CREATE OR REPLACE PROCEDURE update_penalties()

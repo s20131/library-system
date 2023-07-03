@@ -1,3 +1,5 @@
+CREATE EXTENSION hstore;
+
 -- DATABASE FEATURE - ENUM
 CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
 
@@ -182,10 +184,11 @@ CREATE TABLE reservation (
 );
 
 CREATE TABLE config (
-    penalty_rate DECIMAL NOT NULL
+    settings hstore
 );
 
-INSERT INTO config (penalty_rate) VALUES (2.50);
+-- DATABASE FEATURE - key-value pairs
+INSERT INTO config VALUES ('"penalty_rate" => "2.50"');
 
 ---
 
