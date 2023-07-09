@@ -1,7 +1,6 @@
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    # TODO speed up by using postgis container only in the necessary place?
     url: jdbc:tc:postgis:latest:///library?TC_INITSCRIPT=sql/01_schema.sql?stringtype=unspecified
     username: test
     password: test

@@ -22,12 +22,12 @@ data class Rental(
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
 ) {
-    fun completeBookRental(instant: Instant): Rental =
-        if (rentalStatus === RentalStatus.RESERVED_TO_BORROW) {
-            copy(rentalPeriod = RentalPeriod.startRental(instant), rentalStatus = RentalStatus.ACTIVE)
-        } else {
-            throw ReservationNotFoundException(resourceId, userId)
-        }
+    fun completeBookRental(instant: Instant): Rental  {
+        val rental = changeStatus(RentalStatusTransition.START)
+        val updatedRental = rental.copy(rentalPeriod = RentalPeriod.startRental(instant))
+        rentalPeriod.validateIsOverlapped(updatedRental.rentalPeriod, resourceId)
+        return updatedRental
+    }
 
     // TODO bug: borrow a book -> return -> borrow again
     fun validateCanBeBorrowed(previous: Rental?) {
@@ -46,15 +46,17 @@ data class Rental(
         }
     }
 
-    fun validateIsActive(now: Instant) {
+    fun validateIsActive() {
         if (rentalStatus !in RentalStatus.activeStatuses) {
             throw RentalNotActiveException(rentalId)
         }
-        rentalPeriod.validateIsNotOver(now)
     }
 
-    fun finish(): Rental {
-        return copy(rentalStatus = RentalStatus.FINISHED)
+    fun changeStatus(transition: RentalStatusTransition): Rental {
+        if (rentalStatus != transition.source) {
+            throw RentalStatusCannotBeChangedException(this, transition.target)
+        }
+        return copy(rentalStatus = transition.target)
     }
 
     fun toShortInfo(libraryName: LibraryName) = RentalShortInfo(rentalStatus, rentalPeriod.finishTime, libraryName, penalty)
@@ -68,11 +70,19 @@ value class RentalId(val value: UUID) {
 }
 
 enum class RentalStatus {
-    ACTIVE, RESERVED_TO_BORROW, PROLONGED, CANCELED, FINISHED;
+    ACTIVE, RESERVED_TO_BORROW, PROLONGED, CANCELLED, FINISHED;
 
     companion object {
         val activeStatuses = listOf(ACTIVE, PROLONGED, RESERVED_TO_BORROW)
     }
+}
+
+enum class RentalStatusTransition(val source: RentalStatus, val target: RentalStatus) {
+    START(RentalStatus.RESERVED_TO_BORROW, RentalStatus.ACTIVE),
+    PROLONG(RentalStatus.ACTIVE, RentalStatus.PROLONGED),
+    FINISH(RentalStatus.ACTIVE, RentalStatus.FINISHED),
+    PAY_OFF(RentalStatus.PROLONGED, RentalStatus.FINISHED),
+    CANCEL(RentalStatus.RESERVED_TO_BORROW, RentalStatus.FINISHED),
 }
 
 @JvmInline
@@ -91,13 +101,6 @@ data class RentalPeriod(
     fun validateIsOverlapped(other: RentalPeriod, resourceId: ResourceId) {
         if (!isOverlapped(other)) {
             throw RentalPeriodNotOverlappingDatesException(resourceId)
-        }
-    }
-
-    fun validateIsNotOver(now: Instant) {
-        if (finish.isBefore(now)) {
-            // TODO better message?
-            throw RentalPeriodIsOverException(finishTime)
         }
     }
 
@@ -120,7 +123,8 @@ class RentalPeriodOverlappingDatesException(resourceId: ResourceId) :
 class RentalPeriodNotOverlappingDatesException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be completed to be borrowed as reservation ended")
 
-class RentalPeriodIsOverException(finishTime: FinishTime) : BaseException("Rental period was over at $finishTime")
+class RentalStatusCannotBeChangedException(rental: Rental, targetStatus: RentalStatus) :
+    BaseException("Cannot change rental ${rental.rentalId.value} status from ${rental.rentalStatus} to $targetStatus")
 
 class RentalNotActiveException(rentalId: RentalId) : BaseException("Rental $rentalId is not active")
 
@@ -129,6 +133,3 @@ class RentalNotPaidOffException(resourceId: ResourceId) :
 
 class RentalCannotBeDownloadedException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rent")
-
-class ReservationNotFoundException(resourceId: ResourceId, userId: UserId) :
-    BaseException("Reservation of resource ${resourceId.value} for user ${userId.value} was not found")

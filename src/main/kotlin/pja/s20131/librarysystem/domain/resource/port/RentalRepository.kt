@@ -2,8 +2,8 @@ package pja.s20131.librarysystem.domain.resource.port
 
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.resource.RentalHistory
+import pja.s20131.librarysystem.domain.resource.model.BookBasicData
 import pja.s20131.librarysystem.domain.resource.model.Rental
-import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.UserId
@@ -11,7 +11,7 @@ import pja.s20131.librarysystem.exception.BaseException
 
 interface RentalRepository {
     fun getAllBy(userId: UserId): List<RentalHistory>
-    fun getAllAwaitingBy(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData>
+    fun getAllBooksAwaitingBy(libraryId: LibraryId, cardNumber: CardNumber): List<BookBasicData>
     fun getLatest(resourceId: ResourceId, userId: UserId): Rental = findLatest(resourceId, userId) ?: throw RentalNotFoundException(resourceId, userId)
     fun findLatest(resourceId: ResourceId, userId: UserId): Rental?
     fun save(rental: Rental)

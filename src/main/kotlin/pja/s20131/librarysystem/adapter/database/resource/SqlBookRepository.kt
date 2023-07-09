@@ -14,6 +14,7 @@ import pja.s20131.librarysystem.adapter.database.resource.BookSearchView.toBookV
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Book
+import pja.s20131.librarysystem.domain.resource.model.BookBasicData
 import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
@@ -81,6 +82,12 @@ object BookTable : IdTable<UUID>("book") {
         this[ResourceTable.description]?.let { Description(it) },
         this[ResourceTable.series]?.let { Series(it) },
         this[ResourceTable.status],
+        ISBN(this[isbn]),
+    )
+
+    fun ResultRow.toBookBasicData() = BookBasicData(
+        ResourceId(this[ResourceTable.id].value),
+        Title(this[ResourceTable.title]),
         ISBN(this[isbn]),
     )
 }

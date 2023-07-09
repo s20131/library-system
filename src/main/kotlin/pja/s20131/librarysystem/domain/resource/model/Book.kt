@@ -13,6 +13,8 @@ data class Book(
     val isbn: ISBN,
 ) : Resource() {
 
+    fun toBookBasicData() = BookBasicData(resourceId, title, isbn)
+
     companion object {
         fun from(
             title: Title,
@@ -30,3 +32,9 @@ data class Book(
 
 @JvmInline
 value class ISBN(val value: String)
+
+data class BookBasicData(
+    val id: ResourceId,
+    val title: Title,
+    val isbn: ISBN,
+)

@@ -8,12 +8,19 @@ import pja.s20131.librarysystem.domain.library.port.LibrarianRepository
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Book
+import pja.s20131.librarysystem.domain.resource.model.BookBasicData
 import pja.s20131.librarysystem.domain.resource.model.Ebook
 import pja.s20131.librarysystem.domain.resource.model.FinishTime
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.Rental
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition.CANCEL
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition.FINISH
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition.PAY_OFF
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition.PROLONG
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition.START
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
@@ -41,6 +48,7 @@ class RentalService(
     private val libraryCardRepository: LibraryCardRepository,
     private val librarianRepository: LibrarianRepository,
     private val reservationRepository: ReservationRepository,
+    private val penaltyService: PenaltyService,
     private val clock: Clock,
 ) {
 
@@ -85,28 +93,38 @@ class RentalService(
         borrowResource(book.resourceId, libraryId, libraryCard.userId)
     }
 
-    fun getCustomerAwaitingBooks(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData> {
+    fun getCustomerAwaitingBooks(libraryId: LibraryId, cardNumber: CardNumber): List<BookBasicData> {
         libraryCardRepository.getActive(cardNumber)
-        return rentalRepository.getAllAwaitingBy(libraryId, cardNumber)
-    }
-
-    fun completeBookRental(resourceId: ResourceId, cardNumber: CardNumber, librarianId: UserId) {
-        val book = bookRepository.get(resourceId)
-        val libraryCard = libraryCardRepository.getActive(cardNumber)
-        val rental = rentalRepository.getLatest(book.resourceId, libraryCard.userId)
-        if (!librarianRepository.isLibrarianOf(librarianId, rental.libraryId)) {
-            throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
-        }
-        val updatedRental = rental.completeBookRental(clock.instant())
-        rental.rentalPeriod.validateIsOverlapped(updatedRental.rentalPeriod, resourceId)
-        rentalRepository.update(updatedRental)
+        return rentalRepository.getAllBooksAwaitingBy(libraryId, cardNumber)
     }
 
     fun checkBeforeReturningBook(libraryId: LibraryId, isbn: ISBN, cardNumber: CardNumber, librarianId: UserId): Rental {
-        val book = bookRepository.get(isbn)
+        return getLatestRentalValidated(libraryId, bookRepository.get(isbn), cardNumber, librarianId)
+    }
+
+    fun changeRentalStatus(libraryId: LibraryId, isbn: ISBN, statusStrategy: RentalStatusTransition, cardNumber: CardNumber, librarianId: UserId) {
+        val rental = getLatestRentalValidated(libraryId, bookRepository.get(isbn), cardNumber, librarianId)
+        when (statusStrategy) {
+            FINISH, CANCEL, PAY_OFF -> {
+                copyRepository.increaseAvailability(rental.resourceId, libraryId)
+            }
+
+            PROLONG -> {
+                penaltyService.addPenaltyForResourceOverdue(rental.rentalId)
+            }
+
+            START -> {
+                rentalRepository.update(rental.completeBookRental(clock.instant()))
+                return
+            }
+        }
+        rentalRepository.update(rental.changeStatus(statusStrategy))
+    }
+
+    private fun getLatestRentalValidated(libraryId: LibraryId, book: Book, cardNumber: CardNumber, librarianId: UserId): Rental {
         val libraryCard = libraryCardRepository.getActive(cardNumber)
         val rental = rentalRepository.getLatest(book.resourceId, libraryCard.userId)
-        rental.validateIsActive(clock.instant())
+        rental.validateIsActive()
         if (libraryId != rental.libraryId) {
             throw LibraryNotMatchingException(libraryId, rental.libraryId)
         }
@@ -114,12 +132,6 @@ class RentalService(
             throw UserNotPermittedToAccessLibraryException(librarianId, rental.libraryId)
         }
         return rental
-    }
-
-    fun returnBook(libraryId: LibraryId, isbn: ISBN, cardNumber: CardNumber, librarianId: UserId) {
-        val rental = checkBeforeReturningBook(libraryId, isbn, cardNumber, librarianId)
-        copyRepository.increaseAvailability(rental.resourceId, libraryId)
-        rentalRepository.update(rental.finish())
     }
 }
 

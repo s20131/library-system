@@ -111,7 +111,7 @@ class EbookServiceTests @Autowired constructor(
         val ebook = given.author.exists().withEbook().build().third[0]
         val user = given.user.exists().build()
         val library = given.library.exists().hasCopy(ebook.resourceId).build()
-        given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.CANCELED)
+        given.rental.exists(user.userId, ebook.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.CANCELLED)
 
         assertThrows<RentalCannotBeDownloadedException> { ebookService.getEbookContent(ebook.resourceId, user.userId) }
     }

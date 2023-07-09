@@ -10,10 +10,10 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
+import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBookBasicData
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
 import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRental
 import pja.s20131.librarysystem.adapter.database.resource.RentalTable.toRentalHistory
-import pja.s20131.librarysystem.adapter.database.resource.ResourceTable.toResourceBasicData
 import pja.s20131.librarysystem.adapter.database.user.LibraryCardTable
 import pja.s20131.librarysystem.adapter.database.user.UserTable
 import pja.s20131.librarysystem.domain.library.model.LibraryId
@@ -21,6 +21,7 @@ import pja.s20131.librarysystem.domain.person.FirstName
 import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
+import pja.s20131.librarysystem.domain.resource.model.BookBasicData
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.Rental
 import pja.s20131.librarysystem.domain.resource.model.RentalId
@@ -52,18 +53,19 @@ class SqlRentalRepository : RentalRepository {
             }
     }
 
-    override fun getAllAwaitingBy(libraryId: LibraryId, cardNumber: CardNumber): List<ResourceBasicData> {
+    override fun getAllBooksAwaitingBy(libraryId: LibraryId, cardNumber: CardNumber): List<BookBasicData> {
         return RentalTable
             .innerJoin(UserTable)
             .innerJoin(LibraryCardTable)
             .innerJoin(CopyTable)
             .innerJoin(ResourceTable)
+            .innerJoin(BookTable)
             .select {
                 RentalTable.status eq RentalStatus.RESERVED_TO_BORROW and
                         (LibraryCardTable.id eq cardNumber.value) and
                         (CopyTable.libraryId eq libraryId.value)
             }
-            .map { it.toResourceBasicData() }
+            .map { it.toBookBasicData() }
     }
 
     override fun findLatest(resourceId: ResourceId, userId: UserId): Rental? {
