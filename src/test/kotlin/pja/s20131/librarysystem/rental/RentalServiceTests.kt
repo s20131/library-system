@@ -4,8 +4,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.jdbc.Sql
 import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
@@ -19,17 +22,20 @@ import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.UserNotPermittedToAccessLibraryException
 import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.ISBN
+import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalNotActiveException
 import pja.s20131.librarysystem.domain.resource.model.RentalNotPaidOffException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
-import pja.s20131.librarysystem.domain.resource.model.RentalPeriodIsOverException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
+import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.port.RentalNotFoundException
 import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.IsActive
+import java.math.BigDecimal
 
 @SpringBootTest
 class RentalServiceTests @Autowired constructor(
@@ -236,7 +242,14 @@ class RentalServiceTests @Autowired constructor(
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
-        given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()), RentalStatus.PROLONGED)
+        given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startRental(clock.monthAgo()),
+            RentalStatus.PROLONGED,
+            Penalty(BigDecimal.TEN)
+        )
 
         assertThrows<RentalNotPaidOffException> { rentalService.borrowResource(book.resourceId, library.libraryId, user.userId) }
     }
@@ -293,7 +306,7 @@ class RentalServiceTests @Autowired constructor(
 
         val response = rentalService.getCustomerAwaitingBooks(library.libraryId, cardNumber)
 
-        assertThat(response).containsExactly(book1.toBasicData(), book2.toBasicData())
+        assertThat(response).containsExactly(book1.toBookBasicData(), book2.toBookBasicData())
     }
 
     @Test
@@ -324,7 +337,7 @@ class RentalServiceTests @Autowired constructor(
 
         val response = rentalService.getCustomerAwaitingBooks(library.libraryId, cardNumber)
 
-        assertThat(response).containsExactly(book1.toBasicData(), book2.toBasicData())
+        assertThat(response).containsExactly(book1.toBookBasicData(), book2.toBookBasicData())
     }
 
     @Test
@@ -357,26 +370,34 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW,
         )
 
-        rentalService.completeBookRental(book.resourceId, cardNumber, librarian.userId)
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.START, cardNumber, librarian.userId)
 
         assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()), RentalStatus.ACTIVE, penalty = null)
     }
 
     @Test
-    fun `should throw exception when trying to complete rental of not book resource`() {
+    fun `should throw exception when trying to complete a book rental with not existing isbn`() {
         val user = given.user.exists().hasCard(cardNumber).build()
         val librarian = given.user.exists().build()
-        val ebook = given.author.exists().withEbook().build().third[0]
-        val library = given.library.exists().hasCopy(ebook.resourceId).build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
         given.rental.exists(
             user.userId,
-            ebook.resourceId,
+            book.resourceId,
             library.libraryId,
             RentalPeriod.startReservationToBorrow(clock.yesterday()),
             RentalStatus.RESERVED_TO_BORROW
         )
 
-        assertThrows<BookNotFoundException> { rentalService.completeBookRental(ebook.resourceId, cardNumber, librarian.userId) }
+        assertThrows<BookNotFoundException> {
+            rentalService.changeRentalStatus(
+                library.libraryId,
+                ISBN("abc123"),
+                RentalStatusTransition.START,
+                cardNumber,
+                librarian.userId
+            )
+        }
     }
 
     @Test
@@ -393,7 +414,15 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW,
         )
 
-        assertThrows<RentalPeriodNotOverlappingDatesException> { rentalService.completeBookRental(book.resourceId, cardNumber, librarian.userId) }
+        assertThrows<RentalPeriodNotOverlappingDatesException> {
+            rentalService.changeRentalStatus(
+                library.libraryId,
+                book.isbn,
+                RentalStatusTransition.START,
+                cardNumber,
+                librarian.userId
+            )
+        }
     }
 
     @Test
@@ -410,7 +439,15 @@ class RentalServiceTests @Autowired constructor(
             RentalStatus.RESERVED_TO_BORROW,
         )
 
-        assertThrows<UserNotPermittedToAccessLibraryException> { rentalService.completeBookRental(book.resourceId, cardNumber, librarian.userId) }
+        assertThrows<UserNotPermittedToAccessLibraryException> {
+            rentalService.changeRentalStatus(
+                library.libraryId,
+                book.isbn,
+                RentalStatusTransition.START,
+                cardNumber,
+                librarian.userId
+            )
+        }
     }
 
     @Nested
@@ -492,24 +529,6 @@ class RentalServiceTests @Autowired constructor(
         }
 
         @Test
-        fun `should validate if rental finish date has not ended`() {
-            val user = given.user.exists().hasCard(cardNumber).build()
-            val librarian = given.user.exists().build()
-            val book = given.author.exists().withBook().build().second[0]
-            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
-            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
-
-            assertThrows<RentalPeriodIsOverException> {
-                rentalService.checkBeforeReturningBook(
-                    library.libraryId,
-                    book.isbn,
-                    cardNumber,
-                    librarian.userId
-                )
-            }
-        }
-
-        @Test
         fun `should validate if library matches the rental's library`() {
             val user = given.user.exists().hasCard(cardNumber).build()
             val librarian = given.user.exists().build()
@@ -547,22 +566,73 @@ class RentalServiceTests @Autowired constructor(
         }
     }
 
+    @ParameterizedTest
+    @EnumSource(RentalStatusTransition::class, names = ["FINISH", "CANCEL"])
+    fun `should successfully change rental status and increase availability`(statusTransition: RentalStatusTransition) {
+        val user = given.user.exists().hasCard(cardNumber).build()
+        val librarian = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), statusTransition.source)
+
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, statusTransition, cardNumber, librarian.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.FINISHED, penalty = null)
+        assert.library.hasCopies(3, library.libraryId, book.resourceId)
+    }
+
+    @Test
+    fun `should successfully change rental status and increase availability`() {
+        val user = given.user.exists().hasCard(cardNumber).build()
+        val librarian = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+        val rental = given.rental.exists(
+            user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.PROLONGED, Penalty(BigDecimal(10.00))
+        )
+
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.PAY_OFF, cardNumber, librarian.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.FINISHED, Penalty(BigDecimal("10.00")))
+        assert.library.hasCopies(3, library.libraryId, book.resourceId)
+    }
+
+    @Test
+    fun `should successfully change rental status without increasing availability`() {
+        val user = given.user.exists().hasCard(cardNumber).build()
+        val librarian = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+        given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startReservationToBorrow(clock.yesterday()),
+            RentalStatus.RESERVED_TO_BORROW
+        )
+
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.START, cardNumber, librarian.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.now()), RentalStatus.ACTIVE, penalty = null)
+        assert.library.hasCopies(2, library.libraryId, book.resourceId)
+    }
+
+    @Test
+    @Sql("/sql/update_penalties.sql")
+    fun `should successfully change rental status without increasing availability and setting up penalty`() {
+        val user = given.user.exists().hasCard(cardNumber).build()
+        val librarian = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.ACTIVE)
+
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.PROLONG, cardNumber, librarian.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
+    }
+
     @Nested
     inner class ReturnBook {
-        @Test
-        fun `should successfully return a book and increase availability`() {
-            val user = given.user.exists().hasCard(cardNumber).build()
-            val librarian = given.user.exists().build()
-            val book = given.author.exists().withBook().build().second[0]
-            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
-            val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
-
-            rentalService.returnBook(library.libraryId, book.isbn, cardNumber, librarian.userId)
-
-            assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.FINISHED, penalty = null)
-            assert.library.hasCopies(3, library.libraryId, book.resourceId)
-        }
-
         @Test
         fun `should validate if book exists`() {
             given.user.exists().hasCard(cardNumber).build()
@@ -570,7 +640,15 @@ class RentalServiceTests @Autowired constructor(
             val librarian = given.user.exists().build()
             val library = given.library.exists().hasLibrarian(librarian.userId).build()
 
-            assertThrows<BookNotFoundException> { rentalService.returnBook(library.libraryId, book.isbn, cardNumber, librarian.userId) }
+            assertThrows<BookNotFoundException> {
+                rentalService.changeRentalStatus(
+                    library.libraryId,
+                    book.isbn,
+                    RentalStatusTransition.FINISH,
+                    cardNumber,
+                    librarian.userId
+                )
+            }
         }
 
         @Test
@@ -582,9 +660,10 @@ class RentalServiceTests @Autowired constructor(
             given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
 
             assertThrows<LibraryCardDoesNotExistException> {
-                rentalService.returnBook(
+                rentalService.changeRentalStatus(
                     library.libraryId,
                     book.isbn,
+                    RentalStatusTransition.FINISH,
                     cardNumber,
                     librarian.userId
                 )
@@ -599,9 +678,10 @@ class RentalServiceTests @Autowired constructor(
             val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
 
             assertThrows<RentalNotFoundException> {
-                rentalService.returnBook(
+                rentalService.changeRentalStatus(
                     library.libraryId,
                     book.isbn,
+                    RentalStatusTransition.FINISH,
                     cardNumber,
                     librarian.userId
                 )
@@ -617,27 +697,10 @@ class RentalServiceTests @Autowired constructor(
             given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.FINISHED)
 
             assertThrows<RentalNotActiveException> {
-                rentalService.returnBook(
+                rentalService.changeRentalStatus(
                     library.libraryId,
                     book.isbn,
-                    cardNumber,
-                    librarian.userId
-                )
-            }
-        }
-
-        @Test
-        fun `should validate if rental finish date has not ended`() {
-            val user = given.user.exists().hasCard(cardNumber).build()
-            val librarian = given.user.exists().build()
-            val book = given.author.exists().withBook().build().second[0]
-            val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
-            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
-
-            assertThrows<RentalPeriodIsOverException> {
-                rentalService.returnBook(
-                    library.libraryId,
-                    book.isbn,
+                    RentalStatusTransition.FINISH,
                     cardNumber,
                     librarian.userId
                 )
@@ -654,9 +717,10 @@ class RentalServiceTests @Autowired constructor(
             given.rental.exists(user.userId, book.resourceId, library2.libraryId, RentalPeriod.startRental(clock.lastWeek()))
 
             assertThrows<LibraryNotMatchingException> {
-                rentalService.returnBook(
+                rentalService.changeRentalStatus(
                     library1.libraryId,
                     book.isbn,
+                    RentalStatusTransition.FINISH,
                     cardNumber,
                     librarian.userId
                 )
@@ -672,9 +736,10 @@ class RentalServiceTests @Autowired constructor(
             given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()))
 
             assertThrows<UserNotPermittedToAccessLibraryException> {
-                rentalService.returnBook(
+                rentalService.changeRentalStatus(
                     library.libraryId,
                     book.isbn,
+                    RentalStatusTransition.FINISH,
                     cardNumber,
                     librarian.userId
                 )

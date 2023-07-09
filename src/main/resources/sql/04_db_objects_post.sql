@@ -10,6 +10,8 @@ LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
-    UPDATE rental SET penalty = COALESCE(penalty, 0) + get_penalty() WHERE status = 'ACTIVE' AND finish < CURRENT_TIMESTAMP;
+    UPDATE rental
+    SET penalty = COALESCE(penalty, 0) + get_penalty(), status = 'PROLONGED'
+    WHERE (status = 'ACTIVE' OR status = 'PROLONGED') AND finish < CURRENT_TIMESTAMP;
 END;
 $$;

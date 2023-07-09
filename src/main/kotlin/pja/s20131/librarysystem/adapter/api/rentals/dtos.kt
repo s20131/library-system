@@ -4,11 +4,14 @@ import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.library.model.LibraryName
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.FinishTime
+import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
+import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.StartDate
+import pja.s20131.librarysystem.domain.resource.model.Title
 
 data class GetRentalHistoryResponse(
     val libraryId: LibraryId,
@@ -30,4 +33,10 @@ data class GetRentalPenaltyInfoResponse(
     val finish: FinishTime,
     val status: RentalStatus,
     val penalty: Penalty?,
+)
+
+data class GetBookBasicDataResponse(
+    val id: ResourceId,
+    val title: Title,
+    val isbn: ISBN,
 )

@@ -11,6 +11,7 @@ import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.CopyNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.CoverNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.EbookNotFoundException
+import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.ResourceNotFoundException
 import pja.s20131.librarysystem.adapter.database.user.LibraryCardDoesNotExistException
 import pja.s20131.librarysystem.domain.library.model.InvalidPostcodePatternException
@@ -21,10 +22,8 @@ import pja.s20131.librarysystem.domain.resource.model.NegativeSizeException
 import pja.s20131.librarysystem.domain.resource.model.RentalCannotBeDownloadedException
 import pja.s20131.librarysystem.domain.resource.model.RentalNotActiveException
 import pja.s20131.librarysystem.domain.resource.model.RentalNotPaidOffException
-import pja.s20131.librarysystem.domain.resource.model.RentalPeriodIsOverException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
-import pja.s20131.librarysystem.domain.resource.model.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.domain.resource.port.RentalNotFoundException
 import pja.s20131.librarysystem.domain.user.BadCredentialsException
@@ -49,7 +48,6 @@ class ExceptionHandler {
             is RentalCannotBeDownloadedException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_CANNOT_BE_DOWNLOADED)
             is RentalNotActiveException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_NOT_ACTIVE)
             is RentalNotPaidOffException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_NOT_PAID_OFF)
-            is RentalPeriodIsOverException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_PERIOD_IS_OVER)
             is RentalPeriodOverlappingDatesException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_PERIOD_OVERLAPPED)
             is RentalPeriodNotOverlappingDatesException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.RENTAL_PERIOD_NOT_OVERLAPPED)
             is UserHasNotSelectedLibraryException -> e.map(HttpStatus.BAD_REQUEST, ErrorCode.LIBRARY_NOT_SELECTED)

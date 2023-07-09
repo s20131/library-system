@@ -9,13 +9,13 @@ CREATE TABLE rental_status (
     name TEXT  PRIMARY KEY
 );
 
-INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('CANCELED'), ('FINISHED');
+INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('CANCELLED'), ('FINISHED');
 
 CREATE TABLE series (
     name TEXT  PRIMARY KEY
 );
 
--- DATABASE FEATURE - POSTGIS, CHECK CONSTRAINT
+-- DATABASE FEATURE - POSTGIS
 CREATE TABLE library (
     id                        UUID  NOT NULL,
     name                      TEXT  NOT NULL,
@@ -153,6 +153,7 @@ CREATE TABLE storage (
     FOREIGN KEY (resource_id) REFERENCES resource
 );
 
+-- DATABASE FEATURE - CHECK CONSTRAINT
 CREATE TABLE rental (
     id                    UUID  NOT NULL,
     user_id               UUID  NOT NULL,
@@ -166,10 +167,17 @@ CREATE TABLE rental (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id),
-    FOREIGN KEY (status) REFERENCES rental_status
+    FOREIGN KEY (status) REFERENCES rental_status,
+
+    CHECK (
+        CASE
+            WHEN status = 'PROLONGED' THEN penalty IS NOT NULL
+            WHEN status = 'FINISHED' THEN penalty IS NULL OR penalty IS NOT NULL
+            ELSE penalty IS NULL
+        END
+    )
 );
 
---TODO is such PK (less strict than dependencies) ok?
 CREATE TABLE reservation (
     user_id     UUID  NOT NULL,
     resource_id UUID  NOT NULL,
@@ -177,7 +185,7 @@ CREATE TABLE reservation (
     start  TIMESTAMP  NOT NULL,
     finish TIMESTAMP  NOT NULL,
 
-    -- TODO is such PK enough? the data would be only upserted
+    -- TODO is such PK enough? less strict than dependencies, the data would be only upserted
     PRIMARY KEY (user_id, resource_id),
     FOREIGN KEY (user_id) REFERENCES "user",
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)

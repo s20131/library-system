@@ -8,12 +8,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
+import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.CannotReserveResourceException
 import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.ReservationService
 import pja.s20131.librarysystem.domain.resource.ReservationShortInfo
 import pja.s20131.librarysystem.domain.resource.model.Available
-import pja.s20131.librarysystem.domain.resource.model.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 
 @SpringBootTest

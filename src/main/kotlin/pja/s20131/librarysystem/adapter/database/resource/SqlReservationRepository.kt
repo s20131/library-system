@@ -21,7 +21,6 @@ import pja.s20131.librarysystem.domain.person.LastName
 import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.model.AuthorBasicData
 import pja.s20131.librarysystem.domain.resource.model.Reservation
-import pja.s20131.librarysystem.domain.resource.model.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.model.ReservationPeriod
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
@@ -29,6 +28,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.ReservationRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
+import pja.s20131.librarysystem.exception.BaseException
 import java.time.Instant
 
 @Repository
@@ -123,3 +123,6 @@ object ReservationTable : Table("reservation") {
         resourceType,
     )
 }
+
+class ReservationNotFoundException(resourceId: ResourceId, userId: UserId) :
+    BaseException("Reservation of resource ${resourceId.value} for user ${userId.value} was not found")

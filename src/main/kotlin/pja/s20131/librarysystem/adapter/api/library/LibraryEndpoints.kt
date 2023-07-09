@@ -24,7 +24,6 @@ class LibraryEndpoints(
     private val authService: AuthService,
 ) {
 
-    // TODO filtering
     @GetMapping
     fun getLibraries(): List<GetLibraryResponse> =
         libraryService.getAllLibraries().toResponse()
