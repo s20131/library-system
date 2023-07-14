@@ -11,5 +11,7 @@ logging:
     Exposed: DEBUG
 
 cron:
-  update-penalties: 0 0 0 * * *
-  revoke-awaiting-resources: ${cron.update-penalties}
+  basic: 0 0 0 * * *
+  update-penalties: ${cron.basic}
+  revoke-awaiting-resources: ${cron.basic}
+  revoke-ebooks: ${cron.basic}

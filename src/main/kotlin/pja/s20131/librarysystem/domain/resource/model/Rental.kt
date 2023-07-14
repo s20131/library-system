@@ -132,4 +132,4 @@ class RentalNotPaidOffException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be borrowed as you haven't paid off the last rental of this resource")
 
 class RentalCannotBeDownloadedException(resourceId: ResourceId) :
-    BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rent")
+    BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rental")

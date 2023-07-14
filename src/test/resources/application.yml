@@ -6,5 +6,7 @@ spring:
     password: test
 
 cron:
-  update-penalties: "*/1 * * * * *"
-  revoke-awaiting-resources: ${cron.update-penalties}
+  basic: "*/1 * * * * *"
+  update-penalties: ${cron.basic}
+  revoke-awaiting-resources: ${cron.basic}
+  revoke-ebooks: ${cron.basic}

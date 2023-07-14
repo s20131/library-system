@@ -12,7 +12,9 @@ DECLARE
 BEGIN
     UPDATE rental
     SET penalty = COALESCE(penalty, 0) + get_penalty(), status = 'PROLONGED'
-    WHERE (status = 'ACTIVE' OR status = 'PROLONGED') AND finish < CURRENT_TIMESTAMP;
+    WHERE (status = 'ACTIVE' OR status = 'PROLONGED')
+    AND finish < CURRENT_TIMESTAMP
+    AND rental.resource_id IN (SELECT book.resource_id FROM book WHERE rental.resource_id = book.resource_id);
 END;
 $$;
 
@@ -24,5 +26,18 @@ BEGIN
     UPDATE rental
     SET status = 'CANCELLED'
     WHERE status = 'RESERVED_TO_BORROW' AND finish < CURRENT_TIMESTAMP;
+END;
+$$;
+
+CREATE PROCEDURE revoke_ebooks()
+LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE rental
+    SET status = 'FINISHED'
+    WHERE status = 'ACTIVE'
+    AND finish < CURRENT_TIMESTAMP
+    AND rental.resource_id IN (SELECT ebook.resource_id FROM ebook WHERE rental.resource_id = ebook.resource_id);
 END;
 $$;

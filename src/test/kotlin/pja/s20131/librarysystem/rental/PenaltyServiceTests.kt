@@ -43,6 +43,34 @@ class PenaltyServiceTests @Autowired constructor(
     }
 
     @Test
+    fun `should update penalties for all existing and qualified rentals`() {
+        val user = given.user.exists().build()
+        val book1 = given.author.exists().withBook().build().second[0]
+        val book2 = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book1.resourceId).hasCopy(book2.resourceId).build()
+        val rental1 = given.rental.exists(
+            user.userId,
+            book1.resourceId,
+            library.libraryId,
+            RentalPeriod.startRental(clock.monthAgo()),
+            RentalStatus.PROLONGED,
+            Penalty(BigDecimal(2.50)),
+        )
+        val rental2 = given.rental.exists(
+            user.userId,
+            book2.resourceId,
+            library.libraryId,
+            RentalPeriod.startRental(clock.monthAgo()),
+            RentalStatus.ACTIVE,
+        )
+
+        penaltyService.updatePenaltiesForResourceOverdue()
+
+        assert.rental.isSaved(user.userId, book1.resourceId, library.libraryId, rental1.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("5.00")))
+        assert.rental.isSaved(user.userId, book2.resourceId, library.libraryId, rental2.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
+    }
+
+    @Test
     fun `should run update penalties procedure using cron`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
@@ -66,5 +94,24 @@ class PenaltyServiceTests @Autowired constructor(
         penaltyService.updatePenaltiesForResourceOverdue()
 
         assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
+    }
+
+    @Test
+    fun `shouldn't update penalties for ebook resources (if they were added manually for them)`() {
+        val user = given.user.exists().build()
+        val ebook = given.author.exists().withEbook().build().third[0]
+        val library = given.library.exists().hasCopy(ebook.resourceId).build()
+        val rental = given.rental.exists(
+            user.userId,
+            ebook.resourceId,
+            library.libraryId,
+            RentalPeriod.startRental(clock.monthAgo()),
+            RentalStatus.PROLONGED,
+            Penalty(BigDecimal(2.50)),
+        )
+
+        penaltyService.updatePenaltiesForResourceOverdue()
+
+        assert.rental.isSaved(user.userId, ebook.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
     }
 }

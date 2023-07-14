@@ -14,4 +14,11 @@ class RentalJobService {
             TransactionManager.current().exec("CALL revoke_awaiting_resources()")
         }
     }
+
+    @Scheduled(cron = "\${cron.revoke-ebooks}", zone = "Europe/Warsaw")
+    fun revokeEbooks() {
+        transaction {
+            TransactionManager.current().exec("CALL revoke_ebooks()")
+        }
+    }
 }
