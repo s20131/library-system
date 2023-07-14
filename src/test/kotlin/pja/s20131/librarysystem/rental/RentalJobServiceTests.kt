@@ -8,23 +8,21 @@ import org.testcontainers.shaded.org.awaitility.Awaitility
 import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.domain.resource.PenaltyService
-import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
-import java.math.BigDecimal
+import pja.s20131.librarysystem.domain.resource.utils.RentalJobService
 import java.util.concurrent.TimeUnit
 
 @SpringBootTest
-@Sql("/sql/update_penalties.sql")
-class PenaltyServiceTests @Autowired constructor(
-    private val penaltyService: PenaltyService,
+@Sql("/sql/revoke_awaiting_resources.sql")
+class RentalJobServiceTests @Autowired constructor(
+    private val rentalJobService: RentalJobService,
     private val given: Preconditions,
     private val assert: Assertions,
 ) : BaseTestConfig() {
 
     @Test
-    fun `should run update penalties procedure`() {
+    fun `should run revoke awaiting resources procedure`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
@@ -33,38 +31,49 @@ class PenaltyServiceTests @Autowired constructor(
             book.resourceId,
             library.libraryId,
             RentalPeriod.startRental(clock.monthAgo()),
-            RentalStatus.PROLONGED,
-            Penalty(BigDecimal(2.50)),
+            RentalStatus.RESERVED_TO_BORROW,
         )
 
-        penaltyService.updatePenaltiesForResourceOverdue()
+        rentalJobService.revokeAwaitingResources()
 
-        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, rental.rentalStatus, Penalty(BigDecimal("5.00")))
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.CANCELLED, penalty = null)
     }
 
     @Test
-    fun `should run update penalties procedure using cron`() {
+    fun `should run revoke awaiting resources procedure using cron`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
-        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
+        val rental = given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startRental(clock.monthAgo()),
+            RentalStatus.RESERVED_TO_BORROW,
+        )
 
         Awaitility.await()
             .atMost(2, TimeUnit.SECONDS)
             .untilAsserted {
-                assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
+                assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.CANCELLED, penalty = null)
             }
     }
 
     @Test
-    fun `should calculate and set penalty if it was null and change rental status to prolonged`() {
+    fun `should not change resources still waiting to be picked up`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
-        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.monthAgo()))
+        val rental = given.rental.exists(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod.startReservationToBorrow(clock.yesterday()),
+            RentalStatus.RESERVED_TO_BORROW,
+        )
 
-        penaltyService.updatePenaltiesForResourceOverdue()
+        rentalJobService.revokeAwaitingResources()
 
-        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.PROLONGED, Penalty(BigDecimal("2.50")))
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.RESERVED_TO_BORROW, penalty = null)
     }
 }

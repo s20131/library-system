@@ -12,3 +12,4 @@ logging:
 
 cron:
   update-penalties: 0 0 0 * * *
+  revoke-awaiting-resources: ${cron.update-penalties}

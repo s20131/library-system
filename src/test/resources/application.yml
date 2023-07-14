@@ -7,3 +7,4 @@ spring:
 
 cron:
   update-penalties: "*/1 * * * * *"
+  revoke-awaiting-resources: ${cron.update-penalties}
