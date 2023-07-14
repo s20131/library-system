@@ -12,6 +12,8 @@ AS '
     BEGIN
     UPDATE rental
     SET penalty = COALESCE(penalty, 0) + get_penalty(), status = ''PROLONGED''
-    WHERE (status = ''ACTIVE'' OR status = ''PROLONGED'') AND finish < CURRENT_TIMESTAMP;
-    END;
+    WHERE (status = ''ACTIVE'' OR status = ''PROLONGED'')
+    AND finish < CURRENT_TIMESTAMP
+    AND rental.resource_id IN (SELECT book.resource_id FROM book WHERE rental.resource_id = book.resource_id);
+END;
 ';

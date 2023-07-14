@@ -20,7 +20,7 @@ class ClockTestConfiguration {
 
 class TestClock : Clock() {
     private val zone = ZoneId.of("Europe/Warsaw")
-    private val fixedClock = fixed(Instant.parse("2023-05-07T17:55:00.000Z"), zone)
+    private val fixedClock = fixed(Instant.now(), zone)
 
     override fun instant(): Instant {
         return fixedClock.instant()
