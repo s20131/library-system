@@ -4,8 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.jdbc.Sql
@@ -566,23 +564,37 @@ class RentalServiceTests @Autowired constructor(
         }
     }
 
-    @ParameterizedTest
-    @EnumSource(RentalStatusTransition::class, names = ["FINISH", "CANCEL"])
-    fun `should successfully change rental status and increase availability`(statusTransition: RentalStatusTransition) {
+    @Test
+    fun `should successfully finish rental and increase availability`() {
         val user = given.user.exists().hasCard(cardNumber).build()
         val librarian = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
-        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), statusTransition.source)
+        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.ACTIVE)
 
-        rentalService.changeRentalStatus(library.libraryId, book.isbn, statusTransition, cardNumber, librarian.userId)
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.FINISH, cardNumber, librarian.userId)
 
         assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.FINISHED, penalty = null)
         assert.library.hasCopies(3, library.libraryId, book.resourceId)
     }
 
     @Test
-    fun `should successfully change rental status and increase availability`() {
+    @Sql("/sql/revoke_awaiting_resources.sql")
+    fun `should successfully cancel rental and increase availability`() {
+        val user = given.user.exists().hasCard(cardNumber).build()
+        val librarian = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
+        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.RESERVED_TO_BORROW)
+
+        rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.CANCEL, cardNumber, librarian.userId)
+
+        assert.rental.isSaved(user.userId, book.resourceId, library.libraryId, rental.rentalPeriod, RentalStatus.CANCELLED, penalty = null)
+        assert.library.hasCopies(3, library.libraryId, book.resourceId)
+    }
+
+    @Test
+    fun `should successfully finish rental which was prolonged and increase availability`() {
         val user = given.user.exists().hasCard(cardNumber).build()
         val librarian = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]

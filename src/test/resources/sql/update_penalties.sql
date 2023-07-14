@@ -1,12 +1,12 @@
 CREATE OR REPLACE FUNCTION get_penalty()
-    RETURNS decimal
-    LANGUAGE sql
+RETURNS decimal
+LANGUAGE sql
 AS '
     SELECT (settings -> ''penalty_rate'')::decimal FROM config;
 ';
 
 CREATE OR REPLACE PROCEDURE update_penalties()
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS '
     DECLARE
     BEGIN

@@ -82,7 +82,7 @@ enum class RentalStatusTransition(val source: RentalStatus, val target: RentalSt
     PROLONG(RentalStatus.ACTIVE, RentalStatus.PROLONGED),
     FINISH(RentalStatus.ACTIVE, RentalStatus.FINISHED),
     PAY_OFF(RentalStatus.PROLONGED, RentalStatus.FINISHED),
-    CANCEL(RentalStatus.RESERVED_TO_BORROW, RentalStatus.FINISHED),
+    CANCEL(RentalStatus.RESERVED_TO_BORROW, RentalStatus.CANCELLED),
 }
 
 @JvmInline
