@@ -8,7 +8,7 @@ import org.testcontainers.shaded.org.awaitility.Awaitility
 import pja.s20131.librarysystem.Assertions
 import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.domain.resource.PenaltyService
+import pja.s20131.librarysystem.domain.resource.utils.PenaltyService
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus

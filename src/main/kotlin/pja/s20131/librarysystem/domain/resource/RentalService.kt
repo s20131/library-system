@@ -30,6 +30,7 @@ import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.resource.port.RentalRepository
 import pja.s20131.librarysystem.domain.resource.port.ReservationRepository
 import pja.s20131.librarysystem.domain.resource.port.ResourceRepository
+import pja.s20131.librarysystem.domain.resource.utils.PenaltyService
 import pja.s20131.librarysystem.domain.user.model.CardNumber
 import pja.s20131.librarysystem.domain.user.model.UserId
 import pja.s20131.librarysystem.domain.user.port.LibraryCardRepository

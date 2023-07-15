@@ -1,4 +1,4 @@
-package pja.s20131.librarysystem.domain.resource
+package pja.s20131.librarysystem.domain.resource.utils
 
 import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.transactions.TransactionManager
