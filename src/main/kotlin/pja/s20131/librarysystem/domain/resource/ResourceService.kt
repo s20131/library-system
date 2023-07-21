@@ -14,4 +14,8 @@ class ResourceService(
     fun getResourceCover(resourceId: ResourceId): ResourceCover {
         return resourceRepository.getCover(resourceId)
     }
+
+    fun addResourceCover(resourceId: ResourceId, resourceCover: ResourceCover) {
+        resourceRepository.upsertCover(resourceId, resourceCover)
+    }
 }

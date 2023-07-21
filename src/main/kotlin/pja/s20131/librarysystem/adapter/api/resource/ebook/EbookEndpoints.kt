@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_PDF_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import pja.s20131.librarysystem.adapter.api.resource.resource.GetResourceWithAuthorBasicDataResponse
 import pja.s20131.librarysystem.domain.resource.EbookService
@@ -32,7 +32,7 @@ class EbookEndpoints(
     @GetMapping
     fun getAllEbooks(@RequestParam(required = false) search: SearchQuery?): List<GetResourceWithAuthorBasicDataResponse> {
         val result = if (search.isNullOrEmpty()) {
-            ebookService.getAllEbooks()
+            ebookService.getAllActiveEbooks()
         } else {
             requireNotNull(search)
             ebookService.search(search)
@@ -58,7 +58,7 @@ class EbookEndpoints(
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Secured("ROLE_LIBRARIAN")
     fun addEbook(@RequestBody addEbookRequest: AddEbookRequest): ResourceId {
         return ebookService.addEbook(addEbookRequest.toDto())
     }

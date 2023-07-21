@@ -29,10 +29,10 @@ import java.util.UUID
 @Repository
 class SqlBookRepository : BookRepository {
 
-    override fun getAll(): List<Book> =
+    override fun getAllActive(): List<Book> =
         BookTable
             .innerJoin(ResourceTable)
-            .selectAll()
+            .select { ResourceTable.status eq ResourceStatus.AVAILABLE}
             .orderBy(ResourceTable.title)
             .map { it.toBook() }
 

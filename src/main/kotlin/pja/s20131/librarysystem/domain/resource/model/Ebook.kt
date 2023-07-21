@@ -35,7 +35,7 @@ data class Ebook(
             dto.releaseDate,
             dto.description,
             dto.series,
-            dto.status,
+            ResourceStatus.WAITING_FOR_APPROVAL,
             EbookContent(dto.content, dto.format),
             dto.size
         )

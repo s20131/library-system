@@ -5,7 +5,7 @@ import pja.s20131.librarysystem.domain.resource.model.EbookContent
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 
 interface EbookRepository {
-    fun getAll(): List<Ebook>
+    fun getAllActive(): List<Ebook>
     fun get(ebookId: ResourceId): Ebook
     fun getContent(ebookId: ResourceId): EbookContent
     fun insert(ebook: Ebook)

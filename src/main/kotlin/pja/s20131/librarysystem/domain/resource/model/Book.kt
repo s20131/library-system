@@ -26,7 +26,7 @@ data class Book(
         ) = Book(ResourceId.generate(), title, authorId, releaseDate, description, series, status, isbn)
 
         fun from(dto: AddBookDto) =
-            Book(ResourceId.generate(), dto.title, dto.authorId, dto.releaseDate, dto.description, dto.series, dto.status, dto.isbn)
+            Book(ResourceId.generate(), dto.title, dto.authorId, dto.releaseDate, dto.description, dto.series, ResourceStatus.WAITING_FOR_APPROVAL, dto.isbn)
     }
 }
 

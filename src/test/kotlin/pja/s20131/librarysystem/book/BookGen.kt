@@ -35,7 +35,6 @@ object BookGen {
         releaseDate: ReleaseDate = ReleaseDate(LocalDate.now()),
         description: Description? = Description(faker.yoda().quote()),
         series: Series? = null,
-        status: ResourceStatus = ResourceStatus.AVAILABLE,
         isbn: ISBN = ISBN(faker.idNumber().valid())
-    ) = AddBookDto(title, authorId, releaseDate, description, series, status, isbn)
+    ) = AddBookDto(title, authorId, releaseDate, description, series, isbn)
 }

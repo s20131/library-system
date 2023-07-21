@@ -13,11 +13,13 @@ import pja.s20131.librarysystem.domain.resource.model.EbookContent
 import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
+import pja.s20131.librarysystem.domain.resource.model.ResourceCover
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.ebook.EbookDatabaseHelper
+import pja.s20131.librarysystem.resource.ResourceDatabaseHelper
 import pja.s20131.librarysystem.series.SeriesDatabaseHelper
 import java.time.LocalDate
 import kotlin.random.Random
@@ -26,6 +28,7 @@ import kotlin.random.Random
 class AuthorPreconditions(
     private val authorDatabaseHelper: AuthorDatabaseHelper,
     private val seriesDatabaseHelper: SeriesDatabaseHelper,
+    private val resourceDatabaseHelper: ResourceDatabaseHelper,
     private val bookDatabaseHelper: BookDatabaseHelper,
     private val ebookDatabaseHelper: EbookDatabaseHelper,
 ) {
@@ -49,10 +52,12 @@ class AuthorPreconditions(
         series: Series? = null,
         status: ResourceStatus = ResourceStatus.AVAILABLE,
         isbn: ISBN = ISBN(faker.idNumber().valid()),
+        cover: ResourceCover? = null,
     ): AuthorPreconditions {
         val book = Book.from(title, author.authorId, releaseDate, description, series, status, isbn)
         seriesDatabaseHelper.insertSeries(series)
         bookDatabaseHelper.insertBook(book)
+        cover?.let { resourceDatabaseHelper.insertCover(book.resourceId, it) }
         return this
     }
 
@@ -64,10 +69,12 @@ class AuthorPreconditions(
         status: ResourceStatus = ResourceStatus.AVAILABLE,
         content: EbookContent = EbookContent(Random.nextBytes(10), Format.PDF),
         size: Size = Size(faker.number().randomDigit()),
+        cover: ResourceCover? = null,
     ): AuthorPreconditions {
         val ebook = Ebook.from(title, author.authorId, releaseDate, description, series, status, content, size)
         seriesDatabaseHelper.insertSeries(series)
         ebookDatabaseHelper.insertEbook(ebook)
+        cover?.let { resourceDatabaseHelper.insertCover(ebook.resourceId, it) }
         return this
     }
 

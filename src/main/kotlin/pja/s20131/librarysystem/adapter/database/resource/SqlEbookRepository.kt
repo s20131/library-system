@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.TsQuery
@@ -29,10 +28,10 @@ import pja.s20131.librarysystem.exception.BaseException
 
 @Repository
 class SqlEbookRepository : EbookRepository {
-    override fun getAll(): List<Ebook> =
+    override fun getAllActive(): List<Ebook> =
         EbookTable
             .innerJoin(ResourceTable)
-            .selectAll()
+            .select { ResourceTable.status eq ResourceStatus.AVAILABLE}
             .orderBy(ResourceTable.title)
             .map { it.toEbook() }
 

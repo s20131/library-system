@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.adapter.api.resource.book
 
+import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -24,7 +25,7 @@ class BookEndpoints(
     @GetMapping
     fun getAllBooks(@RequestParam(required = false) search: SearchQuery?): List<GetResourceWithAuthorBasicDataResponse> {
         val result = if (search.isNullOrEmpty()) {
-            bookService.getAllBooks()
+            bookService.getAllActiveBooks()
         } else {
             requireNotNull(search)
             bookService.search(search)
@@ -43,6 +44,7 @@ class BookEndpoints(
     }
 
     @PostMapping
+    @Secured("ROLE_LIBRARIAN")
     fun addBook(@RequestBody addBookRequest: AddBookRequest): ResourceId {
         return bookService.addBook(addBookRequest.toDto())
     }

@@ -1,8 +1,6 @@
 CREATE EXTENSION hstore;
 
 -- DATABASE FEATURE - ENUM
-CREATE TYPE resource_status AS ENUM ('WITHDRAWN', 'AVAILABLE');
-
 CREATE TYPE ebook_format AS ENUM ('PDF', 'EPUB');
 
 CREATE TABLE rental_status (
@@ -10,6 +8,12 @@ CREATE TABLE rental_status (
 );
 
 INSERT INTO rental_status VALUES ('ACTIVE'), ('RESERVED_TO_BORROW'), ('PROLONGED'), ('CANCELLED'), ('FINISHED');
+
+CREATE TABLE resource_status (
+    name TEXT  PRIMARY KEY
+);
+
+INSERT INTO resource_status VALUES ('AVAILABLE'), ('WITHDRAWN'), ('WAITING_FOR_APPROVAL');
 
 CREATE TABLE series (
     name TEXT  PRIMARY KEY
@@ -38,17 +42,18 @@ CREATE TABLE author (
 );
 
 CREATE TABLE resource (
-    id                UUID  NOT NULL,
-    title             TEXT  NOT NULL,
-    author            UUID  NOT NULL,
-    release_date      DATE  NOT NULL,
-    description       TEXT          ,
-    series            TEXT          ,
-    status RESOURCE_STATUS  NOT NULL DEFAULT 'AVAILABLE',
+    id           UUID  NOT NULL,
+    title        TEXT  NOT NULL,
+    author       UUID  NOT NULL,
+    release_date DATE  NOT NULL,
+    description  TEXT          ,
+    series       TEXT          ,
+    status       TEXT  NOT NULL DEFAULT 'AVAILABLE',
 
     PRIMARY KEY (id),
     FOREIGN KEY (author) REFERENCES author,
-    FOREIGN KEY (series) REFERENCES series
+    FOREIGN KEY (series) REFERENCES series,
+    FOREIGN KEY (status) REFERENCES resource_status
 );
 
 -- DATABASE FEATURE - BLOB

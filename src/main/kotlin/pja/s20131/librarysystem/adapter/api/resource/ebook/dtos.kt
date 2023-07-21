@@ -16,13 +16,12 @@ data class AddEbookRequest(
     val releaseDate: ReleaseDate,
     val description: Description?,
     val series: Series?,
-    val status: ResourceStatus,
     val content: ByteArray,
     val format: Format,
     val size: Size,
     val authorId: AuthorId,
 ) {
-    fun toDto() = AddEbookDto(title, authorId, releaseDate, description, series, status, content, format, size)
+    fun toDto() = AddEbookDto(title, authorId, releaseDate, description, series, content, format, size)
 }
 
 data class GetEbookInfoResponse(

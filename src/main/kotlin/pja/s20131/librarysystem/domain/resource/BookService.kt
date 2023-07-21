@@ -13,7 +13,6 @@ import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.Resource
 import pja.s20131.librarysystem.domain.resource.model.ResourceBasicData
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Title
@@ -26,8 +25,8 @@ class BookService(
     private val bookRepository: BookRepository,
     private val authorRepository: AuthorRepository,
 ) {
-    fun getAllBooks(): List<ResourceWithAuthorBasicData> {
-        val books = bookRepository.getAll()
+    fun getAllActiveBooks(): List<ResourceWithAuthorBasicData> {
+        val books = bookRepository.getAllActive()
         val authors = authorRepository.getAll()
         return books.withAuthors(authors)
     }
@@ -79,11 +78,9 @@ data class ResourceWithAuthorBasicData(
 
 data class AddBookDto(
     val title: Title,
-    // TODO get or create
     val authorId: AuthorId,
     val releaseDate: ReleaseDate,
     val description: Description?,
     val series: Series?,
-    val status: ResourceStatus,
     val isbn: ISBN,
 )
