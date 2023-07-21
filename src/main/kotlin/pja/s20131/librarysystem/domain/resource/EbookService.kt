@@ -10,7 +10,6 @@ import pja.s20131.librarysystem.domain.resource.model.EbookContent
 import pja.s20131.librarysystem.domain.resource.model.Format
 import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
-import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
@@ -28,8 +27,8 @@ class EbookService(
     private val rentalRepository: RentalRepository,
 ) {
 
-    fun getAllEbooks(): List<ResourceWithAuthorBasicData> {
-        val ebooks = ebookRepository.getAll()
+    fun getAllActiveEbooks(): List<ResourceWithAuthorBasicData> {
+        val ebooks = ebookRepository.getAllActive()
         val authors = authorRepository.getAll()
         return ebooks.withAuthors(authors)
     }
@@ -71,7 +70,6 @@ data class AddEbookDto(
     val releaseDate: ReleaseDate,
     val description: Description?,
     val series: Series?,
-    val status: ResourceStatus,
     val content: ByteArray,
     val format: Format,
     val size: Size,

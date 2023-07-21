@@ -5,8 +5,8 @@ import pja.s20131.librarysystem.author.AuthorAssertions
 import pja.s20131.librarysystem.library.LibraryAssertions
 import pja.s20131.librarysystem.rental.RentalAssertions
 import pja.s20131.librarysystem.reservation.ReservationAssertions
-import pja.s20131.librarysystem.resource.BookAssertions
-import pja.s20131.librarysystem.resource.EbookAssertions
+import pja.s20131.librarysystem.book.BookAssertions
+import pja.s20131.librarysystem.ebook.EbookAssertions
 import pja.s20131.librarysystem.resource.ResourceAssertions
 import pja.s20131.librarysystem.series.SeriesAssertions
 import pja.s20131.librarysystem.user.UserAssertions

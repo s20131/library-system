@@ -18,6 +18,10 @@ class AuthorService(
         return authorRepository.get(authorId)
     }
 
+    fun getAuthors(): List<Author> {
+        return authorRepository.getAll()
+    }
+
     fun addAuthor(dto: AddAuthorDto): AuthorId {
         val newAuthor = Author.from(dto)
         authorRepository.insert(newAuthor)

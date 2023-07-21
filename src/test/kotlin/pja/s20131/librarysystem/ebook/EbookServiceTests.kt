@@ -15,6 +15,7 @@ import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.RentalCannotBeDownloadedException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
+import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 import pja.s20131.librarysystem.resource.ResourceGen
@@ -28,16 +29,34 @@ class EbookServiceTests @Autowired constructor(
 ) : BaseTestConfig() {
 
     @Test
-    fun `should get all ebooks`() {
+    fun `should get all ebooks in status available`() {
         val (author, _, ebooks) = given.author.exists().withEbook(series = ResourceGen.defaultSeries).withEbook().build()
 
-        val response = ebookService.getAllEbooks()
+        val response = ebookService.getAllActiveEbooks()
 
         val expected = listOf(
             ResourceWithAuthorBasicData(ebooks[0].toBasicData(), author.toBasicData()),
             ResourceWithAuthorBasicData(ebooks[1].toBasicData(), author.toBasicData()),
-        ).sortedBy { it.resource.title.value }
-        assertThat(response).isEqualTo(expected)
+        )
+        assertThat(response).containsAll(expected)
+    }
+
+    @Test
+    fun `assert only ebooks in status available are returned`() {
+        val (author, _, ebooks) = given.author.exists()
+            .withEbook()
+            .withEbook(status = ResourceStatus.WAITING_FOR_APPROVAL)
+            .withEbook(status = ResourceStatus.WITHDRAWN)
+            .withEbook()
+            .build()
+
+        val response = ebookService.getAllActiveEbooks()
+
+        val expected = listOf(
+            ResourceWithAuthorBasicData(ebooks[0].toBasicData(), author.toBasicData()),
+            ResourceWithAuthorBasicData(ebooks[3].toBasicData(), author.toBasicData()),
+        )
+        assertThat(response).containsAll(expected)
     }
 
     @Test

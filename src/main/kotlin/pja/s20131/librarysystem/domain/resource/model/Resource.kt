@@ -76,7 +76,7 @@ value class Available(val value: Int) {
 }
 
 enum class ResourceStatus {
-    AVAILABLE, WITHDRAWN
+    AVAILABLE, WITHDRAWN, WAITING_FOR_APPROVAL
 }
 
 enum class ResourceType {
