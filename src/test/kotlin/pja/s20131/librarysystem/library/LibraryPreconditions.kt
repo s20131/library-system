@@ -12,7 +12,7 @@ import pja.s20131.librarysystem.domain.library.model.Location
 import pja.s20131.librarysystem.domain.library.model.Postcode
 import pja.s20131.librarysystem.domain.library.model.StreetName
 import pja.s20131.librarysystem.domain.library.model.StreetNumber
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.model.UserId
 
@@ -39,8 +39,8 @@ class LibraryPreconditions(
 
     inner class Builder(private val library: Library) {
 
-        fun hasCopy(resourceId: ResourceId, available: Available = Available(2)): Builder {
-            copyDatabaseHelper.insertCopy(library.libraryId, resourceId, available)
+        fun hasCopy(resourceId: ResourceId, availability: Availability = Availability(2)): Builder {
+            copyDatabaseHelper.insertCopy(library.libraryId, resourceId, availability)
             return this
         }
 

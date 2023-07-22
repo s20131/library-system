@@ -8,6 +8,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.minus
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
 import org.springframework.stereotype.Repository
@@ -17,7 +18,7 @@ import pja.s20131.librarysystem.adapter.database.library.LibraryTable.toLibrary
 import pja.s20131.librarysystem.domain.library.ResourceCopy
 import pja.s20131.librarysystem.domain.library.model.Distance
 import pja.s20131.librarysystem.domain.library.model.LibraryId
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.exception.BaseException
@@ -32,7 +33,7 @@ class SqlCopyRepository : CopyRepository {
             .map {
                 ResourceCopy(
                     it.toLibrary(),
-                    Available(it[CopyTable.available]),
+                    Availability(it[CopyTable.available]),
                     if (userLocation != null) Distance(it[LibraryTable.location stDistance userLocation]) else null,
                 )
             }
@@ -47,12 +48,20 @@ class SqlCopyRepository : CopyRepository {
         }
     }
 
-    override fun getAvailability(resourceId: ResourceId, libraryId: LibraryId): Available {
+    override fun getAvailability(resourceId: ResourceId, libraryId: LibraryId): Availability {
         return (CopyTable innerJoin LibraryTable)
             .slice(CopyTable.available)
             .select { CopyTable.resourceId eq resourceId.value and (CopyTable.libraryId eq libraryId.value) }
             .singleOrNull()
-            ?.let { Available(it[CopyTable.available]) } ?: throw CopyNotFoundException(resourceId, libraryId)
+            ?.let { Availability(it[CopyTable.available]) } ?: throw CopyNotFoundException(resourceId, libraryId)
+    }
+
+    override fun upsertAvailability(resourceId: ResourceId, libraryId: LibraryId, availability: Availability) {
+        CopyTable.replace {
+            it[CopyTable.resourceId] = resourceId.value
+            it[CopyTable.libraryId] = libraryId.value
+            it[CopyTable.available] = availability.value
+        }
     }
 
     override fun increaseAvailability(resourceId: ResourceId, libraryId: LibraryId) {

@@ -14,6 +14,7 @@ import pja.s20131.librarysystem.domain.library.LibraryService
 import pja.s20131.librarysystem.domain.library.ResourceCopy
 import pja.s20131.librarysystem.domain.library.model.Library
 import pja.s20131.librarysystem.domain.library.model.LibraryId
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.user.AuthService
 
@@ -36,6 +37,15 @@ class LibraryEndpoints(
         }.toResponse()
     }
 
+    @PutMapping("/{libraryId}/librarian")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Secured("ROLE_LIBRARIAN")
+    fun updateSelectedLibrary(@PathVariable libraryId: LibraryId) {
+        authService.withUserContext {
+            libraryService.updateSelectedLibrary(libraryId, it)
+        }
+    }
+
     @GetMapping("/copies/{resourceId}")
     fun getResourceCopiesInLibraries(
         @PathVariable resourceId: ResourceId,
@@ -47,12 +57,17 @@ class LibraryEndpoints(
         return libraryService.getResourceCopiesInLibraries(resourceId, userLocation).toResponse()
     }
 
-    @PutMapping("/{libraryId}/librarian")
+    @GetMapping("/{libraryId}/copies/{resourceId}/availability")
+    fun getAvailability(@PathVariable libraryId: LibraryId, @PathVariable resourceId: ResourceId): Availability {
+        return libraryService.getAvailability(libraryId, resourceId)
+    }
+
+    @PutMapping("/{libraryId}/copies/{resourceId}/availability")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Secured("ROLE_LIBRARIAN")
-    fun updateSelectedLibrary(@PathVariable libraryId: LibraryId) {
+    fun changeAvailability(@PathVariable libraryId: LibraryId, @PathVariable resourceId: ResourceId, @RequestParam("newValue") availability: Availability) {
         authService.withUserContext {
-            libraryService.updateSelectedLibrary(libraryId, it)
+            libraryService.changeAvailability(libraryId, resourceId, availability, it)
         }
     }
 }
@@ -64,4 +79,4 @@ private fun List<Pair<Library, Boolean>>.toResponse() = map { GetLibrarianLibrar
 
 @JvmName("toResourceCopyResponse")
 private fun List<ResourceCopy>.toResponse() =
-    map { GetResourceCopyResponse(it.library.libraryId, it.library.libraryName, it.library.address.toBasic(), it.available, it.distance) }
+    map { GetResourceCopyResponse(it.library.libraryId, it.library.libraryName, it.library.address.toBasic(), it.availability, it.distance) }

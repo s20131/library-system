@@ -63,7 +63,7 @@ value class Description(val value: String)
 value class Series(val value: String)
 
 @JvmInline
-value class Available(val value: Int) {
+value class Availability(val value: Int) {
     fun checkIsEnoughCopies(activeReservations: Int, resourceId: ResourceId, isReservedByCustomer: Boolean) {
         // TODO order of reservations? some limitations?
         if (value > 0 && isReservedByCustomer) {
