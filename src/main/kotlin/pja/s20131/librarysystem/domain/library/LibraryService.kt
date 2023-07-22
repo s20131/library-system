@@ -8,7 +8,8 @@ import pja.s20131.librarysystem.domain.library.model.Library
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.library.port.LibrarianRepository
 import pja.s20131.librarysystem.domain.library.port.LibraryRepository
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.UserNotPermittedToAccessLibraryException
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.port.CopyRepository
 import pja.s20131.librarysystem.domain.user.model.UserId
@@ -35,10 +36,21 @@ class LibraryService(
         librarianRepository.updateSelectedLibrary(selected.libraryId, librarianId, isSelected = false)
         librarianRepository.updateSelectedLibrary(libraryId, librarianId, isSelected = true)
     }
+
+    fun getAvailability(libraryId: LibraryId, resourceId: ResourceId): Availability {
+        return copyRepository.getAvailability(resourceId, libraryId)
+    }
+
+    fun changeAvailability(libraryId: LibraryId, resourceId: ResourceId, availability: Availability, librarianId: UserId) {
+        if (!librarianRepository.isLibrarianOf(librarianId, libraryId)) {
+            throw UserNotPermittedToAccessLibraryException(librarianId, libraryId)
+        }
+        copyRepository.upsertAvailability(resourceId, libraryId, availability)
+    }
 }
 
 data class ResourceCopy(
     val library: Library,
-    val available: Available,
+    val availability: Availability,
     val distance: Distance?,
 )

@@ -5,7 +5,7 @@ import pja.s20131.librarysystem.domain.library.model.BasicAddress
 import pja.s20131.librarysystem.domain.library.model.Distance
 import pja.s20131.librarysystem.domain.library.model.LibraryId
 import pja.s20131.librarysystem.domain.library.model.LibraryName
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.Availability
 
 data class GetLibraryResponse(val libraryId: LibraryId, val libraryName: LibraryName, val address: Address)
 
@@ -15,6 +15,6 @@ data class GetResourceCopyResponse(
     val libraryId: LibraryId,
     val libraryName: LibraryName,
     val address: BasicAddress,
-    val available: Available,
+    val availability: Availability,
     val distance: Distance?,
 )

@@ -13,7 +13,7 @@ import pja.s20131.librarysystem.domain.resource.CannotReserveResourceException
 import pja.s20131.librarysystem.domain.resource.ReservationHistory
 import pja.s20131.librarysystem.domain.resource.ReservationService
 import pja.s20131.librarysystem.domain.resource.ReservationShortInfo
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 
 @SpringBootTest
@@ -57,7 +57,7 @@ class ReservationServiceTests @Autowired constructor(
     fun `should get short info about a reservation`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(0)).build()
         val reservation = given.reservation.exists(user.userId, book.resourceId, library.libraryId)
 
         val response = reservationService.getReservationShortInfo(book.resourceId, user.userId)
@@ -77,7 +77,7 @@ class ReservationServiceTests @Autowired constructor(
     fun `should reserve a resource`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(0)).build()
 
         reservationService.reserveResource(book.resourceId, library.libraryId, user.userId)
 
@@ -99,7 +99,7 @@ class ReservationServiceTests @Autowired constructor(
     fun `should keep only the latest reservation of a resource`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().withEbook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(0)).build()
 
         reservationService.reserveResource(book.resourceId, library.libraryId, user.userId)
         reservationService.reserveResource(book.resourceId, library.libraryId, user.userId)

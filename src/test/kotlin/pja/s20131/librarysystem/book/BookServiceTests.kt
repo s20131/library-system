@@ -15,7 +15,6 @@ import pja.s20131.librarysystem.domain.resource.model.Description
 import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
-import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
@@ -27,7 +26,7 @@ class BookServiceTests @Autowired constructor(
 
     @Test
     fun `should return all books in status available`() {
-        val (author, books) = given.author.exists().withBook(series = ResourceGen.defaultSeries).withBook().build()
+        val (author, books) = given.author.exists().withBook().withBook().build()
 
         val response = bookService.getAllActiveBooks()
 
@@ -36,6 +35,19 @@ class BookServiceTests @Autowired constructor(
             ResourceWithAuthorBasicData(books[1].toBasicData(), author.toBasicData()),
         )
         assertThat(response).containsAll(expected)
+    }
+
+    @Test
+    fun `should return all books in status available sorted by title`() {
+        val (author, books) = given.author.exists().withBook(status = ResourceStatus.WITHDRAWN).withBook().withBook().build()
+
+        val response = bookService.getAllActiveBooks()
+
+        val expected = listOf(
+            ResourceWithAuthorBasicData(books[1].toBasicData(), author.toBasicData()),
+            ResourceWithAuthorBasicData(books[2].toBasicData(), author.toBasicData()),
+        ).sortedBy { it.resource.title.value }
+        assertThat(response).isEqualTo(expected)
     }
 
     @Test

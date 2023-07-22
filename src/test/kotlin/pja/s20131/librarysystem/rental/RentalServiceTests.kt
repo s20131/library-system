@@ -19,7 +19,7 @@ import pja.s20131.librarysystem.domain.resource.RentalHistory
 import pja.s20131.librarysystem.domain.resource.RentalService
 import pja.s20131.librarysystem.domain.resource.RentalShortInfo
 import pja.s20131.librarysystem.domain.resource.UserNotPermittedToAccessLibraryException
-import pja.s20131.librarysystem.domain.resource.model.Available
+import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalNotActiveException
@@ -173,7 +173,7 @@ class RentalServiceTests @Autowired constructor(
     fun `should throw exception when trying to borrow a resource with 0 copies in a library`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(0)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(0)).build()
 
         assertThrows<InsufficientCopyAvailabilityException> {
             rentalService.borrowResource(book.resourceId, library.libraryId, user.userId)
@@ -184,7 +184,7 @@ class RentalServiceTests @Autowired constructor(
     fun `should let customer borrow a resource after making a valid reservation and availability is above 0`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(1)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(1)).build()
         given.reservation.exists(user.userId, book.resourceId, library.libraryId)
         given.reservation.exists(given.user.exists().build().userId, book.resourceId, library.libraryId)
         given.reservation.exists(given.user.exists().build().userId, book.resourceId, library.libraryId)
@@ -205,7 +205,7 @@ class RentalServiceTests @Autowired constructor(
     fun `should remove reservation after borrowing a resource`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
-        val library = given.library.exists().hasCopy(book.resourceId, Available(1)).build()
+        val library = given.library.exists().hasCopy(book.resourceId, Availability(1)).build()
         given.reservation.exists(user.userId, book.resourceId, library.libraryId)
 
         rentalService.borrowResource(book.resourceId, library.libraryId, user.userId)
