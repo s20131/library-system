@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.domain.library.LibraryService
 import pja.s20131.librarysystem.domain.library.ResourceCopy
@@ -18,7 +18,7 @@ import pja.s20131.librarysystem.domain.resource.model.Availability
 class LibraryServiceTests @Autowired constructor(
     val libraryService: LibraryService,
     val given: Preconditions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should get all libraries`() {

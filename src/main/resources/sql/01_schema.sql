@@ -1,6 +1,16 @@
 CREATE EXTENSION hstore;
 
--- DATABASE FEATURE - ENUM
+REVOKE CREATE ON SCHEMA public FROM public; -- unnecessary as it's turned off by default since postgres 15
+-- DATABASE FEATURE - psql variable
+REVOKE ALL ON DATABASE :DBNAME FROM public;
+
+CREATE SCHEMA app;
+-- DATABASE FEATURE - set configuration value
+ALTER DATABASE :DBNAME SET search_path TO app, public, topology, tiger;
+SET search_path TO app, public; -- needs to be repeated as the above doesn't apply to the current session
+ALTER DATABASE :DBNAME SET timezone TO 'Europe/Warsaw';
+
+-- DATABASE FEATURE - enum
 CREATE TYPE ebook_format AS ENUM ('PDF', 'EPUB');
 
 CREATE TABLE rental_status (
@@ -19,7 +29,7 @@ CREATE TABLE series (
     name TEXT  PRIMARY KEY
 );
 
--- DATABASE FEATURE - POSTGIS
+-- DATABASE FEATURE - postgis
 CREATE TABLE library (
     id                        UUID  NOT NULL,
     name                      TEXT  NOT NULL,
@@ -56,7 +66,7 @@ CREATE TABLE resource (
     FOREIGN KEY (status) REFERENCES resource_status
 );
 
--- DATABASE FEATURE - BLOB
+-- DATABASE FEATURE - blob
 CREATE TABLE cover (
     id         UUID  NOT NULL,
     content   BYTEA  NOT NULL,
@@ -119,7 +129,7 @@ CREATE TABLE user_settings (
     FOREIGN KEY (user_id) REFERENCES "user"
 );
 
--- DATABASE FEATURE - SEQUENCE
+-- DATABASE FEATURE - sequence
 CREATE SEQUENCE library_card_seq MINVALUE 1000;
 
 CREATE TABLE library_card (
@@ -133,7 +143,7 @@ CREATE TABLE library_card (
     FOREIGN KEY (user_id) REFERENCES "user"
 );
 
--- DATABASE FEATURE - CONDITIONAL UNIQUE CONSTRAINT
+-- DATABASE FEATURE - conditionally unique constraint
 CREATE UNIQUE INDEX active_card_unique_idx ON library_card (user_id, is_active) WHERE is_active = true;
 
 CREATE TABLE librarian (
@@ -158,7 +168,7 @@ CREATE TABLE storage (
     FOREIGN KEY (resource_id) REFERENCES resource
 );
 
--- DATABASE FEATURE - CHECK CONSTRAINT
+-- DATABASE FEATURE - check constraint
 CREATE TABLE rental (
     id                    UUID  NOT NULL,
     user_id               UUID  NOT NULL,
@@ -196,23 +206,15 @@ CREATE TABLE reservation (
     FOREIGN KEY (resource_id, library_id) REFERENCES copy (resource_id, library_id)
 );
 
-CREATE TABLE config (
-    settings hstore
-);
-
--- DATABASE FEATURE - key-value pairs
-INSERT INTO config VALUES ('"penalty_rate" => "2.50"');
-
 ---
 
--- TODO polish dictionary?
--- DATABASE FEATURE - MATERIALIZED VIEW, FULL-TEXT SEARCH
+-- DATABASE FEATURE - materialized view, full-text search
 CREATE MATERIALIZED VIEW books_search_view AS SELECT r.*, b.isbn, to_tsvector(concat_ws(', ', r.title, r.description, r.series, b.isbn, a.first_name, a.last_name)) AS tokens
 FROM resource r
 INNER JOIN book b ON r.id = b.resource_id
 INNER JOIN author a on r.author = a.id;
 
--- DATABASE FEATURE - INDEX
+-- DATABASE FEATURE - index
 CREATE UNIQUE INDEX books_search_view_idx ON books_search_view (id);
 
 ---
@@ -226,5 +228,22 @@ CREATE UNIQUE INDEX ebooks_search_view_idx ON ebooks_search_view (id);
 
 ---
 
--- TODO privileges + schema
-CREATE USER spring_app;
+-- DATABASE FEATURE - user + privileges
+CREATE USER spring_app WITH PASSWORD 'test';
+GRANT CONNECT ON DATABASE :DBNAME TO spring_app;
+GRANT USAGE ON SCHEMA app TO spring_app;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA app TO spring_app;
+ALTER DEFAULT PRIVILEGES FOR USER spring_app IN SCHEMA app GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO spring_app;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA app TO spring_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA app GRANT USAGE ON SEQUENCES TO spring_app;
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA app TO spring_app;
+
+-- DATABASE FEATURE - schema
+CREATE SCHEMA internal;
+CREATE TABLE internal.config (
+    settings hstore
+);
+
+-- DATABASE FEATURE - key-value pairs
+INSERT INTO internal.config VALUES ('penalty_rate => 2.50');
+UPDATE internal.config SET settings['mocked_time'] = 'current_timestamp';

@@ -1,4 +1,4 @@
--- DATABASE FEATURE - FUNCTION, PROCEDURAL LANGUAGE
+-- DATABASE FEATURE - function
 CREATE FUNCTION get_file_extension(filename text)
 RETURNS text
 LANGUAGE plpgsql
@@ -21,9 +21,10 @@ END; $$;
 
 ---
 
--- DATABASE FEATURE - DYNAMIC SQL
+-- DATABASE FEATURE - dynamic SQL, run functions with owner privileges
 CREATE FUNCTION refresh_view()
 RETURNS trigger
+SECURITY DEFINER
 LANGUAGE plpgsql
 AS $$
 DECLARE
@@ -53,8 +54,30 @@ $$;
 
 ---
 
--- DATABASE FEATURE - STORED PROCEDURE, CONDITIONALS
-CREATE PROCEDURE create_book(
+-- todo doesn't work
+-- DATABASE FEATURE - exception
+CREATE FUNCTION check_resource_id_uniqueness()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    counter int;
+BEGIN
+    SELECT count(*) INTO counter
+    FROM resource
+    INNER JOIN book b ON NEW.id = b.resource_id
+    INNER JOIN ebook e ON NEW.id = e.resource_id;
+
+    IF counter > 0 THEN
+        RAISE 'Duplicate resource id: %', NEW.id USING ERRCODE = 'unique_violation';
+    END IF;
+    RETURN NULL;
+END; $$;
+
+---
+
+-- DATABASE FEATURE - stored procedure, conditionals, procedural language
+CREATE PROCEDURE internal.create_book(
     title text,
     series text,
     author_first_name text,
@@ -98,7 +121,7 @@ END; $$;
 
 ---
 
-CREATE PROCEDURE create_ebook(
+CREATE PROCEDURE internal.create_ebook(
     title text,
     series text,
     author_first_name text,
@@ -162,4 +185,93 @@ CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook
 EXECUTE FUNCTION refresh_view('ebooks_search_view');
 
--- TODO trigger to check ebook/book mutual id constraint
+---
+
+CREATE TRIGGER unique_resource_id_check
+AFTER INSERT ON resource
+EXECUTE FUNCTION check_resource_id_uniqueness();
+
+---
+
+CREATE FUNCTION get_penalty()
+    RETURNS decimal
+    SECURITY DEFINER
+    LANGUAGE sql
+AS $$
+SELECT (settings -> 'penalty_rate')::decimal FROM internal.config;
+$$;
+
+---
+
+CREATE FUNCTION get_time()
+    RETURNS timestamp
+    SECURITY DEFINER
+    LANGUAGE sql
+AS $$
+SELECT (settings -> 'mocked_time')::timestamptz FROM internal.config;
+$$;
+
+---
+
+CREATE PROCEDURE update_penalties()
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE rental
+    SET penalty = COALESCE(penalty, 0) + get_penalty(), status = 'PROLONGED'
+    WHERE (status = 'ACTIVE' OR status = 'PROLONGED')
+      AND finish < get_time()
+      AND rental.resource_id IN (SELECT book.resource_id FROM book WHERE rental.resource_id = book.resource_id);
+END;
+$$;
+
+---
+
+CREATE PROCEDURE revoke_awaiting_resources()
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE rental
+    SET status = 'CANCELLED'
+    WHERE status = 'RESERVED_TO_BORROW' AND finish < get_time();
+END;
+$$;
+
+CREATE PROCEDURE revoke_ebooks()
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE rental
+    SET status = 'FINISHED'
+    WHERE status = 'ACTIVE'
+      AND finish < get_time()
+      AND rental.resource_id IN (SELECT ebook.resource_id FROM ebook WHERE rental.resource_id = ebook.resource_id);
+END;
+$$;
+
+CREATE PROCEDURE internal.activate_resource(resource_id uuid)
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE resource
+    SET status = 'AVAILABLE'
+    WHERE id = resource_id;
+END;
+$$;
+
+---
+
+CREATE PROCEDURE internal.deactivate_resource(resource_id uuid)
+    LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    UPDATE resource
+    SET status = 'WITHDRAWN'
+    WHERE id = resource_id;
+END;
+$$;

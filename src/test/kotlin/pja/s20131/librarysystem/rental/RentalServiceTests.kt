@@ -6,9 +6,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.jdbc.Sql
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.adapter.database.user.LibraryCardDoesNotExistException
@@ -40,7 +39,7 @@ class RentalServiceTests @Autowired constructor(
     private val rentalService: RentalService,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should return user rentals`() {
@@ -579,13 +578,13 @@ class RentalServiceTests @Autowired constructor(
     }
 
     @Test
-    @Sql("/sql/revoke_awaiting_resources.sql")
     fun `should successfully cancel rental and increase availability`() {
         val user = given.user.exists().hasCard(cardNumber).build()
         val librarian = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).hasLibrarian(librarian.userId).build()
-        val rental = given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.RESERVED_TO_BORROW)
+        val rental =
+            given.rental.exists(user.userId, book.resourceId, library.libraryId, RentalPeriod.startRental(clock.lastWeek()), RentalStatus.RESERVED_TO_BORROW)
 
         rentalService.changeRentalStatus(library.libraryId, book.isbn, RentalStatusTransition.CANCEL, cardNumber, librarian.userId)
 
@@ -630,7 +629,6 @@ class RentalServiceTests @Autowired constructor(
     }
 
     @Test
-    @Sql("/sql/update_penalties.sql")
     fun `should successfully change rental status without increasing availability and setting up penalty`() {
         val user = given.user.exists().hasCard(cardNumber).build()
         val librarian = given.user.exists().build()

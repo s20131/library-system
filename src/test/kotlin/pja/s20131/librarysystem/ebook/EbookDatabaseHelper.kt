@@ -43,8 +43,4 @@ class EbookDatabaseHelper @Autowired constructor(
             .select { ResourceTable.author eq authorId.value }
             .map { it.toEbook() }
     }
-
-    fun refreshSearchView() {
-        TransactionManager.current().exec("REFRESH MATERIALIZED VIEW ebooks_search_view;")
-    }
 }

@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Assertions
+import pja.s20131.librarysystem.IntegrationTestConfig
+import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.domain.resource.StorageService
 import pja.s20131.librarysystem.domain.resource.StoredResource
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
 import pja.s20131.librarysystem.domain.user.port.UserNotFoundException
-import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.resource.ResourceGen
 import pja.s20131.librarysystem.user.UserGen
 
@@ -20,7 +20,7 @@ class StorageServiceTests @Autowired constructor(
     private val storageService: StorageService,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should get user's storage`() {
