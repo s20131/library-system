@@ -6,7 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.ReservationNotFoundException
 import pja.s20131.librarysystem.domain.resource.CannotReserveResourceException
@@ -21,7 +21,7 @@ class ReservationServiceTests @Autowired constructor(
     private val reservationService: ReservationService,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should get user reservations`() {

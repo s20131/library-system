@@ -3,25 +3,23 @@ package pja.s20131.librarysystem.rental
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.jdbc.Sql
 import org.testcontainers.shaded.org.awaitility.Awaitility
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
-import pja.s20131.librarysystem.domain.resource.utils.PenaltyService
 import pja.s20131.librarysystem.domain.resource.model.Penalty
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
+import pja.s20131.librarysystem.domain.resource.utils.PenaltyService
 import java.math.BigDecimal
 import java.util.concurrent.TimeUnit
 
 @SpringBootTest
-@Sql("/sql/update_penalties.sql")
 class PenaltyServiceTests @Autowired constructor(
     private val penaltyService: PenaltyService,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should run update penalties procedure`() {

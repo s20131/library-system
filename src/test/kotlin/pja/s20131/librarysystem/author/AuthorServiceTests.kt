@@ -4,10 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import pja.s20131.librarysystem.BaseTestConfig
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.domain.resource.AuthorService
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
+import pja.s20131.librarysystem.domain.resource.AuthorService
 import pja.s20131.librarysystem.resource.ResourceGen
 
 @SpringBootTest
@@ -15,7 +15,7 @@ class AuthorServiceTests @Autowired constructor(
     private val authorService: AuthorService,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should correctly retrieve an author`() {

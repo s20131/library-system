@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.domain.resource.ResourceService
 
@@ -14,7 +14,7 @@ class ResourceServiceTests @Autowired constructor(
     private val resourceService: ResourceService,
     private val given: Preconditions,
     private val assert: Assertions,
-    ) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should get a cover`() {

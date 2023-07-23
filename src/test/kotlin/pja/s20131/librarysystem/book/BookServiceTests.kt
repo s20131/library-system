@@ -6,7 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import pja.s20131.librarysystem.Assertions
-import pja.s20131.librarysystem.BaseTestConfig
+import pja.s20131.librarysystem.IntegrationTestConfig
 import pja.s20131.librarysystem.Preconditions
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.domain.resource.BookService
@@ -19,10 +19,9 @@ import pja.s20131.librarysystem.domain.resource.port.AuthorNotFoundException
 @SpringBootTest
 class BookServiceTests @Autowired constructor(
     private val bookService: BookService,
-    private val bookDatabaseHelper: BookDatabaseHelper,
     private val given: Preconditions,
     private val assert: Assertions,
-) : BaseTestConfig() {
+) : IntegrationTestConfig() {
 
     @Test
     fun `should return all books in status available`() {
@@ -117,7 +116,6 @@ class BookServiceTests @Autowired constructor(
             .withBook(description = Description("some book"))
             .withBook(description = Description("another book"))
             .build()
-        bookDatabaseHelper.refreshSearchView()
 
         val response = bookService.search(SearchQuery("majestic"))
 
