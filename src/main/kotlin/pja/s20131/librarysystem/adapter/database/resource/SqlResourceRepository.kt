@@ -4,10 +4,10 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.date
-import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.InsertStatement
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.upsert
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
@@ -44,7 +44,7 @@ class SqlResourceRepository : ResourceRepository {
     }
 
     override fun upsertCover(resourceId: ResourceId, resourceCover: ResourceCover) {
-        CoverTable.replace {
+        CoverTable.upsert {
             it[id] = resourceId.value
             it[content] = ExposedBlob(resourceCover.content)
             it[mediaType] = resourceCover.mediaType.toString()
