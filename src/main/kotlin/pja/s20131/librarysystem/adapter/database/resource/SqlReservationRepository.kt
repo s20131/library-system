@@ -7,8 +7,8 @@ import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.javatime.timestamp
-import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.upsert
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.resource.BookTable.toBook
 import pja.s20131.librarysystem.adapter.database.resource.EbookTable.toEbook
@@ -56,7 +56,7 @@ class SqlReservationRepository : ReservationRepository {
     }
 
     override fun upsert(reservation: Reservation) {
-        ReservationTable.replace {
+        ReservationTable.upsert {
             it[userId] = reservation.userId.value
             it[libraryId] = reservation.libraryId.value
             it[resourceId] = reservation.resourceId.value

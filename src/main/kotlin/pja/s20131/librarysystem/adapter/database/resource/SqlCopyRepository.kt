@@ -8,9 +8,9 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.minus
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.plus
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.update
+import org.jetbrains.exposed.sql.upsert
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.stDistance
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
@@ -57,7 +57,7 @@ class SqlCopyRepository : CopyRepository {
     }
 
     override fun upsertAvailability(resourceId: ResourceId, libraryId: LibraryId, availability: Availability) {
-        CopyTable.replace {
+        CopyTable.upsert {
             it[CopyTable.resourceId] = resourceId.value
             it[CopyTable.libraryId] = libraryId.value
             it[CopyTable.available] = availability.value
