@@ -54,8 +54,7 @@ $$;
 
 ---
 
--- todo doesn't work
--- DATABASE FEATURE - exception
+-- DATABASE FEATURE - derived table, exception
 CREATE FUNCTION check_resource_id_uniqueness()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -63,13 +62,15 @@ AS $$
 DECLARE
     counter int;
 BEGIN
-    SELECT count(*) INTO counter
-    FROM resource
-    INNER JOIN book b ON NEW.id = b.resource_id
-    INNER JOIN ebook e ON NEW.id = e.resource_id;
+    SELECT count(*) INTO counter FROM
+    (
+        SELECT resource_id FROM book
+        INTERSECT
+        SELECT resource_id FROM ebook
+    ) AS result;
 
     IF counter > 0 THEN
-        RAISE 'Duplicate resource id: %', NEW.id USING ERRCODE = 'unique_violation';
+        RAISE 'Duplicate resource id: %', NEW.resource_id USING ERRCODE = 'unique_violation';
     END IF;
     RETURN NULL;
 END; $$;
@@ -174,12 +175,10 @@ END; $$;
 
 ---
 
--- DATABASE FEATURE - TRIGGER
+-- DATABASE FEATURE - trigger
 CREATE TRIGGER refresh_books_search_view
 AFTER INSERT OR UPDATE OR DELETE ON book
 EXECUTE FUNCTION refresh_view('books_search_view');
-
----
 
 CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook
@@ -187,34 +186,40 @@ EXECUTE FUNCTION refresh_view('ebooks_search_view');
 
 ---
 
-CREATE TRIGGER unique_resource_id_check
-AFTER INSERT ON resource
+CREATE TRIGGER unique_book_resource_id_check
+AFTER INSERT ON book
+FOR EACH ROW
+EXECUTE FUNCTION check_resource_id_uniqueness();
+
+CREATE TRIGGER unique_ebook_resource_id_check
+AFTER INSERT ON ebook
+FOR EACH ROW
 EXECUTE FUNCTION check_resource_id_uniqueness();
 
 ---
 
 CREATE FUNCTION get_penalty()
-    RETURNS decimal
-    SECURITY DEFINER
-    LANGUAGE sql
+RETURNS decimal
+SECURITY DEFINER
+LANGUAGE sql
 AS $$
-SELECT (settings -> 'penalty_rate')::decimal FROM internal.config;
+    SELECT (settings -> 'penalty_rate')::decimal FROM internal.config;
 $$;
 
 ---
 
 CREATE FUNCTION get_time()
-    RETURNS timestamp
-    SECURITY DEFINER
-    LANGUAGE sql
+RETURNS timestamp
+SECURITY DEFINER
+LANGUAGE sql
 AS $$
-SELECT (settings -> 'mocked_time')::timestamptz FROM internal.config;
+    SELECT (settings -> 'mocked_time')::timestamptz FROM internal.config;
 $$;
 
 ---
 
 CREATE PROCEDURE update_penalties()
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
@@ -229,7 +234,7 @@ $$;
 ---
 
 CREATE PROCEDURE revoke_awaiting_resources()
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
@@ -240,7 +245,7 @@ END;
 $$;
 
 CREATE PROCEDURE revoke_ebooks()
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
@@ -253,7 +258,7 @@ END;
 $$;
 
 CREATE PROCEDURE internal.activate_resource(resource_id uuid)
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
@@ -266,12 +271,37 @@ $$;
 ---
 
 CREATE PROCEDURE internal.deactivate_resource(resource_id uuid)
-    LANGUAGE plpgsql
+LANGUAGE plpgsql
 AS $$
 DECLARE
 BEGIN
     UPDATE resource
     SET status = 'WITHDRAWN'
     WHERE id = resource_id;
+END;
+$$;
+
+---
+
+-- DATABASE FEATURE - subquery
+CREATE PROCEDURE internal.grant_librarian(u_id uuid, lib_id uuid)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+BEGIN
+    INSERT INTO librarian
+    VALUES (
+        u_id,
+        lib_id,
+        (
+            SELECT
+            CASE count(*)
+                WHEN 0 THEN true
+                ELSE false
+            END
+            FROM librarian l
+            WHERE l.user_id = u_id
+        )
+    );
 END;
 $$;

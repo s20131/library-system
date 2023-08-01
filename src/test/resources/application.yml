@@ -1,9 +1,0 @@
-spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-
-cron:
-  basic: "*/1 * * * * *"
-  update-penalties: ${cron.basic}
-  revoke-awaiting-resources: ${cron.basic}
-  revoke-ebooks: ${cron.basic}
