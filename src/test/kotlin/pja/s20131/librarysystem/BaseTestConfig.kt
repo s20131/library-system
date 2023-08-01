@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
+import org.springframework.test.context.ActiveProfiles
 import pja.s20131.librarysystem.adapter.database.library.LibrarianTable
 import pja.s20131.librarysystem.adapter.database.library.LibraryTable
 import pja.s20131.librarysystem.adapter.database.resource.AuthorTable
@@ -26,6 +27,7 @@ import pja.s20131.librarysystem.infrastracture.TestClock
 
 @Component
 @Import(ClockTestConfiguration::class)
+@ActiveProfiles("test")
 class BaseTestConfig {
 
     @Autowired
