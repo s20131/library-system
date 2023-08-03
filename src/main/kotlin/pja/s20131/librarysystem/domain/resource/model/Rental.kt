@@ -22,21 +22,16 @@ data class Rental(
     val rentalStatus: RentalStatus,
     val penalty: Penalty?,
 ) {
-    fun completeBookRental(instant: Instant): Rental  {
+    fun completeBookRental(instant: Instant): Rental {
         val rental = changeStatus(RentalStatusTransition.START)
         val updatedRental = rental.copy(rentalPeriod = RentalPeriod.startRental(instant))
         rentalPeriod.validateIsOverlapped(updatedRental.rentalPeriod, resourceId)
         return updatedRental
     }
 
-    // TODO bug: borrow a book -> return -> borrow again
     fun validateCanBeBorrowed(previous: Rental?) {
-        if (previous != null && rentalPeriod.isOverlapped(previous.rentalPeriod)) {
-            throw RentalPeriodOverlappingDatesException(resourceId)
-        }
-        // TODO check if there is ANY not paid-off rental
-        if (previous != null && previous.rentalStatus === RentalStatus.PROLONGED) {
-            throw RentalNotPaidOffException(resourceId)
+        if (previous != null && previous.rentalStatus in RentalStatus.activeStatuses) {
+            throw RentalAlreadyActiveException(resourceId)
         }
     }
 
@@ -117,9 +112,6 @@ value class StartDate(val value: LocalDate)
 @JvmInline
 value class FinishTime(val value: LocalDateTime)
 
-class RentalPeriodOverlappingDatesException(resourceId: ResourceId) :
-    BaseException("Resource ${resourceId.value} cannot be borrowed as you already have an active rental of it")
-
 class RentalPeriodNotOverlappingDatesException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be completed to be borrowed as reservation ended")
 
@@ -128,8 +120,8 @@ class RentalStatusCannotBeChangedException(rental: Rental, targetStatus: RentalS
 
 class RentalNotActiveException(rentalId: RentalId) : BaseException("Rental $rentalId is not active")
 
-class RentalNotPaidOffException(resourceId: ResourceId) :
-    BaseException("Resource ${resourceId.value} cannot be borrowed as you haven't paid off the last rental of this resource")
+class RentalAlreadyActiveException(resourceId: ResourceId) :
+    BaseException("Resource ${resourceId.value} cannot be borrowed as you already have an active rental of this resource")
 
 class RentalCannotBeDownloadedException(resourceId: ResourceId) :
     BaseException("Resource ${resourceId.value} cannot be downloaded as you don't have an active rental")

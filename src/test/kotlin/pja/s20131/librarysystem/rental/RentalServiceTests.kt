@@ -21,11 +21,10 @@ import pja.s20131.librarysystem.domain.resource.UserNotPermittedToAccessLibraryE
 import pja.s20131.librarysystem.domain.resource.model.Availability
 import pja.s20131.librarysystem.domain.resource.model.ISBN
 import pja.s20131.librarysystem.domain.resource.model.Penalty
+import pja.s20131.librarysystem.domain.resource.model.RentalAlreadyActiveException
 import pja.s20131.librarysystem.domain.resource.model.RentalNotActiveException
-import pja.s20131.librarysystem.domain.resource.model.RentalNotPaidOffException
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriod
 import pja.s20131.librarysystem.domain.resource.model.RentalPeriodNotOverlappingDatesException
-import pja.s20131.librarysystem.domain.resource.model.RentalPeriodOverlappingDatesException
 import pja.s20131.librarysystem.domain.resource.model.RentalStatus
 import pja.s20131.librarysystem.domain.resource.model.RentalStatusTransition
 import pja.s20131.librarysystem.domain.resource.model.ResourceType
@@ -147,7 +146,7 @@ class RentalServiceTests @Autowired constructor(
         val library2 = given.library.exists().hasCopy(ebook.resourceId).build()
         given.rental.exists(user.userId, ebook.resourceId, library1.libraryId, RentalPeriod.startRental(clock.lastWeek()))
 
-        assertThrows<RentalPeriodOverlappingDatesException> { rentalService.borrowResource(ebook.resourceId, library2.libraryId, user.userId) }
+        assertThrows<RentalAlreadyActiveException> { rentalService.borrowResource(ebook.resourceId, library2.libraryId, user.userId) }
     }
 
     @Test
@@ -164,6 +163,24 @@ class RentalServiceTests @Autowired constructor(
             library.libraryId,
             RentalPeriod(clock.now(), clock.inDays(2)),
             RentalStatus.RESERVED_TO_BORROW,
+            penalty = null
+        )
+    }
+
+    @Test
+    fun `should borrow a book for user if borrowed by librarian`() {
+        val user = given.user.exists().build()
+        val book = given.author.exists().withBook().build().second[0]
+        val library = given.library.exists().hasCopy(book.resourceId).build()
+
+        rentalService.borrowResource(book.resourceId, library.libraryId, user.userId, true)
+
+        assert.rental.isSaved(
+            user.userId,
+            book.resourceId,
+            library.libraryId,
+            RentalPeriod(clock.now(), clock.inDays(14)),
+            RentalStatus.ACTIVE,
             penalty = null
         )
     }
@@ -235,7 +252,7 @@ class RentalServiceTests @Autowired constructor(
     }
 
     @Test
-    fun `should throw an error when trying to borrow a prolonged resource without paying it off before`() {
+    fun `should throw an error when trying to borrow a resource in an active status`() {
         val user = given.user.exists().build()
         val book = given.author.exists().withBook().build().second[0]
         val library = given.library.exists().hasCopy(book.resourceId).build()
@@ -248,7 +265,7 @@ class RentalServiceTests @Autowired constructor(
             Penalty(BigDecimal.TEN)
         )
 
-        assertThrows<RentalNotPaidOffException> { rentalService.borrowResource(book.resourceId, library.libraryId, user.userId) }
+        assertThrows<RentalAlreadyActiveException> { rentalService.borrowResource(book.resourceId, library.libraryId, user.userId) }
     }
 
     @Test
