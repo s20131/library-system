@@ -70,9 +70,9 @@ class SqlRentalRepository : RentalRepository {
 
     override fun findLatest(resourceId: ResourceId, userId: UserId): Rental? {
         return RentalTable.select {
-            RentalTable.finish eqSubQuery
+            RentalTable.start eqSubQuery
                     RentalTable
-                        .slice(RentalTable.finish.max())
+                        .slice(RentalTable.start.max())
                         .select { RentalTable.resourceId eq resourceId.value and (RentalTable.userId eq userId.value) }
         }.singleOrNull()
             ?.toRental()

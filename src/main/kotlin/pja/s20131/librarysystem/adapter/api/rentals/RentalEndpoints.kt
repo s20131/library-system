@@ -66,7 +66,7 @@ class RentalEndpoints(
         }.toResponse()
     }
 
-    @GetMapping("/libraries/{libraryId}/librarian/rentals/{isbn}/return")
+    @GetMapping("/libraries/{libraryId}/librarian/rentals/{isbn}/status")
     @Secured("ROLE_LIBRARIAN")
     fun checkBeforeReturningBook(
         @PathVariable libraryId: LibraryId,

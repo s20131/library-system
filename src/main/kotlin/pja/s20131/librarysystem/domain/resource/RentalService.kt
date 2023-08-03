@@ -64,7 +64,7 @@ class RentalService(
         return latestRental.toShortInfo(library.libraryName)
     }
 
-    fun borrowResource(resourceId: ResourceId, libraryId: LibraryId, userId: UserId) {
+    fun borrowResource(resourceId: ResourceId, libraryId: LibraryId, userId: UserId, isBorrowFromLibrary: Boolean = false) {
         val available = copyRepository.getAvailability(resourceId, libraryId)
         if (available.value == 0) {
             throw InsufficientCopyAvailabilityException(resourceId, libraryId)
@@ -75,7 +75,14 @@ class RentalService(
         available.checkIsEnoughCopies(reservations.toInt(), resourceId, isReserved)
         // TODO pass in the request and validate?
         val rental = when (val resource = resourceRepository.getResource(resourceId)) {
-            is Book -> resource.reserveToBorrow(userId, libraryId, now)
+            is Book -> {
+                if (isBorrowFromLibrary) {
+                    resource.borrow(userId, libraryId, now)
+                } else {
+                    resource.reserveToBorrow(userId, libraryId, now)
+                }
+            }
+
             is Ebook -> resource.borrow(userId, libraryId, now)
         }
         val latest = rentalRepository.findLatest(resourceId, userId)
@@ -91,7 +98,7 @@ class RentalService(
             throw UserNotPermittedToAccessLibraryException(librarianId, libraryId)
         }
         val book = bookRepository.get(isbn)
-        borrowResource(book.resourceId, libraryId, libraryCard.userId)
+        borrowResource(book.resourceId, libraryId, libraryCard.userId, true)
     }
 
     fun getCustomerAwaitingBooks(libraryId: LibraryId, cardNumber: CardNumber): List<BookBasicData> {
