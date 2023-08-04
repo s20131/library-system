@@ -5,37 +5,34 @@ services:
     image: postgis/postgis
     container_name: library-database
     env_file: .env
-    ports:
-      - '5432:5432'
     volumes:
-      - ./src/main/resources/covers:/covers
-      - ./src/main/resources/ebooks:/ebooks
-      - ./src/main/resources/sql/01_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
-      - ./src/main/resources/sql/02_db_objects_pre.sql:/docker-entrypoint-initdb.d/2-db-objects.sql
-      - ./src/main/resources/sql/03_data.sql:/docker-entrypoint-initdb.d/3-data.sql
-      - ./src/main/resources/sql/04_db_objects_post.sql:/docker-entrypoint-initdb.d/4-db-objects.sql
+      - ./resources/covers:/covers
+      - ./resources/ebooks:/ebooks
+      - ./resources/sql/01_schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./resources/sql/02_db_objects_pre.sql:/docker-entrypoint-initdb.d/2-db-objects.sql
+      - ./resources/sql/03_data.sql:/docker-entrypoint-initdb.d/3-data.sql
+      - ./resources/sql/04_db_objects_post.sql:/docker-entrypoint-initdb.d/4-db-objects.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+    network_mode: host
 
   backend:
     image: kubaugust/library-system
     container_name: library-backend
-    ports:
-      - '8080:8080'
     depends_on:
       database:
         condition: service_healthy
+    network_mode: host
 
   frontend:
     image: kubaugust/library-system-frontend
     container_name: library-frontend
-    ports:
-      - '3000:80'
     depends_on:
       database:
         condition: service_healthy
       backend:
         condition: service_started
+    network_mode: host

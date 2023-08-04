@@ -75,8 +75,9 @@ class ExceptionHandler {
             // 500
             else -> ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_EXCEPTION, "Unknown exception occurred")
         }
-        when (errorMessage.status) {
-            HttpStatus.INTERNAL_SERVER_ERROR -> logger.error(errorMessage.toString())
+        when {
+            errorMessage.status == HttpStatus.INTERNAL_SERVER_ERROR -> logger.error(errorMessage.toString())
+            errorMessage.code == ErrorCode.COVER_NOT_FOUND -> {}
             else -> logger.warn(errorMessage.toString())
         }
         return ResponseEntity<ErrorResponse>(errorMessage.toResponse(), errorMessage.status)
