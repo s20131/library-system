@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service
 @Service
 class RentalJobService {
 
-    @Scheduled(cron = "\${cron.revoke-awaiting-resources}", zone = "Europe/Warsaw")
+    @Scheduled(cron = "\${cron.revoke-awaiting-resources}", zone = "\${time.zone}")
     fun revokeAwaitingResources() {
         transaction {
             TransactionManager.current().exec("CALL revoke_awaiting_resources()")
         }
     }
 
-    @Scheduled(cron = "\${cron.revoke-ebooks}", zone = "Europe/Warsaw")
+    @Scheduled(cron = "\${cron.revoke-ebooks}", zone = "\${time.zone}")
     fun revokeEbooks() {
         transaction {
             TransactionManager.current().exec("CALL revoke_ebooks()")
