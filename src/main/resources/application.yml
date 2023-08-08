@@ -10,6 +10,9 @@ logging:
     org.springframework.web: DEBUG
     Exposed: DEBUG
 
+time:
+  zone: Europe/Warsaw
+
 cron:
   basic: 0 0 0 * * *
   update-penalties: ${cron.basic}
