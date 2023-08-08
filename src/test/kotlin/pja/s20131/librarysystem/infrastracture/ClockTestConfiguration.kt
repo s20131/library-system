@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.infrastracture
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -9,18 +10,20 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 
 @TestConfiguration
-class ClockTestConfiguration {
+class ClockTestConfiguration(
+    @Value("\${time.zone}")
+    private val timeZone: String
+) {
 
     @Bean
     @Primary
     fun testClock(): TestClock {
-        return TestClock()
+        return TestClock(timeZone)
     }
 }
 
-class TestClock : Clock() {
-    private val zone = ZoneId.of("Europe/Warsaw")
-    private val fixedClock = fixed(Instant.parse("2023-05-07T17:55:00.000Z"), zone)
+class TestClock(timeZone: String) : Clock() {
+    private val fixedClock = fixed(Instant.parse("2023-05-07T17:55:00.000Z"), ZoneId.of(timeZone))
 
     override fun instant(): Instant {
         return fixedClock.instant()

@@ -10,7 +10,7 @@ import pja.s20131.librarysystem.domain.resource.model.RentalId
 @Service
 class PenaltyService {
 
-    @Scheduled(cron = "\${cron.update-penalties}", zone = "Europe/Warsaw")
+    @Scheduled(cron = "\${cron.update-penalties}", zone = "\${time.zone}")
     fun updatePenaltiesForResourceOverdue() {
         transaction {
             TransactionManager.current().exec("CALL update_penalties()")
