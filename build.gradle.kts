@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-val exposed = "0.42.0"
+val exposed = "0.42.1"
 val postgres = "42.6.0"
 val postgis = "2021.1.0"
 val jackson = "2.15.2"
