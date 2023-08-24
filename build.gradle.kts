@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "3.1.2"
     id("io.spring.dependency-management") version "1.1.3"
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.10"
     kotlin("plugin.spring") version "1.9.0"
 }
 
@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-val exposed = "0.42.0"
+val exposed = "0.42.1"
 val postgres = "42.6.0"
 val postgis = "2021.1.0"
 val jackson = "2.15.2"
