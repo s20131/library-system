@@ -3,6 +3,7 @@ package pja.s20131.librarysystem.adapter.database.resource
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.select
@@ -61,10 +62,10 @@ class SqlEbookRepository : EbookRepository {
         }
     }
 
-    override fun search(tokens: List<String>): List<Ebook> {
+    override fun searchActive(tokens: List<String>): List<Ebook> {
         val joinedTokens = tokens.joinToString(" | ")
         return EbookSearchView
-            .select { TsQuery(EbookSearchView.tokens, joinedTokens) eq true }
+            .select { TsQuery(EbookSearchView.tokens, joinedTokens) eq true and (EbookSearchView.status eq ResourceStatus.AVAILABLE) }
             // TODO by rank
             .orderBy(EbookSearchView.title)
             .map { it.toEbookView() }

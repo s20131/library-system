@@ -246,4 +246,4 @@ CREATE TABLE internal.config (
 
 -- DATABASE FEATURE - key-value pairs
 INSERT INTO internal.config VALUES ('penalty_rate => 2.50');
-UPDATE internal.config SET settings['mocked_time'] = 'current_timestamp';
+UPDATE internal.config SET settings['mocked_time'] = 'now()';

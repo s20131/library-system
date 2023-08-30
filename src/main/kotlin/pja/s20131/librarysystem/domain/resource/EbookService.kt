@@ -53,7 +53,7 @@ class EbookService(
 
     fun search(query: SearchQuery): List<ResourceWithAuthorBasicData> {
         val tokens = query.tokenize()
-        val ebooks = ebookRepository.search(tokens)
+        val ebooks = ebookRepository.searchActive(tokens)
         val authors = authorRepository.getAll()
         return ebooks.withAuthors(authors)
     }

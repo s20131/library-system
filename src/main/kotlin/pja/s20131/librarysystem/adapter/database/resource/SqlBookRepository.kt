@@ -3,10 +3,10 @@ package pja.s20131.librarysystem.adapter.database.resource
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
 import org.springframework.stereotype.Repository
 import pja.s20131.librarysystem.adapter.database.exposed.TsQuery
 import pja.s20131.librarysystem.adapter.database.exposed.tsvector
@@ -32,7 +32,7 @@ class SqlBookRepository : BookRepository {
     override fun getAllActive(): List<Book> =
         BookTable
             .innerJoin(ResourceTable)
-            .select { ResourceTable.status eq ResourceStatus.AVAILABLE}
+            .select { ResourceTable.status eq ResourceStatus.AVAILABLE }
             .orderBy(ResourceTable.title)
             .map { it.toBook() }
 
@@ -60,10 +60,10 @@ class SqlBookRepository : BookRepository {
         }
     }
 
-    override fun search(tokens: List<String>): List<Book> {
+    override fun searchActive(tokens: List<String>): List<Book> {
         val joinedTokens = tokens.joinToString(" | ")
         return BookSearchView
-            .select { TsQuery(BookSearchView.tokens, joinedTokens) eq true }
+            .select { TsQuery(BookSearchView.tokens, joinedTokens) eq true and (BookSearchView.status eq ResourceStatus.AVAILABLE) }
             .orderBy(BookSearchView.title)
             .map { it.toBookView() }
     }
