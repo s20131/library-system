@@ -184,6 +184,8 @@ CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook
 EXECUTE FUNCTION refresh_view('ebooks_search_view');
 
+-- TODO could be refreshed on resource, author change
+
 ---
 
 CREATE TRIGGER unique_book_resource_id_check
@@ -213,7 +215,7 @@ RETURNS timestamp
 SECURITY DEFINER
 LANGUAGE sql
 AS $$
-    SELECT (settings -> 'mocked_time')::timestamptz FROM internal.config;
+    SELECT (settings -> 'mocked_time')::timestamp FROM internal.config;
 $$;
 
 ---

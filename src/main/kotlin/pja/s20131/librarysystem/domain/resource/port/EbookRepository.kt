@@ -9,5 +9,5 @@ interface EbookRepository {
     fun get(ebookId: ResourceId): Ebook
     fun getContent(ebookId: ResourceId): EbookContent
     fun insert(ebook: Ebook)
-    fun search(tokens: List<String>): List<Ebook>
+    fun searchActive(tokens: List<String>): List<Ebook>
 }
