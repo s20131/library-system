@@ -9,6 +9,7 @@ import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.springframework.stereotype.Repository
+import pja.s20131.librarysystem.adapter.database.exposed.PGEnum
 import pja.s20131.librarysystem.adapter.database.exposed.TsQuery
 import pja.s20131.librarysystem.adapter.database.exposed.tsvector
 import pja.s20131.librarysystem.adapter.database.resource.EbookSearchView.toEbookView
@@ -75,7 +76,9 @@ class SqlEbookRepository : EbookRepository {
 object EbookTable : Table("ebook") {
     val id = reference("resource_id", ResourceTable)
     val content = blob("content")
-    val format = enumerationByName<Format>("format", 255)
+    val format = customEnumeration(
+        "format", "ebook_format", { Format.valueOf(it as String) }, { PGEnum("ebook_format", it) }
+    )
     override val primaryKey = PrimaryKey(id, format)
 
     fun ResultRow.toEbook() = Ebook(

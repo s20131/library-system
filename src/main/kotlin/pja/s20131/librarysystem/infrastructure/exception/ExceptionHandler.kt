@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
+import pja.s20131.librarysystem.adapter.api.resource.ebook.UnsupportedEbookFormatException
 import pja.s20131.librarysystem.adapter.database.library.UserHasNotSelectedLibraryException
 import pja.s20131.librarysystem.adapter.database.resource.BookNotFoundException
 import pja.s20131.librarysystem.adapter.database.resource.CopyNotFoundException
@@ -71,6 +72,9 @@ class ExceptionHandler {
             // 409
             is EmailAlreadyExistsException -> e.map(HttpStatus.CONFLICT, ErrorCode.EMAIL_ALREADY_EXISTS)
             is InsufficientCopyAvailabilityException -> e.map(HttpStatus.CONFLICT, ErrorCode.NOT_ENOUGH_COPIES)
+
+            // 415
+            is UnsupportedEbookFormatException -> e.map(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ErrorCode.UNSUPPORTED_EBOOK_FORMAT)
 
             // 500
             else -> ErrorMessage(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.UNKNOWN_EXCEPTION, "Unknown exception occurred")

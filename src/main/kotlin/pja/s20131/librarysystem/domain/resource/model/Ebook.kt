@@ -37,7 +37,7 @@ data class Ebook(
             dto.series,
             ResourceStatus.WAITING_FOR_APPROVAL,
             EbookContent(dto.content, dto.format),
-            dto.size
+            Size(dto.content.size)
         )
     }
 }

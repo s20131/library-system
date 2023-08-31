@@ -41,6 +41,5 @@ object EbookGen {
         series: Series? = null,
         content: ByteArray = Random.nextBytes(10),
         format: Format = Format.PDF,
-        size: Size = Size(faker.number().randomDigit()),
-    ) = AddEbookDto(title, authorId, releaseDate, description, series, content, format, size)
+    ) = AddEbookDto(title, authorId, releaseDate, description, series, content, format)
 }
