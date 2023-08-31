@@ -1,5 +1,6 @@
 package pja.s20131.librarysystem.adapter.api.resource.ebook
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import pja.s20131.librarysystem.domain.resource.AddEbookDto
 import pja.s20131.librarysystem.domain.resource.model.AuthorId
 import pja.s20131.librarysystem.domain.resource.model.Description
@@ -9,19 +10,30 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceStatus
 import pja.s20131.librarysystem.domain.resource.model.Series
 import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
+import java.time.LocalDate
+import java.util.UUID
 
-@Suppress("ArrayInDataClass")
 data class AddEbookRequest(
     val title: Title,
     val releaseDate: ReleaseDate,
     val description: Description?,
     val series: Series?,
-    val content: ByteArray,
-    val format: Format,
-    val size: Size,
     val authorId: AuthorId,
 ) {
-    fun toDto() = AddEbookDto(title, authorId, releaseDate, description, series, content, format, size)
+    fun toDto(format: Format, content: ByteArray) = AddEbookDto(title, authorId, releaseDate, description, series, content, format)
+
+    companion object {
+        @JvmStatic
+        @JsonCreator
+        fun creator(title: String, releaseDate: LocalDate, description: String?, series: String?, authorId: UUID) =
+            AddEbookRequest(
+                Title(title),
+                ReleaseDate(releaseDate),
+                description?.let { Description(it) },
+                series?.let { Series(it) },
+                AuthorId(authorId),
+            )
+    }
 }
 
 data class GetEbookInfoResponse(

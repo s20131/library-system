@@ -8,10 +8,11 @@ import org.springframework.security.access.annotation.Secured
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import pja.s20131.librarysystem.adapter.api.resource.resource.GetResourceWithAuthorBasicDataResponse
 import pja.s20131.librarysystem.domain.resource.EbookService
 import pja.s20131.librarysystem.domain.resource.ResourceWithAuthorBasicData
@@ -21,6 +22,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery.Companion.isNullOrEmpty
 import pja.s20131.librarysystem.domain.user.AuthService
+import pja.s20131.librarysystem.exception.BaseException
 
 @RestController
 @RequestMapping("/ebooks")
@@ -57,10 +59,19 @@ class EbookEndpoints(
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf(contentType)).body(content.bytes)
     }
 
-    @PostMapping
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @Secured("ROLE_LIBRARIAN")
-    fun addEbook(@RequestBody addEbookRequest: AddEbookRequest): ResourceId {
-        return ebookService.addEbook(addEbookRequest.toDto())
+    fun addEbook(@RequestPart addEbookRequest: AddEbookRequest, @RequestPart content: MultipartFile): ResourceId {
+        val contentType = content.contentType
+        if (contentType == null || contentType !in arrayOf(APPLICATION_PDF_VALUE, APPLICATION_EPUB_VALUE)) {
+            throw UnsupportedEbookFormatException(contentType)
+        }
+        val format = when (contentType) {
+            APPLICATION_PDF_VALUE -> Format.PDF
+            APPLICATION_EPUB_VALUE -> Format.EPUB
+            else -> throw UnsupportedEbookFormatException(contentType)
+        }
+        return ebookService.addEbook(addEbookRequest.toDto(format, content.bytes))
     }
 
     companion object {
@@ -70,3 +81,5 @@ class EbookEndpoints(
 
 private fun List<ResourceWithAuthorBasicData>.toResponse() = map { GetResourceWithAuthorBasicDataResponse(it.resource, it.author) }
 private fun Ebook.toResponse() = GetEbookInfoResponse(title, authorId, releaseDate, description, series, status, content.format, size)
+
+class UnsupportedEbookFormatException(contentType: String?) : BaseException("Format $contentType is not supported for e-book file")

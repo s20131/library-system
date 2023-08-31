@@ -72,5 +72,4 @@ data class AddEbookDto(
     val series: Series?,
     val content: ByteArray,
     val format: Format,
-    val size: Size,
 )
