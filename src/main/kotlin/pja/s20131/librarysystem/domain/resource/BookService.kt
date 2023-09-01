@@ -31,8 +31,8 @@ class BookService(
         return books.withAuthors(authors)
     }
 
-    fun getBook(bookId: ResourceId): Book {
-        return bookRepository.get(bookId)
+    fun getActiveBook(bookId: ResourceId): Book {
+        return bookRepository.getActive(bookId)
     }
 
     fun getBook(isbn: ISBN): ResourceWithAuthorBasicData {

@@ -12,7 +12,6 @@ import pja.s20131.librarysystem.domain.resource.model.ReleaseDate
 import pja.s20131.librarysystem.domain.resource.model.ResourceId
 import pja.s20131.librarysystem.domain.resource.model.SearchQuery
 import pja.s20131.librarysystem.domain.resource.model.Series
-import pja.s20131.librarysystem.domain.resource.model.Size
 import pja.s20131.librarysystem.domain.resource.model.Title
 import pja.s20131.librarysystem.domain.resource.port.AuthorRepository
 import pja.s20131.librarysystem.domain.resource.port.EbookRepository
@@ -33,8 +32,8 @@ class EbookService(
         return ebooks.withAuthors(authors)
     }
 
-    fun getEbook(ebookId: ResourceId): Ebook {
-        return ebookRepository.get(ebookId)
+    fun getActiveEbook(ebookId: ResourceId): Ebook {
+        return ebookRepository.getActive(ebookId)
     }
 
     fun getEbookContent(ebookId: ResourceId, userId: UserId): EbookContent {

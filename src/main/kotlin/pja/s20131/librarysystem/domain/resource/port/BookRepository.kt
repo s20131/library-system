@@ -6,7 +6,7 @@ import pja.s20131.librarysystem.domain.resource.model.ResourceId
 
 interface BookRepository {
     fun getAllActive(): List<Book>
-    fun get(bookId: ResourceId): Book
+    fun getActive(bookId: ResourceId): Book
     fun get(isbn: ISBN): Book
     fun save(book: Book)
     fun searchActive(tokens: List<String>): List<Book>

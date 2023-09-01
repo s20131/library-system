@@ -184,7 +184,13 @@ CREATE TRIGGER refresh_ebooks_search_view
 AFTER INSERT OR UPDATE OR DELETE ON ebook
 EXECUTE FUNCTION refresh_view('ebooks_search_view');
 
--- TODO could be refreshed on resource, author change
+CREATE TRIGGER refresh_resources_search_view_books
+AFTER INSERT OR UPDATE OR DELETE ON resource
+EXECUTE FUNCTION refresh_view('books_search_view');
+
+CREATE TRIGGER refresh_resources_search_view_ebooks
+AFTER INSERT OR UPDATE OR DELETE ON resource
+EXECUTE FUNCTION refresh_view('ebooks_search_view');
 
 ---
 

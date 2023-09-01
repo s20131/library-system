@@ -37,10 +37,10 @@ class SqlEbookRepository : EbookRepository {
             .orderBy(ResourceTable.title)
             .map { it.toEbook() }
 
-    override fun get(ebookId: ResourceId): Ebook =
+    override fun getActive(ebookId: ResourceId): Ebook =
         EbookTable
             .innerJoin(ResourceTable)
-            .select { EbookTable.id eq ebookId.value }
+            .select { EbookTable.id eq ebookId.value and (ResourceTable.status eq ResourceStatus.AVAILABLE) }
             .singleOrNull()
             ?.toEbook() ?: throw EbookNotFoundException(ebookId)
 
