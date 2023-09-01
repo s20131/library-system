@@ -35,7 +35,7 @@ class BookEndpoints(
 
     @GetMapping("/{bookId}")
     fun getBook(@PathVariable bookId: ResourceId): GetBookResponse {
-        return bookService.getBook(bookId).toResponse()
+        return bookService.getActiveBook(bookId).toResponse()
     }
 
     @GetMapping("/isbn/{isbn}")

@@ -74,17 +74,24 @@ class EbookServiceTests @Autowired constructor(
     fun `should return an ebook`() {
         val ebook = given.author.exists().withEbook().build().third[0]
 
-        val response = ebookService.getEbook(ebook.resourceId)
+        val response = ebookService.getActiveEbook(ebook.resourceId)
 
         assertThat(ebook.content.bytes).isEqualTo(response.content.bytes)
         assertThat(ebook.copy(content = response.content)).isEqualTo(response)
     }
 
     @Test
+    fun `assert only ebook in status available is returned`() {
+        val ebook = given.author.exists().withEbook(status = ResourceStatus.WAITING_FOR_APPROVAL).build().third[0]
+
+        assertThrows<EbookNotFoundException> { ebookService.getActiveEbook(ebook.resourceId) }
+    }
+
+    @Test
     fun `should throw an exception when getting an ebook which doesn't exist`() {
         val ebook = EbookGen.ebook()
 
-        assertThrows<EbookNotFoundException> { ebookService.getEbook(ebook.resourceId) }
+        assertThrows<EbookNotFoundException> { ebookService.getActiveEbook(ebook.resourceId) }
     }
 
     @Test

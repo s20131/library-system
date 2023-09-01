@@ -44,7 +44,7 @@ class EbookEndpoints(
 
     @GetMapping("/{ebookId}")
     fun getEbook(@PathVariable ebookId: ResourceId): GetEbookInfoResponse {
-        return ebookService.getEbook(ebookId).toResponse()
+        return ebookService.getActiveEbook(ebookId).toResponse()
     }
 
     @GetMapping("/{ebookId}/content", produces = [APPLICATION_EPUB_VALUE, APPLICATION_PDF_VALUE])

@@ -2,6 +2,7 @@ package pja.s20131.librarysystem.book
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -71,16 +72,23 @@ class BookServiceTests @Autowired constructor(
     fun `should return a book`() {
         val book = given.author.exists().withBook().build().second[0]
 
-        val response = bookService.getBook(book.resourceId)
+        val response = bookService.getActiveBook(book.resourceId)
 
         assertThat(book).isEqualTo(response)
+    }
+
+    @Test
+    fun `assert only book in status available is returned`() {
+        val book = given.author.exists().withBook(status = ResourceStatus.WITHDRAWN).build().second[0]
+
+        assertThrows<BookNotFoundException> { bookService.getActiveBook(book.resourceId) }
     }
 
     @Test
     fun `should throw an exception when getting a book which doesn't exist`() {
         val book = BookGen.book()
 
-        assertThrows<BookNotFoundException> { bookService.getBook(book.resourceId) }
+        assertThrows<BookNotFoundException> { bookService.getActiveBook(book.resourceId) }
     }
 
     @Test
@@ -90,6 +98,13 @@ class BookServiceTests @Autowired constructor(
         val response = bookService.getBook(books[0].isbn)
 
         assertThat(response).isEqualTo(ResourceWithAuthorBasicData(books[0].toBasicData(), author.toBasicData()))
+    }
+
+    @Test
+    fun `assert even book in not available status is returned`() {
+        val book = given.author.exists().withBook(status = ResourceStatus.WITHDRAWN).build().second[0]
+
+        assertDoesNotThrow { bookService.getBook(book.isbn) }
     }
 
     @Test
