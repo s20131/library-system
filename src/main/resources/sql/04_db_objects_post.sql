@@ -1,3 +1,7 @@
 CREATE INDEX available_resources_idx ON resource(id, title, author, release_date, description, series) WHERE status = 'AVAILABLE';
 
-CREATE INDEX author_index_only_idx ON author(id, first_name, last_name);
+CREATE INDEX author_covering_idx ON author(first_name, last_name) INCLUDE (id);
+
+-- CREATE INDEX book_isbn_hash_idx ON book USING HASH(isbn); -- only example as this is already unique column
+
+CREATE INDEX settings_idx ON internal.config USING GIST(settings);
